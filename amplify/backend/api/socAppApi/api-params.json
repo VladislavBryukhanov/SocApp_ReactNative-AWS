@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/api",
+            "lambdaFunction": "dbConnection",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "socAppApi",
+    "apiName": "socAppApi",
+    "functionArns": [
+        {
+            "lambdaFunction": "dbConnection"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "soc-app-env-20191024191923-authRole",
+        "unAuthRoleName": "soc-app-env-20191024191923-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "dbConnection",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}
