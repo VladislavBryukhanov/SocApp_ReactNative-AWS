@@ -12,7 +12,8 @@ export default StyleSheet.create({
     borderWidth: 1,
     flex: 1,
     marginTop: 10,
-    marginBottom: 16
+    marginBottom: 16,
+    color: Colors.light
   },
   label: {
     color: Colors.primary,

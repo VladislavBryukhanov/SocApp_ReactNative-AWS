@@ -1,12 +1,7 @@
 import React from 'react';
 import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { NavigationParams } from 'react-navigation';
-import API from '@aws-amplify/api'
-import awsConfig from '../../aws-exports';
 import styles from './styles';
-import apiParams from '../../amplify/backend/api/socAppApi/api-params.json';
-// import apiParams from '../../amplify/backend/api/api02d0d043/api-params';
 
 interface UserListProps extends NavigationParams {}
 
@@ -32,32 +27,17 @@ const mockData: User[] = [
   { id: 'q10', name: '123', avatar: mockAvatar },
 ];
 
-class UserListScreen extends React.Component<UserListProps> {
-  componentDidMount() {
-    API.configure(awsConfig);
-    const init = { // OPTIONAL
-      // headers: {}, // OPTIONAL
-      response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
-      // queryStringParameters: {  // OPTIONAL
-      //     name: 'param'
-      // },
-      body: {
-        id: 'test',
-        username: 'TEST1234'
-      }
-    };
-    API.post(apiParams.apiName, apiParams.paths[0].name, init)
+const UserListScreen: React.FC<UserListProps> = (props: UserListProps) => {
+
+  const onOpenProfile = () => {
+    props.navigation.navigate('Profile');
   }
 
-  onOpenProfile = () => {
-    this.props.navigation.navigate('Profile');
-  }
-
-  userTemplate = ({ item }: { item: User }) => {
+  const userTemplate = ({ item }: { item: User }) => {
     return (
       <TouchableNativeFeedback
         key={item.id}
-        onPress={this.onOpenProfile}
+        onPress={onOpenProfile}
       >
         <View style={styles.userContainer}>
           <Image 
@@ -70,13 +50,11 @@ class UserListScreen extends React.Component<UserListProps> {
     )
   }
 
-  render() { 
-    return (
-      <FlatList
-        data={mockData}
-        renderItem={this.userTemplate}
-      />
-    )
-  }
+  return (
+    <FlatList
+      data={mockData}
+      renderItem={userTemplate}
+    />
+  )
 }
 export default UserListScreen;
