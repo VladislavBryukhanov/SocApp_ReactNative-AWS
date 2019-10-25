@@ -9,13 +9,18 @@
     "test": "jest"
   },
   "dependencies": {
+    "@types/react-redux": "^7.1.5",
+    "@types/redux-thunk": "^2.1.0",
     "@types/uuid": "^3.4.5",
     "aws-amplify": "^1.2.3",
+    "aws-amplify-react-native": "^2.2.3",
     "react": "16.9.0",
     "react-native": "0.61.2",
     "react-native-gesture-handler": "^1.4.1",
     "react-navigation": "^4.0.10",
     "react-navigation-stack": "^1.10.2",
+    "react-redux": "^7.1.1",
+    "redux-thunk": "^2.3.0",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
@@ -26,10 +31,12 @@
     "@types/react": "16.9.0",
     "@types/react-native": "^0.60.17",
     "@types/react-test-renderer": "16.9.0",
+    "@types/redux-logger": "^3.0.7",
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
     "react-test-renderer": "16.9.0",
+    "redux-logger": "^3.0.6",
     "typescript": "^3.6.3"
   },
   "jest": {

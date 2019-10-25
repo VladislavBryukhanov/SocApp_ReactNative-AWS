@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { ScrollView, View, Text, TextInput, Button } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import styles from './styles';
+import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
+import { createUser } from '../../store/users/users.actions';
+import { User } from '../../types/user';
 
-import uuidv4 from 'uuid/v4';
-import API from '@aws-amplify/api';
-import awsConfig from '../../aws-exports';
-import apiParams from '../../amplify/backend/api/socAppApi/api-params.json';
-
-interface SignInProps extends NavigationParams {}
+interface SignInProps extends NavigationParams {
+  createUser: (user: User) => Promise<void>;
+}
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [username, setUsername] = useState('');
@@ -16,17 +17,8 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 
   const onSignIn = () => {
     props.navigation.navigate('UserList');
-
-    API.configure(awsConfig);
-    const init = {
-      response: true,
-      body: {
-        id: uuidv4(),
-        username: username
-      }
-    };
-    API.post(apiParams.apiName, apiParams.paths[0].name, init)
-  };
+    props.createUser({ username });
+  }
 
   return (
     <ScrollView style={styles.scrollView}>
@@ -54,4 +46,11 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   )
 }
 
-export default SignInScreen;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  createUser: (user: User) => dispatch(createUser(user))
+});
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(SignInScreen);
