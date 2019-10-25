@@ -61,10 +61,25 @@ const convertUrlType = (param, type) => {
   }
 }
 
+app.get(path, function(req, res) {
+  let queryParams = {
+    TableName: tableName,
+  }
+
+  dynamodb.scan(queryParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({error: 'Could not load items: ' + err});
+    } else {
+      res.json(data.Items);
+    }
+  });
+});
+
 /********************************
  * HTTP Get method for list objects *
  ********************************/
-
+// '/api/:id'
 app.get(path + hashKeyPath, function(req, res) {
   var condition = {}
   condition[partitionKeyName] = {
@@ -100,7 +115,7 @@ app.get(path + hashKeyPath, function(req, res) {
 /*****************************************
  * HTTP Get method for get single object *
  *****************************************/
-
+// '/api/object/:id/:username'
 app.get(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
   var params = {};
   if (userIdPresent && req.apiGateway) {

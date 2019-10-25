@@ -77,7 +77,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "soc-app-env-20191024191923-deployment",
-					"S3Key": "amplify-builds/dbConnection-6f4f6c4b735056686365-build.zip"
+					"S3Key": "amplify-builds/dbConnection-43334442443075506531-build.zip"
 				}
 			}
 		},

@@ -1,12 +1,11 @@
 import React from 'react';
 import { ScrollView, Image, Text } from 'react-native';
-
-const mockAvatar = 'https://cdn4.iconfinder.com/data/icons/men-avatars-icons-set-2/256/4-512.png';
+import defaultAvatar from '../../assets/icons/user.png';
 
 const ProfileScreen: React.FC = () => (
   <ScrollView>
     <Image
-      source={{ uri: mockAvatar }}
+      source={ defaultAvatar }
     />
     <Text>
       Username

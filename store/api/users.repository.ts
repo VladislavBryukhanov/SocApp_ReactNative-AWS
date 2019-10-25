@@ -1,30 +1,18 @@
 import { User } from '../../types/user';
+import { ApiInstance } from './api';
 
-import uuidv4 from 'uuid/v4';
-import API, { APIClass } from '@aws-amplify/api';
-import awsConfig from '../../aws-exports';
-import apiParams from '../../amplify/backend/api/socAppApi/api-params.json';
-// import AWS from 'aws-sdk/aws-sdk-react-native';
-
-API.configure(awsConfig);
-
-
+const api = new ApiInstance();
 
 export class UsersRepository {
-  static list() {
-
+  
+  static async list(): Promise<User[]> {
+    return await api.get()
+      .then(res => res.data);
   }
 
-  static create(user: User) {
-    const init = {
-      response: true,
-      body: {
-        ...user,
-        id: uuidv4()
-      }
-    };
-
-    return API.post(apiParams.apiName, apiParams.paths[0].name, init);
+  static async create(user: User): Promise<User> {
+    const { config: { data: newUser } } = await api.post<User>(user);
+    return JSON.parse(newUser);
   }
 
   static update() {

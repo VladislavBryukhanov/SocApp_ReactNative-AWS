@@ -1,42 +1,41 @@
 import React from 'react';
 import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-native';
 import { NavigationParams } from 'react-navigation';
+import { connect } from 'react-redux';
+import { AppState } from 'store';
+import { Dispatch } from 'redux';
+import { fetchUsers } from '../../store/users/users.actions';
+import { User } from '../../types/user';
 import styles from './styles';
-import { User } from 'types/user';
+import defaultAvatar from '../../assets/icons/user.png';
 
-interface UserListProps extends NavigationParams {}
+interface UserListProps extends NavigationParams {
+  userList: User[];
+  fetchUsers: () => Promise<void>;
+}
 
-const mockAvatar = 'https://cdn4.iconfinder.com/data/icons/men-avatars-icons-set-2/256/4-512.png';
-// const mockAvatar = 'https://facebook.github.io/react/logo-og.png';
-
-const mockData: User[] = [
-  { id: 'q1', username: '123', avatar: mockAvatar },
-  { id: 'q2', username: '123', avatar: mockAvatar },
-  { id: 'q3', username: '123', avatar: mockAvatar },
-  { id: 'q4', username: '123', avatar: mockAvatar },
-  { id: 'q5', username: '123', avatar: mockAvatar },
-  { id: 'q6', username: '123', avatar: mockAvatar },
-  { id: 'q7', username: '123', avatar: mockAvatar },
-  { id: 'q8', username: '123', avatar: mockAvatar },
-  { id: 'q9', username: '123', avatar: mockAvatar },
-  { id: 'q10', username: '123', avatar: mockAvatar },
-];
-
-const UserListScreen: React.FC<UserListProps> = (props: UserListProps) => {
-
-  const onOpenProfile = () => {
-    props.navigation.navigate('Profile');
+class UserListScreen extends React.Component<UserListProps> {
+  componentDidMount() {
+    this.props.fetchUsers();
   }
 
-  const userTemplate = ({ item }: { item: User }) => {
+  onOpenProfile = () => {
+    this.props.navigation.navigate('Profile');
+  }
+
+  userTemplate = ({ item }: { item: User }) => {
+    const avatar = item.avatar
+      ? { uri: item.avatar } 
+      : defaultAvatar;
+
     return (
       <TouchableNativeFeedback
-        key={item.id}
-        onPress={onOpenProfile}
+        key={item.id!}
+        onPress={this.onOpenProfile}
       >
         <View style={styles.userContainer}>
           <Image 
-            source={{ uri: item.avatar }}
+            source={ avatar }
             style={styles.avatar}
           />
           <Text style={styles.username}>{item.username}</Text>
@@ -45,11 +44,25 @@ const UserListScreen: React.FC<UserListProps> = (props: UserListProps) => {
     )
   }
 
-  return (
-    <FlatList
-      data={mockData}
-      renderItem={userTemplate}
-    />
-  )
+  render() {
+    return (
+      <FlatList
+        data={this.props.userList}
+        renderItem={this.userTemplate}
+      />
+    )
+  }
 }
-export default UserListScreen;
+
+const mapStateToProps = (store: AppState) => ({
+  userList: store.userStore.users
+});
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  fetchUsers: () => dispatch(fetchUsers())
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UserListScreen);

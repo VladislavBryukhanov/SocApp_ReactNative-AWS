@@ -1,5 +1,5 @@
-import { User } from 'types/user';
 import { Action } from 'redux';
+import { User } from '../../types/user';
 import { FETCH_USERS, CREATE_USER } from '../action-types';
 
 interface IUserState {
@@ -7,7 +7,12 @@ interface IUserState {
 }
 
 interface IUserAction extends Action {
-  payload: IUserState
+  payload: {
+    fetchedUsers?: User[],
+    newUser?: User,
+    // updateUser?: User,
+    // deletedUser?: User
+  }
 }
 
 const initState: IUserState = {
@@ -20,14 +25,14 @@ export const usersReducer = (state = initState, action: IUserAction): IUserState
       return {
         users: [
           ...state.users,
-          ...action.payload.users
+          ...action.payload.fetchedUsers!
         ]
       };
     case CREATE_USER:
       return {
         users: [
           ...state.users,
-          ...action.payload.users
+          action.payload.newUser!
         ]
       }
 
