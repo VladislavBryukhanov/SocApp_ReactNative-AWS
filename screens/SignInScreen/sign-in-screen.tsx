@@ -21,7 +21,10 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   }
 
   return (
-    <ScrollView style={styles.scrollView}>
+    <ScrollView
+      keyboardShouldPersistTaps='handled'
+      style={styles.scrollView}
+    >
 
       <View style={styles.authForm}>
         <Text style={styles.label}>

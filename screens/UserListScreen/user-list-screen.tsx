@@ -19,8 +19,11 @@ class UserListScreen extends React.Component<UserListProps> {
     this.props.fetchUsers();
   }
 
-  onOpenProfile = () => {
-    this.props.navigation.navigate('Profile');
+  onOpenProfile = (user: User) => {
+    this.props.navigation.navigate(
+      'Profile',
+      { user }
+    );
   }
 
   userTemplate = ({ item }: { item: User }) => {
@@ -31,7 +34,7 @@ class UserListScreen extends React.Component<UserListProps> {
     return (
       <TouchableNativeFeedback
         key={item.id!}
-        onPress={this.onOpenProfile}
+        onPress={() => this.onOpenProfile(item)}
       >
         <View style={styles.userContainer}>
           <Image 
