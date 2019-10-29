@@ -1,8 +1,9 @@
 import { Dispatch } from "redux";
-import { User } from '../../types/user';
-import { UsersRepository } from "../api/users.repository";
+import { Credentials } from '../../types/user';
+import { UsersRepository } from "../../api/users.repository";
 import { CREATE_USER } from "../../store/action-types";
 import { FETCH_USERS } from '../action-types';
+import errorHandler from "../../store/errorHandler";
 
 export const fetchUsers = (): any => (
   async (dispatch: Dispatch) => {
@@ -15,13 +16,12 @@ export const fetchUsers = (): any => (
         }
       });
     } catch (err) {
-      console.log('ERROR HANDLING...')
-      console.log(err)
+      errorHandler(err);
     }
   }
 )
 
-export const createUser = (user: User): any => (
+export const createUser = (user: Credentials): any => (
   async (dispatch: Dispatch) => {
     try {
       const newUser = await UsersRepository.create(user);
@@ -30,8 +30,7 @@ export const createUser = (user: User): any => (
         payload: { newUser }
       });
     } catch (err) {
-        console.log('ERROR HANDLING...')
-        console.log(err)
+      errorHandler(err);
     }
   }
 )

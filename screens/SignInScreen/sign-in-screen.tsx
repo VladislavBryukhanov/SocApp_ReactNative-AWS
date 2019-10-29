@@ -5,19 +5,23 @@ import styles from './styles';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { createUser } from '../../store/users/users.actions';
-import { User } from '../../types/user';
+import { Credentials } from '../../types/user';
+import { Auth } from '../../api/auth';
 
 interface SignInProps extends NavigationParams {
-  createUser: (user: User) => Promise<void>;
+  createUser: (user: Credentials) => Promise<void>;
 }
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onSignIn = () => {
-    props.navigation.navigate('UserList');
-    props.createUser({ username });
+  const onSignIn = async () => {
+    // await props.createUser({ email, password });
+    // props.navigation.navigate('UserList');
+    const auth = new Auth();
+    await auth.signUp(email, password);
+    // await auth.confirmEmail(code);
   }
 
   return (
@@ -28,18 +32,19 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 
       <View style={styles.authForm}>
         <Text style={styles.label}>
-          Login
+          Email
         </Text>
         <TextInput 
           style={styles.textInput}
-          value={username}
-          onChangeText={(text: string) => setUsername(text)}/>
+          value={email}
+          onChangeText={(text: string) => setEmail(text)}/>
 
         <Text style={styles.label}>
           Password
         </Text>
         <TextInput 
           style={styles.textInput}
+          secureTextEntry={true}
           value={password}
           onChangeText={(text: string) => setPassword(text)}/>
       </View>
@@ -50,7 +55,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  createUser: (user: User) => dispatch(createUser(user))
+  createUser: (user: Credentials) => dispatch(createUser(user))
 });
 
 export default connect(

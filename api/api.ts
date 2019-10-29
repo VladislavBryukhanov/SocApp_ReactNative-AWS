@@ -1,7 +1,7 @@
 import uuidv4 from 'uuid/v4';
 import API from '@aws-amplify/api';
-import awsConfig from '../../aws-exports';
-import apiParams from '../../amplify/backend/api/socAppApi/api-params.json';
+import awsConfig from '../aws-exports';
+import apiParams from '../amplify/backend/api/socAppApi/api-params.json';
 
 API.configure(awsConfig);
 

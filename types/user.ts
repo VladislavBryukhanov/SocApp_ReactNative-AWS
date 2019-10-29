@@ -1,5 +1,10 @@
-export type User = {
+export interface User extends Credentials {
   id?: string;
-  username: string;
+  email: string;
   avatar?: string;
 };
+
+export type Credentials = {
+  email: string;
+  password: string;
+}
