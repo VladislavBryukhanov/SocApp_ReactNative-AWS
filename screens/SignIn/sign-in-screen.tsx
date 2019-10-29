@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, TextInput, Button } from 'react-native';
+import { ScrollView, View, Button, Text } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import styles from './styles';
 import { connect } from 'react-redux';
@@ -7,21 +7,23 @@ import { Dispatch } from 'redux';
 import { createUser } from '../../store/users/users.actions';
 import { Credentials } from '../../types/user';
 import { Auth } from '../../api/auth';
+import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
 
 interface SignInProps extends NavigationParams {
-  createUser: (user: Credentials) => Promise<void>;
+  // createUser: (user: Credentials) => Promise<void>;
 }
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onSignIn = async () => {
-    // await props.createUser({ email, password });
-    // props.navigation.navigate('UserList');
-    const auth = new Auth();
-    await auth.signUp(email, password);
-    // await auth.confirmEmail(code);
+  const onSignIn = () => {
+    Auth.signIn({ email, password })
+      .then(() => props.navigation.navigate('UserList'));
+  }
+
+  const goToSignUp = () => {
+    props.navigation.navigate('SignUp');
   }
 
   return (
@@ -31,25 +33,26 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
     >
 
       <View style={styles.authForm}>
-        <Text style={styles.label}>
-          Email
-        </Text>
-        <TextInput 
-          style={styles.textInput}
+        <BasicTextField
+          label='Email'
           value={email}
-          onChangeText={(text: string) => setEmail(text)}/>
+          onChangeText={(text: string) => setEmail(text)}
+        />
 
-        <Text style={styles.label}>
-          Password
-        </Text>
-        <TextInput 
-          style={styles.textInput}
-          secureTextEntry={true}
+        <BasicTextField
+          label='Password'
           value={password}
-          onChangeText={(text: string) => setPassword(text)}/>
+          secureTextEntry={true}
+          onChangeText={(text: string) => setPassword(text)}
+        />
       </View>
       
       <Button title="Sign in" onPress={onSignIn}/>
+      
+      <Text onPress={goToSignUp} style={styles.linkButton}>
+        Sign up
+      </Text>
+      
     </ScrollView>
   )
 }

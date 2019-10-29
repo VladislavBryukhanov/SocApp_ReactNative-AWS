@@ -1,15 +1,22 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
-import SignInScreen from './screens/SignInScreen/sign-in-screen';
-import UserListScreen from './screens/UserListScreen/user-list-screen';
-import ProfileScreen from './screens/ProfileScreen/profile-screen';
+import SignInScreen from './screens/SignIn/sign-in-screen';
+import UserListScreen from './screens/UserList/user-list-screen';
+import ProfileScreen from './screens/Profile/profile-screen';
+import signUpScreen from './screens/SignUp/sign-up-screen';
 
 const ScreenNavigation = createStackNavigator({
   Home: { 
     screen: SignInScreen,
     navigationOptions: {
       header: null
+    }
+  },
+  SignUp: { 
+    screen: signUpScreen,
+    navigationOptions: {
+      title: 'Sign up'
     }
   },
   UserList: { 
