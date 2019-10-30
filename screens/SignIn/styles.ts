@@ -10,7 +10,7 @@ export default StyleSheet.create({
   linkButton: {
     color: Colors.primary,
     marginTop: 26,
-    fontSize: 13,
+    fontSize: 14,
     textAlign: 'center',
     textTransform: 'uppercase'
   },

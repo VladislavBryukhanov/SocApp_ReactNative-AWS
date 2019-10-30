@@ -17,9 +17,11 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const onSignIn = () => {
-    Auth.signIn({ email, password })
-      .then(() => props.navigation.navigate('UserList'));
+  const onSignIn = async () => {
+    const user = await Auth.signIn({ email, password });
+    if (user) {
+      props.navigation.navigate('UserList');
+    }
   }
 
   const goToSignUp = () => {
