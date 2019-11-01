@@ -7,13 +7,6 @@ export default StyleSheet.create({
     backgroundColor: Colors.dark,
     // alignItems: center
   },
-  linkButton: {
-    color: Colors.primary,
-    marginTop: 26,
-    fontSize: 14,
-    textAlign: 'center',
-    textTransform: 'uppercase'
-  },
   authForm: {
     marginBottom: 26
   }

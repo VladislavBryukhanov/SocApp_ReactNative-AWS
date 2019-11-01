@@ -2,11 +2,11 @@ import { Action } from 'redux';
 import { User } from '../../types/user';
 import { FETCH_USERS, CREATE_USER } from '../action-types';
 
-interface IUserState {
+interface UserState {
   users: User[]
 }
 
-interface IUserAction extends Action {
+interface UserAction extends Action {
   payload: {
     fetchedUsers?: User[],
     newUser?: User,
@@ -15,11 +15,11 @@ interface IUserAction extends Action {
   }
 }
 
-const initState: IUserState = {
+const initState: UserState = {
   users: []
 };
 
-export const usersReducer = (state = initState, action: IUserAction): IUserState => {
+export const usersReducer = (state = initState, action: UserAction): UserState => {
   switch(action.type) {
     case FETCH_USERS:
       return {

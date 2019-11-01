@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { ScrollView, View, Button, Text } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import styles from './styles';
+import baseStyles from '../../components/base.styles';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { createUser } from '../../store/users/users.actions';
 import { Credentials } from '../../types/user';
-import { Auth } from '../../api/auth';
 import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
+import { signIn } from '../../store/auth/auth.actions';
 
 interface SignInProps extends NavigationParams {
-  // createUser: (user: Credentials) => Promise<void>;
+  signIn: (user: Credentials) => Promise<boolean>;
 }
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
@@ -18,7 +18,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [password, setPassword] = useState('');
 
   const onSignIn = async () => {
-    const user = await Auth.signIn({ email, password });
+    const user = await props.signIn({ email, password });
     if (user) {
       props.navigation.navigate('UserList');
     }
@@ -51,7 +51,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
       
       <Button title="Sign in" onPress={onSignIn}/>
       
-      <Text onPress={goToSignUp} style={styles.linkButton}>
+      <Text onPress={goToSignUp} style={baseStyles.linkButton}>
         Sign up
       </Text>
       
@@ -60,7 +60,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  createUser: (user: Credentials) => dispatch(createUser(user))
+  signIn: (credentials: Credentials) => dispatch(signIn(credentials)),
 });
 
 export default connect(
