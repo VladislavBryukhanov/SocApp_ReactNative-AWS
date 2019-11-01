@@ -1,21 +1,16 @@
 import React from 'react';
-import { ScrollView, View, Button, Alert } from 'react-native';
+import { ScrollView, View, Button } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
+import { Dispatch, compose } from 'redux';
 import styles from './styles';
-import { createUser } from '../../store/users/users.actions';
 import { Credentials } from '../../types/user';
 import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
 import { ToastAndroid } from 'react-native';
 import { signUp } from '../../store/auth/auth.actions';
-import { ModalComponent } from '../../store/modal/modal.reducer';
-import { openModal } from '../../store/modal/modal.actions';
-import { closeModal } from '../../store/modal/modal.actions';
-import SignUpConfirmation from '../../components/sign-up-confirmation-code/sign-up-confirmation-code.component';
+import { AuthComponentProps, withEmailConfirmation } from '../../wrappers/withEmailConfirmation';
 
-interface SignUpProps extends NavigationParams {
-  createUser: (user: Credentials) => Promise<void>;
+interface SignUpProps extends NavigationParams, AuthComponentProps {
   signUp: (user: Credentials, onUserExistsHandler?: Function) => Promise<boolean>;
 }
 
@@ -45,7 +40,10 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     );
 
     if(user) {
-      this.confirmRegistration();
+      this.props.confirmRegistration(
+        { email, password },
+        'Confirmation code sent to your inbox, please check it and input code'
+      );
     }
   }
 
@@ -54,34 +52,7 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     this.props.navigation.navigate('SignIn');
   }
 
-  confirmRegistration = () => {
-    const { email, password } = this.state;
-    const confirmRegistrationDialog = (
-      <SignUpConfirmation
-        credentials={{ email, password }}
-        onComplete={this.onRegestrationComplete}
-      />
-    )
-
-    Alert.alert(
-      'Complete registration',
-      'Confirmation code sent to your inbox, please check it and input code',
-      [{
-        text: 'Ok',
-        onPress: () => this.props.openModal(confirmRegistrationDialog)
-      }],
-      {cancelable: false}
-    )
-  }
-
-  onRegestrationComplete = async () => {
-    const { email, password } = this.state;
-    
-    await this.props.createUser({ email, password });
-    this.props.closeModal();
-    this.props.navigation.navigate('UserList');
-  }
-
+ 
   render() {
     const { email, password, confirmPassword } = this.state;
 
@@ -121,13 +92,10 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  createUser: (user: Credentials) => dispatch(createUser(user)),
   signUp: (user: Credentials, onUserExistsHandler?: Function) => dispatch(signUp(user, onUserExistsHandler)),
-  openModal: (element: ModalComponent) => dispatch(openModal(element)),
-  closeModal: () => dispatch(closeModal())
 });
 
-export default connect(
-  null,
-  mapDispatchToProps
+export default compose(
+  connect(null, mapDispatchToProps),
+  withEmailConfirmation
 )(SignUpScreen);

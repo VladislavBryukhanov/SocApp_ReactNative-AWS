@@ -4,13 +4,14 @@ import { NavigationParams } from 'react-navigation';
 import styles from './styles';
 import baseStyles from '../../components/base.styles';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
+import { Dispatch, compose } from 'redux';
 import { Credentials } from '../../types/user';
 import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
 import { signIn } from '../../store/auth/auth.actions';
+import { withEmailConfirmation, AuthComponentProps } from '../../wrappers/withEmailConfirmation';
 
-interface SignInProps extends NavigationParams {
-  signIn: (user: Credentials) => Promise<boolean>;
+interface SignInProps extends NavigationParams, AuthComponentProps {
+  signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
 }
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
@@ -18,10 +19,17 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [password, setPassword] = useState('');
 
   const onSignIn = async () => {
-    const user = await props.signIn({ email, password });
+    const user = await props.signIn({ email, password }, onUserIsNotConfirmedHandler);
     if (user) {
       props.navigation.navigate('UserList');
     }
+  }
+
+  const onUserIsNotConfirmedHandler = () => {
+    props.confirmRegistration(
+      { email, password },
+      'You still doesn\'t confirm your email, please check your inbox and input code'
+    );
   }
 
   const goToSignUp = () => {
@@ -60,10 +68,11 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  signIn: (credentials: Credentials) => dispatch(signIn(credentials)),
+  signIn: (credentials: Credentials, confirmationExceptionHandler?: Function) => 
+    dispatch(signIn(credentials, confirmationExceptionHandler)),
 });
 
-export default connect(
-  null,
-  mapDispatchToProps
+export default compose(
+  connect(null, mapDispatchToProps),
+  withEmailConfirmation
 )(SignInScreen);

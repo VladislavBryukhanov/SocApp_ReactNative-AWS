@@ -3,24 +3,25 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Modal, View, ModalProps } from 'react-native';
 import { connect } from 'react-redux';
 import { AppState } from '../../store';
+import { closeModal } from '../../store/modal/modal.actions';
 import styles from './styles';
+import { Dispatch } from 'redux';
 
 interface ModalDialogProps extends ModalProps {
-  displayedDialog?: React.ReactNode,
-  onClose: () => void
+  displayedDialog?: React.ReactNode;
+  closeModal: () => void;
 }
 
 const ModalDialog = (props: ModalDialogProps) => (
   <>
-    {props.displayedDialog && (
+    { props.displayedDialog && (
       <Modal {...props}>
         <View style={styles.modal}>
           <Icon 
             name="close"
             style={styles.closeButton}
-            onPress={props.onClose}
+            onPress={props.closeModal}
           />
-          
           {props.displayedDialog}
         </View>
       </Modal>
@@ -37,6 +38,11 @@ const mapStateToProps = (store: AppState) => {
   }
 };
 
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  closeModal: () => dispatch(closeModal())
+})
+
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(ModalDialog);
