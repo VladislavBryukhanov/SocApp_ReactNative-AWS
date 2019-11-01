@@ -4,7 +4,7 @@ import { Credentials } from "../../types/user";
 import errorHandler from '../errorHandler';
 import { SIGN_IN, SIGN_UP, CONFIRM_EMAIL, RESEND_CONFIRMATION_CODE } from "../action-types";
 
-export const signIn = (credentials: Credentials): any => (
+export const signIn = (credentials: Credentials, confirmationExceptionHandler?: Function): any => (
   async (dispatch: Dispatch) => {
     try {
       const user = await Auth.signIn(credentials);
@@ -17,10 +17,9 @@ export const signIn = (credentials: Credentials): any => (
 
       return true;
     } catch (err) {
-      // this exception should be reacted in component
       if (err.code === USER_IS_NOT_CONFIRMED_EXCEPTION) {
-        throw err;
-        // TODO open confirmation dialog
+        confirmationExceptionHandler ? 
+          confirmationExceptionHandler() : errorHandler(err);;
       } else {
         errorHandler(err);
       }
@@ -28,7 +27,7 @@ export const signIn = (credentials: Credentials): any => (
   }
 )
 
-export const signUp = (credentials: Credentials): any => (
+export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Function): any => (
   async (dispatch: Dispatch) => {
     try {
       const { user } = await Auth.signUp(credentials);
@@ -41,10 +40,9 @@ export const signUp = (credentials: Credentials): any => (
 
       return true;
     } catch (err) {
-      // this exception should be reacted in component
       if (err.code === USER_ALREADY_EXISTS_EXCEPTION) {
-        throw err;
-        // TODO redirect to sign in screen
+        userExistsExceptionHandler ? 
+          userExistsExceptionHandler() : errorHandler(err);
       } else {
         errorHandler(err);
       }

@@ -7,21 +7,22 @@ import styles from './styles';
 import { createUser } from '../../store/users/users.actions';
 import { Credentials } from '../../types/user';
 import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
-import SignUpConfirmation from '../../components/sign-up-confirmation-code/sign-up-confirmation-code.component';
-import { ModalDialog } from '../../components/modal-dialog/modal-dialog.component';
 import { ToastAndroid } from 'react-native';
 import { signUp } from '../../store/auth/auth.actions';
+import { ModalComponent } from '../../store/modal/modal.reducer';
+import { openModal } from '../../store/modal/modal.actions';
+import { closeModal } from '../../store/modal/modal.actions';
+import SignUpConfirmation from '../../components/sign-up-confirmation-code/sign-up-confirmation-code.component';
 
 interface SignUpProps extends NavigationParams {
   createUser: (user: Credentials) => Promise<void>;
-  signUp: (user: Credentials) => Promise<boolean>;
+  signUp: (user: Credentials, onUserExistsHandler?: Function) => Promise<boolean>;
 }
 
 interface SignUpState {
   email: string,
   password: string;
   confirmPassword: string;
-  isConfirmation: boolean;
 }
 
 class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
@@ -29,7 +30,6 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     email: 'messagebotforsite@gmail.com',
     password: 'P@ssw0rd',
     confirmPassword: 'P@ssw0rd',
-    isConfirmation: false
   }
 
   onSignUp = async () => {
@@ -39,19 +39,36 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
       return ToastAndroid.show('The passwords do not match', ToastAndroid.LONG);
     }
 
-    const user = await this.props.signUp({ email, password });
+    const user = await this.props.signUp(
+      { email, password },
+      this.onUserExistsHandler
+    );
+
     if(user) {
       this.confirmRegistration();
     }
   }
 
+  onUserExistsHandler = () => {
+    ToastAndroid.show('User already exists, please try to sign in', ToastAndroid.LONG);
+    this.props.navigation.navigate('SignIn');
+  }
+
   confirmRegistration = () => {
+    const { email, password } = this.state;
+    const confirmRegistrationDialog = (
+      <SignUpConfirmation
+        credentials={{ email, password }}
+        onComplete={this.onRegestrationComplete}
+      />
+    )
+
     Alert.alert(
       'Complete registration',
       'Confirmation code sent to your inbox, please check it and input code',
       [{
         text: 'Ok',
-        onPress: () => this.setState({ isConfirmation: true })
+        onPress: () => this.props.openModal(confirmRegistrationDialog)
       }],
       {cancelable: false}
     )
@@ -61,30 +78,15 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     const { email, password } = this.state;
     
     await this.props.createUser({ email, password });
-    this.setState({ isConfirmation: false });
+    this.props.closeModal();
     this.props.navigation.navigate('UserList');
   }
 
-  onCloseModal = () => this.setState({ isConfirmation: false })
-
   render() {
-    const { isConfirmation, email, password, confirmPassword } = this.state;
+    const { email, password, confirmPassword } = this.state;
 
     return (
       <>
-        { isConfirmation && (
-          <ModalDialog
-            visible={isConfirmation}
-            animationType={"slide"}
-            onClose={this.onCloseModal}
-          >
-            <SignUpConfirmation 
-              credentials={{ email, password }}
-              onComplete={this.onRegestrationComplete}
-            />
-          </ModalDialog>
-        )}
-  
         <ScrollView
           keyboardShouldPersistTaps='handled'
           style={styles.scrollView}
@@ -120,7 +122,9 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   createUser: (user: Credentials) => dispatch(createUser(user)),
-  signUp: (user: Credentials) => dispatch(signUp(user))
+  signUp: (user: Credentials, onUserExistsHandler?: Function) => dispatch(signUp(user, onUserExistsHandler)),
+  openModal: (element: ModalComponent) => dispatch(openModal(element)),
+  closeModal: () => dispatch(closeModal())
 });
 
 export default connect(

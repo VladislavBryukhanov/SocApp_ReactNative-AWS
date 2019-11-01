@@ -58,7 +58,7 @@ class UserListScreen extends React.Component<UserListProps> {
 }
 
 const mapStateToProps = (store: AppState) => ({
-  userList: store.userStore.users
+  userList: store.usersModule.users
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
