@@ -4,21 +4,43 @@ import {
   ISignUpResult,
   CognitoUser,
   AuthenticationDetails,
-  NodeCallback
+  NodeCallback,
+  CognitoUserSession
 } from 'amazon-cognito-identity-js';
 import { Credentials } from '../types/user';
 import { promisify } from 'es6-promisify';
+import awsmobile from '../aws-exports';
 
 export const USER_IS_NOT_CONFIRMED_EXCEPTION = 'UserNotConfirmedException';
 export const USER_ALREADY_EXISTS_EXCEPTION = 'UsernameExistsException';
 
 const poolData = {
-  UserPoolId: 'us-east-1_0lmVJyP6m',
-  ClientId: '550die4add4qtkaqql3eqce3cu'
+  UserPoolId: awsmobile.aws_user_pools_id,
+  ClientId: awsmobile.aws_user_pools_web_client_id
 };
 const userPool = new CognitoUserPool(poolData);
 
 export class Auth {
+  static async getAwsConfigCredentials() {
+    const awsIdentityLogin = `cognito-idp.${awsmobile.aws_cognito_region}.amazonaws.com/${awsmobile.aws_user_pools_id}`;
+
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+      const getSession = promisify(
+        (callback) => cognitoUser.getSession(callback)
+      );
+      const session = await getSession();
+      if (session instanceof CognitoUserSession) {
+        return {
+          IdentityPoolId: awsmobile.aws_cognito_identity_pool_id,
+          Logins: {
+            [awsIdentityLogin]: session.getIdToken().getJwtToken()
+          }
+        }
+      }
+    }
+  }
+
   static initCognitoUser(email: string) {
     const userData = {
       Username: email,

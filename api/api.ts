@@ -6,13 +6,13 @@ import apiParams from '../amplify/backend/api/socAppApi/api-params.json';
 API.configure(awsConfig);
 
 export class ApiInstance {
-  config = {
+  apiConfig = {
     apiName: apiParams.apiName,
     path: apiParams.paths[0].name
   };
 
   constructor(config?: any) {
-    this.config = config || this.config;
+    this.apiConfig = config || this.apiConfig;
   }
 
   get(): Promise<any> {
@@ -21,8 +21,8 @@ export class ApiInstance {
     };
     
     return API.get(
-      this.config.apiName,
-      this.config.path,
+      this.apiConfig.apiName,
+      this.apiConfig.path,
       request
     );
   }
@@ -37,8 +37,8 @@ export class ApiInstance {
     };
 
     return API.post(
-      this.config.apiName,
-      this.config.path,
+      this.apiConfig.apiName,
+      this.apiConfig.path,
       request
     );
   }

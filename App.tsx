@@ -7,7 +7,6 @@ import UserListScreen from './screens/UserList/user-list-screen';
 import ProfileScreen from './screens/Profile/profile-screen';
 import SignUpScreen from './screens/SignUp/sign-up-screen';
 import ModalDialog from './components/modal-dialog/modal-dialog.component';
-import { View } from 'react-native';
 
 const ScreenNavigation = createStackNavigator({
   SignIn: { 

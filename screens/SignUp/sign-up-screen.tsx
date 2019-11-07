@@ -22,9 +22,9 @@ interface SignUpState {
 
 class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
   state = {
-    email: 'messagebotforsite@gmail.com',
-    password: 'P@ssw0rd',
-    confirmPassword: 'P@ssw0rd',
+    email: '',
+    password: '',
+    confirmPassword: '',
   }
 
   onSignUp = async () => {
