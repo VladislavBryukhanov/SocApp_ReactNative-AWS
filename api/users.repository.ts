@@ -1,5 +1,6 @@
 import { User } from '../types/user';
 import { DatabaseInstance } from './database';
+import normilizeResponse from '../utils/NormilizeDynamoDbResponse';
 
 const dynamoDb = new DatabaseInstance();
 
@@ -15,8 +16,8 @@ export class UsersRepository {
     };
 
     return await dynamoDb.get(params)
-      .then(res => res.Items) as User[];
-      
+      .then(res => normilizeResponse<User>(res));
+
     // return await api.get()
       // .then(res => res.data);
   }
@@ -24,6 +25,9 @@ export class UsersRepository {
   static async create(user: User): Promise<User> {
     // const { config: { data: newUser } } = await api.post<User>(user);
     // return JSON.parse(newUser);
+
+    return await dynamoDb.post(params, user)
+      .then(res => normilizeResponse<User>(res));
   }
 
   static update() {

@@ -1,7 +1,10 @@
 export interface User extends Credentials {
   id?: string;
-  email: string;
+  username: string;
+  nickname?: string;
   avatar?: string;
+  bio?: string;
+  age? :number;
 };
 
 export type Credentials = {

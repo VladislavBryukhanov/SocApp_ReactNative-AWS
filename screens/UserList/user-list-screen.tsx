@@ -38,7 +38,7 @@ class UserListScreen extends React.Component<UserListProps> {
       >
         <View style={styles.userContainer}>
           <Image 
-            source={ avatar }
+            source={avatar}
             style={styles.avatar}
           />
           <Text style={styles.username}>{item.username}</Text>
