@@ -13,5 +13,9 @@ export default StyleSheet.create({
   label: {
     color: Colors.primary,
     fontSize: 16,
+  },
+  description: {
+    fontSize: 14,
+    color: Colors.light,
   }
 });

@@ -4,12 +4,10 @@ import { Alert } from 'react-native';
 import { Credentials } from '../types/user';
 import { Dispatch } from 'redux';
 import { openModal, closeModal } from '../store/modal/modal.actions';
-import { createUser } from '../store/users/users.actions';
 import { connect } from 'react-redux';
 import { NavigationParams } from 'react-navigation';
 
 export interface AuthComponentProps extends NavigationParams {
-  createUser: (user: Credentials) => Promise<void>;
   openModal: (element: React.ReactNode) => void;
   closeModal: () => void;
 
@@ -26,7 +24,7 @@ export const withEmailConfirmation = <P extends object>(Component: React.Compone
           credentials={credentials}
           onComplete={this.onRegestrationComplete}
         />
-      )
+      );
 
       Alert.alert(
         'Complete registration',
@@ -39,10 +37,9 @@ export const withEmailConfirmation = <P extends object>(Component: React.Compone
       )
     }
 
-    onRegestrationComplete = async (credentials: Credentials) => {
-      await this.props.createUser(credentials);
+    onRegestrationComplete = () => {
       this.props.closeModal();
-      this.props.navigation.navigate('UserList');
+      this.props.navigation.navigate('App');
     }
     
     render() {
@@ -54,7 +51,6 @@ export const withEmailConfirmation = <P extends object>(Component: React.Compone
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  createUser: (user: Credentials) => dispatch(createUser(user)),
   openModal: (element: React.ReactNode) => dispatch(openModal(element)),
   closeModal: () => dispatch(closeModal())
 });

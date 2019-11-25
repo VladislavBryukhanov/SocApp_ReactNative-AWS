@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-native';
-import { NavigationParams } from 'react-navigation';
+import { NavigationParams, NavigationActions, StackActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import { AppState } from 'store';
 import { Dispatch } from 'redux';
@@ -16,7 +16,9 @@ interface UserListProps extends NavigationParams {
 
 class UserListScreen extends React.Component<UserListProps> {
   componentDidMount() {
-    this.props.fetchUsers();
+    if (!this.props.userList.length) {
+      this.props.fetchUsers();
+    }
   }
 
   onOpenProfile = (user: User) => {

@@ -1,5 +1,5 @@
 import { Dispatch } from "redux";
-import { Credentials } from '../../types/user';
+import { User } from '../../types/user';
 import { UsersRepository } from "../../api/users.repository";
 import { CREATE_USER } from "../../store/action-types";
 import { FETCH_USERS } from '../action-types';
@@ -21,7 +21,7 @@ export const fetchUsers = (): any => (
   }
 )
 
-export const createUser = (user: Credentials): any => (
+export const createUser = (user: User): any => (
   async (dispatch: Dispatch) => {
     try {
       const newUser = await UsersRepository.create(user);

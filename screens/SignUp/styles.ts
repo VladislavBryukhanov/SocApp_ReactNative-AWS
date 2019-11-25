@@ -21,5 +21,8 @@ export default StyleSheet.create({
   },
   authForm: {
     marginBottom: 22
+  },
+  signUpBtn: {
+    marginBottom: 42
   }
 });

@@ -10,6 +10,13 @@ import {
 import { Credentials } from '../types/user';
 import { promisify } from 'es6-promisify';
 import awsmobile from '../aws-exports';
+import { CognitoIdentityCredentials } from 'aws-sdk';
+import { Auth } from 'aws-amplify';
+
+interface ISignInResult {
+  session: CognitoUserSession,
+  userConfirmationNecessary?: boolean
+}
 
 export const USER_IS_NOT_CONFIRMED_EXCEPTION = 'UserNotConfirmedException';
 export const USER_ALREADY_EXISTS_EXCEPTION = 'UsernameExistsException';
@@ -20,8 +27,16 @@ const poolData = {
 };
 const userPool = new CognitoUserPool(poolData);
 
-export class Auth {
-  static async getAwsConfigCredentials() {
+export class CognitoAuth {
+  private static initCognitoUser(email: string): CognitoUser {
+    const userData = {
+      Username: email,
+      Pool: userPool
+    };
+    return new CognitoUser(userData);
+  }
+
+  static async getAwsConfigCredentials(): Promise<CognitoIdentityCredentials.CognitoIdentityOptions | undefined> {
     const awsIdentityLogin = `cognito-idp.${awsmobile.aws_cognito_region}.amazonaws.com/${awsmobile.aws_user_pools_id}`;
 
     const cognitoUser = userPool.getCurrentUser();
@@ -41,15 +56,13 @@ export class Auth {
     }
   }
 
-  static initCognitoUser(email: string) {
-    const userData = {
-      Username: email,
-      Pool: userPool
-    };
-    return new CognitoUser(userData);
+  static retrieveAuthenticatedUser(): CognitoUser | null {
+    // return Auth.currentAuthenticatedUser();
+    const cognitoUser = userPool.getCurrentUser();
+    return cognitoUser;
   }
 
-  static signIn(credentials: Credentials) {
+  static signIn(credentials: Credentials): Promise<ISignInResult> {
     const { email, password } = credentials;
     const authDetails = new AuthenticationDetails({
       Username: email,
@@ -57,9 +70,9 @@ export class Auth {
     });
     const cognitoUser = this.initCognitoUser(email);
 
-    const signInPromise = new Promise((resolve, reject) => {
+    const signInPromise = new Promise((resolve: (session: ISignInResult) => void, reject) => {
       cognitoUser.authenticateUser(authDetails, {
-        onSuccess: resolve,
+        onSuccess: (session: CognitoUserSession, userConfirmationNecessary?: boolean) => resolve({session, userConfirmationNecessary}),
         onFailure: reject,
         mfaRequired: () => reject('MFA required')
       });

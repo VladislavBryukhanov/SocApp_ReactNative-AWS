@@ -1,14 +1,27 @@
 import { Dispatch } from "redux";
-import { Auth, USER_IS_NOT_CONFIRMED_EXCEPTION, USER_ALREADY_EXISTS_EXCEPTION } from "../../api/auth";
+import { CognitoAuth, USER_IS_NOT_CONFIRMED_EXCEPTION, USER_ALREADY_EXISTS_EXCEPTION } from "../../api/auth";
 import { Credentials } from "../../types/user";
 import errorHandler from '../errorHandler';
 import { SIGN_IN, SIGN_UP, CONFIRM_EMAIL, RESEND_CONFIRMATION_CODE } from "../action-types";
 
+export const retrieveAuthenticatedUser = (): any => (
+  async (dispatch: Dispatch) => {
+    try {
+      const user = await CognitoAuth.retrieveAuthenticatedUser();
+      console.log(user);
+
+      return user;
+    } catch (err) {
+      errorHandler(err);
+    }
+  }
+)
+
 export const signIn = (credentials: Credentials, confirmationExceptionHandler?: Function): any => (
   async (dispatch: Dispatch) => {
     try {
-      const user = await Auth.signIn(credentials);
-      console.log(user);
+      const user = await CognitoAuth.signIn(credentials);
+      // console.log(user);
 
       dispatch({
         type: SIGN_IN,
@@ -18,8 +31,9 @@ export const signIn = (credentials: Credentials, confirmationExceptionHandler?: 
       return true;
     } catch (err) {
       if (err.code === USER_IS_NOT_CONFIRMED_EXCEPTION) {
-        confirmationExceptionHandler ? 
-          confirmationExceptionHandler() : errorHandler(err);;
+        confirmationExceptionHandler 
+          ? confirmationExceptionHandler()
+          : errorHandler(err);
       } else {
         errorHandler(err);
       }
@@ -30,8 +44,8 @@ export const signIn = (credentials: Credentials, confirmationExceptionHandler?: 
 export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Function): any => (
   async (dispatch: Dispatch) => {
     try {
-      const { user } = await Auth.signUp(credentials);
-      console.log(user);
+      const { user } = await CognitoAuth.signUp(credentials);
+      // console.log(user);
 
       dispatch({
         type: SIGN_UP,
@@ -41,8 +55,9 @@ export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Fu
       return true;
     } catch (err) {
       if (err.code === USER_ALREADY_EXISTS_EXCEPTION) {
-        userExistsExceptionHandler ? 
-          userExistsExceptionHandler() : errorHandler(err);
+        userExistsExceptionHandler 
+          ? userExistsExceptionHandler()
+          : errorHandler(err);
       } else {
         errorHandler(err);
       }
@@ -53,8 +68,8 @@ export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Fu
 export const confirmEmail = (confirmationCode: string, credentials: Credentials): any => (
   async (dispatch: Dispatch) => {
     try {
-      const res = await Auth.confirmEmail(confirmationCode, credentials);
-      console.log(res);
+      const res = await CognitoAuth.confirmEmail(confirmationCode, credentials);
+      // console.log(res);
 
       dispatch({
         type: CONFIRM_EMAIL,
@@ -71,8 +86,8 @@ export const confirmEmail = (confirmationCode: string, credentials: Credentials)
 export const resendConfirmationCode = (credentials: Credentials): any => (
   async (dispatch: Dispatch) => {
     try {
-      const res = await Auth.resendConfirmationCode(credentials);
-      console.log(res);
+      const res = await CognitoAuth.resendConfirmationCode(credentials);
+      // console.log(res);
 
       dispatch({
         type: RESEND_CONFIRMATION_CODE,

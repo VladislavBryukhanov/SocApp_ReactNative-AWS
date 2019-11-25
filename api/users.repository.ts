@@ -8,14 +8,10 @@ export class UsersRepository {
   
   static async list(): Promise<User[]> {
     const params = {
-      TableName: 'localDB-env',
-      // Item: {
-      //   'CUSTOMER_ID' : {N: '001'},
-      //   'CUSTOMER_NAME' : {S: 'Richard Roe'}
-      // }
+      TableName: 'localDB-env'
     };
 
-    return await dynamoDb.get(params)
+    return await dynamoDb.scan(params)
       .then(res => normilizeResponse<User>(res));
 
     // return await api.get()
@@ -26,7 +22,7 @@ export class UsersRepository {
     // const { config: { data: newUser } } = await api.post<User>(user);
     // return JSON.parse(newUser);
 
-    return await dynamoDb.post(params, user)
+    return await dynamoDb.create(params, user)
       .then(res => normilizeResponse<User>(res));
   }
 

@@ -21,7 +21,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const onSignIn = async () => {
     const user = await props.signIn({ email, password }, onUserIsNotConfirmedHandler);
     if (user) {
-      props.navigation.navigate('UserList');
+      props.navigation.navigate('App');
     }
   }
 

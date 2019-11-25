@@ -1,6 +1,6 @@
 import AWS, { DynamoDB, AWSError } from 'aws-sdk';
 import { promisify } from 'es6-promisify';
-import { Auth } from './auth';
+import { CognitoAuth } from './auth';
 import awsmobile from '../aws-exports';
 
 export class DatabaseInstance {
@@ -8,7 +8,7 @@ export class DatabaseInstance {
 
   async getDbInstance() {
     if (!this.dynamoDb) {
-      const credentials = await Auth.getAwsConfigCredentials();
+      const credentials = await CognitoAuth.getAwsConfigCredentials();
       AWS.config.credentials = new AWS.CognitoIdentityCredentials(credentials);
       AWS.config.update({ region: awsmobile.aws_project_region });
   
@@ -20,7 +20,7 @@ export class DatabaseInstance {
     return this.dynamoDb;
   }
 
-  async get(requestParams: DynamoDB.Types.ScanInput): Promise<DynamoDB.Types.ScanOutput> {
+  async scan(requestParams: DynamoDB.Types.ScanInput): Promise<DynamoDB.Types.ScanOutput> {
     const db = await this.getDbInstance();
     const scanDb = promisify(
       (
@@ -35,6 +35,22 @@ export class DatabaseInstance {
     // const dynamodb = new AWS.DynamoDB.DocumentClient();
 
     const items = await scanDb(requestParams);
+    return items;
+  }
+
+  async create(item: DynamoDB.Types.PutItemInput) {
+    const db = await this.getDbInstance();
+    const putItem = promisify(
+      (
+        params: DynamoDB.Types.PutItemInput,
+        callback: (
+          err: AWSError,
+          data: DynamoDB.Types.ScanOutput
+        ) => void
+      ) => db.putItem(params, callback)
+    );
+
+    const items = await putItem(item);
     return items;
   }
 }

@@ -19,5 +19,5 @@ const logger = createLogger({
 
 export const store = createStore(
   rootReducer,
-  applyMiddleware(thunk, logger)
+  applyMiddleware(thunk)
 );
