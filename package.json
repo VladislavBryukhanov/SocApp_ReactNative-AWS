@@ -9,6 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.6.3",
     "@types/aws-sdk": "^2.7.0",
     "@types/es6-promisify": "^6.0.0",
     "@types/lodash": "^4.14.144",

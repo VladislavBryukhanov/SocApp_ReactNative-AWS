@@ -4,6 +4,8 @@ import { Dispatch } from 'redux';
 import { retrieveAuthenticatedUser } from '../../store/auth/auth.actions';
 import { connect } from 'react-redux';
 import { NavigationParams } from 'react-navigation';
+import styles from './styles';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 interface AuthLoadingScreenProps extends NavigationParams {
   retrieveAuthenticatedUser: () => any
@@ -20,9 +22,9 @@ class AuthLoadingScreen extends React.Component<AuthLoadingScreenProps> {
 
   render() {
     return (
-      <View>
-        <ActivityIndicator />
+      <View style={styles.container}>
         <StatusBar barStyle="default" />
+        <ActivityIndicator size={80} color={Colors.primary}/>
       </View>
     );
   }

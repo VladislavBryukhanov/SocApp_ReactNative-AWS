@@ -11,7 +11,6 @@ import { Credentials } from '../types/user';
 import { promisify } from 'es6-promisify';
 import awsmobile from '../aws-exports';
 import { CognitoIdentityCredentials } from 'aws-sdk';
-import { Auth } from 'aws-amplify';
 
 interface ISignInResult {
   session: CognitoUserSession,
@@ -56,10 +55,12 @@ export class CognitoAuth {
     }
   }
 
-  static retrieveAuthenticatedUser(): CognitoUser | null {
-    // return Auth.currentAuthenticatedUser();
+  static async retrieveAuthenticatedUser(): Promise<CognitoUser> {
+    const syncStorage = promisify(userPool.storage.sync);
+    await syncStorage();
+
     const cognitoUser = userPool.getCurrentUser();
-    return cognitoUser;
+    return cognitoUser!;
   }
 
   static signIn(credentials: Credentials): Promise<ISignInResult> {
@@ -72,7 +73,8 @@ export class CognitoAuth {
 
     const signInPromise = new Promise((resolve: (session: ISignInResult) => void, reject) => {
       cognitoUser.authenticateUser(authDetails, {
-        onSuccess: (session: CognitoUserSession, userConfirmationNecessary?: boolean) => resolve({session, userConfirmationNecessary}),
+        onSuccess: (session: CognitoUserSession, userConfirmationNecessary?: boolean) =>
+          resolve({session, userConfirmationNecessary}),
         onFailure: reject,
         mfaRequired: () => reject('MFA required')
       });

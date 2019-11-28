@@ -34,9 +34,7 @@ export const modalReducer = (state = initState, actions: ModalAction): ModalStat
     case CLOSE_MODAL:
       const mutableModalList = clone(state);
       mutableModalList.modalDialogs.pop();
-      return {
-        ...mutableModalList
-      }
+      return mutableModalList;
     default:
       return state;
   }

@@ -1,14 +1,30 @@
 import { Dispatch } from "redux";
-import { CognitoAuth, USER_IS_NOT_CONFIRMED_EXCEPTION, USER_ALREADY_EXISTS_EXCEPTION } from "../../api/auth";
+import { 
+  CognitoAuth,
+  USER_IS_NOT_CONFIRMED_EXCEPTION,
+  USER_ALREADY_EXISTS_EXCEPTION
+} from "../../api/auth";
 import { Credentials } from "../../types/user";
 import errorHandler from '../errorHandler';
-import { SIGN_IN, SIGN_UP, CONFIRM_EMAIL, RESEND_CONFIRMATION_CODE } from "../action-types";
+import { 
+  SIGN_IN,
+  SIGN_UP,
+  CONFIRM_EMAIL,
+  RESEND_CONFIRMATION_CODE,
+  AUTH_CHECKED
+} from "../action-types";
 
 export const retrieveAuthenticatedUser = (): any => (
   async (dispatch: Dispatch) => {
     try {
       const user = await CognitoAuth.retrieveAuthenticatedUser();
-      console.log(user);
+
+      dispatch({
+        type: AUTH_CHECKED,
+        payload: {
+          isAuthenticated: !!user
+        }
+      });
 
       return user;
     } catch (err) {
@@ -21,11 +37,12 @@ export const signIn = (credentials: Credentials, confirmationExceptionHandler?: 
   async (dispatch: Dispatch) => {
     try {
       const user = await CognitoAuth.signIn(credentials);
-      // console.log(user);
 
       dispatch({
         type: SIGN_IN,
-        payload: user
+        payload: {
+          isAuthenticated: !!user
+        }
       });
 
       return true;
@@ -45,11 +62,12 @@ export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Fu
   async (dispatch: Dispatch) => {
     try {
       const { user } = await CognitoAuth.signUp(credentials);
-      // console.log(user);
 
       dispatch({
         type: SIGN_UP,
-        payload: user
+        payload: {
+          isAuthenticated: !!user
+        }
       });
 
       return true;
@@ -69,7 +87,6 @@ export const confirmEmail = (confirmationCode: string, credentials: Credentials)
   async (dispatch: Dispatch) => {
     try {
       const res = await CognitoAuth.confirmEmail(confirmationCode, credentials);
-      // console.log(res);
 
       dispatch({
         type: CONFIRM_EMAIL,
@@ -87,7 +104,6 @@ export const resendConfirmationCode = (credentials: Credentials): any => (
   async (dispatch: Dispatch) => {
     try {
       const res = await CognitoAuth.resendConfirmationCode(credentials);
-      // console.log(res);
 
       dispatch({
         type: RESEND_CONFIRMATION_CODE,

@@ -1,9 +1,9 @@
 import React from 'react';
-import SignUpConfirmation from '../components/sign-up-confirmation-code/sign-up-confirmation-code.component';
+import SignUpConfirmation from '../../components/sign-up-confirmation-code/sign-up-confirmation-code.component';
 import { Alert } from 'react-native';
-import { Credentials } from '../types/user';
+import { Credentials } from '../../types/user';
 import { Dispatch } from 'redux';
-import { openModal, closeModal } from '../store/modal/modal.actions';
+import { openModal, closeModal } from '../../store/modal/modal.actions';
 import { connect } from 'react-redux';
 import { NavigationParams } from 'react-navigation';
 

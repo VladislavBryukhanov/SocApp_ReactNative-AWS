@@ -9,7 +9,7 @@ import { BasicTextField } from '../../components/basic-text-field/basic-text-fie
 import { ToastAndroid } from 'react-native';
 import { signUp } from '../../store/auth/auth.actions';
 import { createUser } from '../../store/users/users.actions';
-import { AuthComponentProps, withEmailConfirmation } from '../../wrappers/withEmailConfirmation';
+import { AuthComponentProps, withEmailConfirmation } from '../../wrappers/auth/withEmailConfirmation';
 
 type StateKeys = 'email' | 'password' | 'confirmPassword' | 'nickname' | 'username';
 
@@ -50,7 +50,7 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
 
     if(user) {
       // TODO check is user created
-      await this.props.createUser({ ...this.state });
+      // await this.props.createUser({ ...this.state });
 
       this.props.confirmRegistration(
         { email, password },
@@ -64,13 +64,14 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     this.props.navigation.navigate('SignIn');
   }
 
+  commonProps = (fieldName: StateKeys) => ({
+    value: this.state[fieldName],
+    onChangeText: (text: string) => this.setState({
+      [fieldName]: text
+    })
+  });
+
   render() {
-    const commonProps = (fieldName: StateKeys) => ({
-      value: this.state[fieldName],
-      onChangeText: (text: string) => this.setState({
-        [fieldName]: text
-      })
-    });
 
     return (
       <>
@@ -82,31 +83,31 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
           <View style={styles.authForm}>
             <BasicTextField
               label='Email*'
-              {...commonProps('email')}
+              {...this.commonProps('email')}
             />
 
             <BasicTextField
               label='Password*'
               secureTextEntry={true}
-              {...commonProps('password')}
+              {...this.commonProps('password')}
             />
           
             <BasicTextField
               label='Confirm password*'
               secureTextEntry={true}
-              {...commonProps('confirmPassword')}
+              {...this.commonProps('confirmPassword')}
             />
 
             <BasicTextField
               label='Username*'
               description='Unique name of your user'
-              {...commonProps('username')}
+              {...this.commonProps('username')}
             />
 
             <BasicTextField
               label='Nickname'
               description='Nickname which will be displayed for your user'
-              {...commonProps('nickname')}
+              {...this.commonProps('nickname')}
             />
           </View>
   

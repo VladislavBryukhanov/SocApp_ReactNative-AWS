@@ -8,9 +8,9 @@ import { Dispatch, compose } from 'redux';
 import { Credentials } from '../../types/user';
 import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
 import { signIn } from '../../store/auth/auth.actions';
-import { withEmailConfirmation, AuthComponentProps } from '../../wrappers/withEmailConfirmation';
+import { withEmailConfirmation, AuthComponentProps } from '../../wrappers/auth/withEmailConfirmation';
 
-interface SignInProps extends NavigationParams, AuthComponentProps {
+interface SignInProps extends Partial<NavigationParams>, AuthComponentProps {
   signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
 }
 
