@@ -141,13 +141,14 @@ export class CognitoAuth {
   }
 
   //TODO
-  static forgotPassword(credentials: Credentials) {
-    const cognitoUser = this.initCognitoUser(credentials.email);
+  static forgotPassword(email: string) {
+    const cognitoUser = this.initCognitoUser(email);
     const signInPromise = new Promise((resolve, reject) => {
       cognitoUser.forgotPassword({
         onSuccess: resolve,
         onFailure: reject,
-        inputVerificationCode() {
+        inputVerificationCode(data) {
+          console.log('VerCode', data)
           // var verificationCode = prompt('Please input verification code ' ,'');
           // var newPassword = prompt('Enter new password ' ,'');
           // cognitoUser.confirmPassword(verificationCode, newPassword, this);
@@ -155,5 +156,17 @@ export class CognitoAuth {
       })
     });
     return signInPromise;
+  }
+
+  static confirmNewPassword(email: string, verificationCode: string, newPassword: string) {
+    const cognitoUser = this.initCognitoUser(email);
+    const confirmationPromise = new Promise((resolve, reject) => cognitoUser.confirmPassword(
+      verificationCode,
+      newPassword, {
+        onFailure: reject,
+        onSuccess: resolve
+      })
+    );
+    return confirmationPromise;
   }
 }

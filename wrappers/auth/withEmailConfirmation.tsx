@@ -1,5 +1,5 @@
 import React from 'react';
-import SignUpConfirmation from '../../components/sign-up-confirmation-code/sign-up-confirmation-code.component';
+import SignUpConfirmation from '../../components/modals/SignUpConfirmationCode/sign-up-confirmation-code.component';
 import { Alert } from 'react-native';
 import { Credentials } from '../../types/user';
 import { Dispatch } from 'redux';

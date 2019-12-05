@@ -6,12 +6,15 @@ import baseStyles from '../../components/base.styles';
 import { connect } from 'react-redux';
 import { Dispatch, compose } from 'redux';
 import { Credentials } from '../../types/user';
-import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
+import { BasicTextField } from '../../components/BasicTextField/basic-text-field.component';
+import ForgotPassword from '../../components/modals/ForgotPassword/forgot-password.component';
 import { signIn } from '../../store/auth/auth.actions';
 import { withEmailConfirmation, AuthComponentProps } from '../../wrappers/auth/withEmailConfirmation';
+import { openModal } from '../../store/modal/modal.actions';
 
-interface SignInProps extends Partial<NavigationParams>, AuthComponentProps {
+interface SignInProps extends NavigationParams, AuthComponentProps {
   signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
+  openModal: (element: React.ReactNode) => void;
 }
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
@@ -34,6 +37,10 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 
   const goToSignUp = () => {
     props.navigation.navigate('SignUp');
+  }
+
+  const onForgotPassword = () => {
+    props.openModal(React.createElement(ForgotPassword));
   }
 
   return (
@@ -59,9 +66,16 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
       
       <Button title="Sign in" onPress={onSignIn}/>
       
-      <Text onPress={goToSignUp} style={baseStyles.linkButton}>
-        Sign up
+      <Text onPress={onForgotPassword} style={baseStyles.linkButton}>
+        Forgot password
       </Text>
+
+      <View style={styles.signUpWrapper}>
+        <Text style={styles.description}>Don't have an account?</Text>
+        <Text onPress={goToSignUp} style={baseStyles.linkButton}>
+          Sign up
+        </Text>
+      </View>
       
     </ScrollView>
   )
@@ -70,6 +84,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   signIn: (credentials: Credentials, confirmationExceptionHandler?: Function) => 
     dispatch(signIn(credentials, confirmationExceptionHandler)),
+  openModal: (element: React.ReactNode) => dispatch(openModal(element)),
 });
 
 export default compose(

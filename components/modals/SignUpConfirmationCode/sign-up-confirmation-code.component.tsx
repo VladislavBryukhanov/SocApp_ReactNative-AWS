@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
 import { View, Button, Text, Alert } from 'react-native';
-import { BasicTextField } from '../basic-text-field/basic-text-field.component';
-import { Credentials } from '../../types/user';
+import { BasicTextField } from '../../BasicTextField/basic-text-field.component';
+import { Credentials } from '../../../types/user';
 import styles from './styles';
-import baseStyles from '../base.styles';
+import baseStyles from '../../base.styles';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { confirmEmail, resendConfirmationCode } from '../../store/auth/auth.actions';
+import { confirmEmail, resendConfirmationCode } from '../../../store/auth/auth.actions';
 
 interface SignUpConfirmationProps {
   credentials: Credentials,

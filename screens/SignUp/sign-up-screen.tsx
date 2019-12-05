@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Dispatch, compose } from 'redux';
 import styles from './styles';
 import { Credentials, User } from '../../types/user';
-import { BasicTextField } from '../../components/basic-text-field/basic-text-field.component';
+import { BasicTextField } from '../../components/BasicTextField/basic-text-field.component';
 import { ToastAndroid } from 'react-native';
 import { signUp } from '../../store/auth/auth.actions';
 import { createUser } from '../../store/users/users.actions';

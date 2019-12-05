@@ -9,5 +9,16 @@ export default StyleSheet.create({
   },
   authForm: {
     marginBottom: 26
+  },
+  signUpWrapper: {
+    flexDirection: "row",
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30
+  },
+  description: {
+    color: Colors.white,
+    marginRight: 10
   }
 });

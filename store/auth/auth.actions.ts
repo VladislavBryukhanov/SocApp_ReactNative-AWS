@@ -117,8 +117,22 @@ export const resendConfirmationCode = (credentials: Credentials): any => (
   }
 )
 
-export const forgotPassword = (credentials: Credentials): any => (
+export const forgotPassword = (email: string): any => (
   async (dispatch: Dispatch) => {
+    try {
+      const res = await CognitoAuth.forgotPassword(email);
+    } catch (err) {
+      errorHandler(err);
+    }
+  }
+)
 
+export const confirmNewPassword = (email: string, verificationCode: string, newPassword: string): any => (
+  async (dispatch: Dispatch) => {
+    try {
+      const res = await CognitoAuth.confirmNewPassword(email, verificationCode, newPassword);
+    } catch (err) {
+      errorHandler(err);
+    }
   }
 )

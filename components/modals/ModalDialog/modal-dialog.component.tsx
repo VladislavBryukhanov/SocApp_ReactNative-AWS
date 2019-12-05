@@ -2,8 +2,8 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Modal, View, ModalProps } from 'react-native';
 import { connect } from 'react-redux';
-import { AppState } from '../../store';
-import { closeModal } from '../../store/modal/modal.actions';
+import { AppState } from '../../../store';
+import { closeModal } from '../../../store/modal/modal.actions';
 import styles from './styles';
 import { Dispatch } from 'redux';
 
