@@ -11,7 +11,8 @@ import {
   SIGN_UP,
   CONFIRM_EMAIL,
   RESEND_CONFIRMATION_CODE,
-  AUTH_CHECKED
+  AUTH_CHECKED,
+  SIGN_OUT
 } from "../action-types";
 
 export const retrieveAuthenticatedUser = (): any => (
@@ -79,6 +80,17 @@ export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Fu
       } else {
         errorHandler(err);
       }
+    }
+  }
+)
+
+export const signOut = (): any => (
+  async (dispatch: Dispatch) => {
+    try {
+      await CognitoAuth.signOut();
+      dispatch({ type: SIGN_OUT });
+    } catch (err) {
+      errorHandler(err);
     }
   }
 )

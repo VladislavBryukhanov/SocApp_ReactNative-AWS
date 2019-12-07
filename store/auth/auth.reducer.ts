@@ -1,5 +1,5 @@
 import { Action } from "redux";
-import { AUTH_CHECKED, SIGN_IN, SIGN_UP } from './../action-types';
+import { AUTH_CHECKED, SIGN_IN, SIGN_UP, SIGN_OUT } from './../action-types';
 
 interface AuthState {
   isAuthenticated?: boolean;
@@ -30,6 +30,12 @@ export const authReducer = (state = initState, action: AuthAction): AuthState =>
         ...state,
         isAuthenticated: action.payload.isAuthenticated
       }
+    case SIGN_OUT: {
+      return {
+        ...state,
+        isAuthenticated: false
+      }
+    }
   }
   return state;
 }

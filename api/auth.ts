@@ -113,6 +113,13 @@ export class CognitoAuth {
     return signUp(email, password, attributeList, []);
   }
 
+  static signOut() {
+    const cognitoUser = userPool.getCurrentUser();
+    if (cognitoUser) {
+      cognitoUser.signOut();
+    }
+  }
+
   static confirmEmail(confirmationCode: string, credentials: Credentials) {
     const cognitoUser = this.initCognitoUser(credentials.email);
     const confirmRegistration = promisify(

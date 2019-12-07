@@ -16,12 +16,7 @@ const AppStack = createStackNavigator({
       title: 'User list'
     }
   },
-  Profile: {
-    screen: ProfileScreen,
-    navigationOptions: {
-      title: '[NAME] Profile'
-    }
-  }
+  Profile: ProfileScreen
 });
 
 const AuthStack = createStackNavigator({

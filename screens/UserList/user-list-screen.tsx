@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-native';
-import { NavigationParams, NavigationActions, StackActions } from 'react-navigation';
+import { NavigationParams } from 'react-navigation';
 import { connect } from 'react-redux';
 import { AppState } from 'store';
 import { Dispatch } from 'redux';
@@ -8,6 +8,7 @@ import { fetchUsers } from '../../store/users/users.actions';
 import { User } from '../../types/user';
 import styles from './styles';
 import defaultAvatar from '../../assets/icons/user.png';
+import SignOutButton from '../../components/SignOutButton/sign-out-button.component';
 
 interface UserListProps extends NavigationParams {
   userList: User[];
@@ -20,6 +21,10 @@ class UserListScreen extends React.Component<UserListProps> {
       this.props.fetchUsers();
     }
   }
+
+  static navigationOptions = {
+    headerRight: () => <SignOutButton/>,
+  };
 
   onOpenProfile = (user: User) => {
     this.props.navigation.navigate(
