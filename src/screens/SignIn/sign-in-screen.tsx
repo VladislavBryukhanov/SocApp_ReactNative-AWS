@@ -3,7 +3,7 @@ import { ScrollView, View, Button, Text } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
-import { Credentials } from '@types/user';
+import { Credentials } from '@models/user';
 import baseStyles from '@components/base.styles';
 import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
 import ForgotPassword from '@components/modals/ForgotPassword/forgot-password.component';
@@ -87,7 +87,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   openModal: (element: React.ReactNode) => dispatch(openModal(element)),
 });
 
-export default compose(
+export default compose<SignInProps>(
   connect(null, mapDispatchToProps),
   withEmailConfirmation
 )(SignInScreen);

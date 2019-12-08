@@ -6,7 +6,9 @@ import { startCase } from 'lodash';
 import styles from './styles';
 
 interface ProfileScreeProps extends NavigationParams {}
-interface ScreenParams {
+
+type NavigationProps = NavigationScreenProp<ScreenParams>;
+type ScreenParams = {
   screenName: string;
 }
 
@@ -18,7 +20,7 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
     this.props.navigation.setParams({ screenName });
   }
 
-  static navigationOptions = ({ navigation }: { navigation: NavigationScreenProp<ScreenParams> }) => ({
+  static navigationOptions = ({ navigation }: { navigation: NavigationProps }) => ({
     title: navigation.getParam('screenName')
   });
 

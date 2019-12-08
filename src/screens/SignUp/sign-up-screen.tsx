@@ -3,7 +3,7 @@ import { ToastAndroid, ScrollView, View, Button } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
-import { Credentials, User } from '@types/user';
+import { Credentials, User } from '@models/user';
 import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
 import { signUp } from '@store/auth/auth.actions';
 import { createUser } from '@store/users/users.actions';
@@ -126,7 +126,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   createUser: (user: User) => dispatch(createUser(user)),
 });
 
-export default compose(
+export default compose<SignUpProps>(
   connect(null, mapDispatchToProps),
   withEmailConfirmation
 )(SignUpScreen);

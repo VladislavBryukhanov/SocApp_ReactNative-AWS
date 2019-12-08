@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import SignUpConfirmation from '@components/modals/SignUpConfirmationCode/sign-up-confirmation-code.component';
 import { openModal, closeModal } from '@store/modal/modal.actions';
-import { Credentials } from '@types/user';
+import { Credentials } from '@models/user';
 
 export interface AuthComponentProps extends NavigationParams {
   openModal: (element: React.ReactNode) => void;

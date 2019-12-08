@@ -1,4 +1,4 @@
-import { User } from '../types/user';
+import { User } from '@models/user';
 import { DatabaseInstance } from './database';
 import normilizeResponse from '../utils/NormilizeDynamoDbResponse';
 

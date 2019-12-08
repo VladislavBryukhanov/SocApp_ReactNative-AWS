@@ -29,7 +29,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   signOut: () => dispatch(signOut())
 })
 
-export default compose(
+export default compose<SignOutProps>(
   connect(null,  mapDispatchToProps),
   withNavigation
 )(SignOutButton);

@@ -4,7 +4,7 @@ import {
   USER_IS_NOT_CONFIRMED_EXCEPTION,
   USER_ALREADY_EXISTS_EXCEPTION
 } from "@api/auth";
-import { Credentials } from "@types/user";
+import { Credentials } from "@models/user";
 import errorHandler from '@store/errorHandler';
 import { 
   SIGN_IN,

@@ -7,7 +7,7 @@ import {
   NodeCallback,
   CognitoUserSession
 } from 'amazon-cognito-identity-js';
-import { Credentials } from '../types/user';
+import { Credentials } from '@models/user';
 import { promisify } from 'es6-promisify';
 import awsmobile from '../../aws-exports';
 import { CognitoIdentityCredentials } from 'aws-sdk';

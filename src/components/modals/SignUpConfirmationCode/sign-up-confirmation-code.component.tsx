@@ -5,7 +5,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
 import baseStyles from '@components/base.styles';
-import { Credentials } from '@types/user';
+import { Credentials } from '@models/user';
 import { confirmEmail, resendConfirmationCode } from '@store/auth/auth.actions';
 import styles from './styles';
 

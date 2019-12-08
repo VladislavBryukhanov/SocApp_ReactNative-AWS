@@ -3,8 +3,8 @@ import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-nati
 import { NavigationParams } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
-import { User } from '@types/user';
-import { AppState } from '@store';
+import { User } from '@models/user';
+import { AppState } from '@store/index';
 import { fetchUsers } from '@store/users/users.actions';
 import defaultAvatar from '@assets/icons/user.png';
 import SignOutButton from '@components/SignOutButton/sign-out-button.component';
