@@ -3,6 +3,10 @@
 		"userList": {
 			"service": "DynamoDB",
 			"providerPlugin": "awscloudformation"
+		},
+		"localDB": {
+			"service": "DynamoDB",
+			"providerPlugin": "awscloudformation"
 		}
 	},
 	"function": {
@@ -36,6 +40,13 @@
 					]
 				}
 			]
+		}
+	},
+	"auth": {
+		"socapp1b1fa1e9": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
 		}
 	}
 }
