@@ -73,49 +73,47 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
   render() {
 
     return (
-      <>
-        <ScrollView
-          keyboardShouldPersistTaps='handled'
-          style={styles.scrollView}
-        >
-          
-          <View style={styles.authForm}>
-            <BasicTextField
-              label='Email*'
-              {...this.commonProps('email')}
-            />
+      <ScrollView
+        keyboardShouldPersistTaps='handled'
+        style={styles.scrollView}
+      >
+        
+        <View style={styles.authForm}>
+          <BasicTextField
+            label='Email*'
+            {...this.commonProps('email')}
+          />
 
-            <BasicTextField
-              label='Password*'
-              secureTextEntry={true}
-              {...this.commonProps('password')}
-            />
-          
-            <BasicTextField
-              label='Confirm password*'
-              secureTextEntry={true}
-              {...this.commonProps('confirmPassword')}
-            />
+          <BasicTextField
+            label='Password*'
+            secureTextEntry={true}
+            {...this.commonProps('password')}
+          />
+        
+          <BasicTextField
+            label='Confirm password*'
+            secureTextEntry={true}
+            {...this.commonProps('confirmPassword')}
+          />
 
-            <BasicTextField
-              label='Username*'
-              description='Unique name of your user'
-              {...this.commonProps('username')}
-            />
+          <BasicTextField
+            label='Username*'
+            description='Unique name of your user'
+            {...this.commonProps('username')}
+          />
 
-            <BasicTextField
-              label='Nickname'
-              description='Nickname which will be displayed for your user'
-              {...this.commonProps('nickname')}
-            />
-          </View>
-  
-          <View style={styles.signUpBtn}>
-            <Button title="Sign up" onPress={this.onSignUp}/>
-          </View>
+          <BasicTextField
+            label='Nickname'
+            description='Nickname which will be displayed for your user'
+            {...this.commonProps('nickname')}
+          />
+        </View>
 
-        </ScrollView>
-      </>
+        <View style={styles.signUpBtn}>
+          <Button title="Sign up" onPress={this.onSignUp}/>
+        </View>
+
+      </ScrollView>
     )
   }
 }

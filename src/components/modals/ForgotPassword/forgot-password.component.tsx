@@ -1,19 +1,40 @@
 import React, { useState } from 'react';
 import { Dispatch } from 'redux';
-import { Text, View, Button } from 'react-native';
+import { Text, View, Button, Alert } from 'react-native';
 import styles from './styles';
 import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
 import { forgotPassword } from '@store/auth/auth.actions';
 import { connect } from 'react-redux';
+import { ForgotPasswordResult } from '@models/auth';
+import { openModal } from '@store/modal/modal.actions';
+import ConfirmNewPassword from '../ConfirmNewPassword/confirm-new-password.component';
 
 interface ForgotPasswordProps {
-  forgotPassword: (email: string) => Promise<boolean>;
+  forgotPassword: (email: string) => Promise<ForgotPasswordResult | undefined>;
+  openModal: (element: React.ReactNode) => void;
 }
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = (props: ForgotPasswordProps) => {
-  console.log(props);
   const [email, setEmail] = useState('');
-  const onForgotPassword = () => props.forgotPassword(email);
+  const onForgotPassword = async () => {
+    const response = await props.forgotPassword(email);
+
+    if (response) {
+      const { CodeDeliveryDetails: { AttributeName, Destination  } } = response;
+      const info = 'Verefication code for password reset sent to ' +
+        `${AttributeName} "${Destination}", please check it and follow further instructions`;
+
+      Alert.alert(
+        'Complete password reset',
+        info,
+        [{
+          text: 'Ok',
+          onPress: () => props.openModal(React.createElement(ConfirmNewPassword))
+        }],
+        { cancelable: false }
+      );
+    }
+  };
 
   return (
     <>
@@ -40,7 +61,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = (props: ForgotPasswordProp
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  forgotPassword: (email: string) => dispatch(forgotPassword(email))
+  forgotPassword: (email: string) => dispatch(forgotPassword(email)),
+  openModal: (element: React.ReactNode) => dispatch(openModal(element)),
 })
 
 export default connect(

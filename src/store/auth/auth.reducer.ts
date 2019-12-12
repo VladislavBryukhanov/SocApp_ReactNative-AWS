@@ -1,8 +1,15 @@
 import { Action } from "redux";
-import { AUTH_CHECKED, SIGN_IN, SIGN_UP, SIGN_OUT } from '../action-types';
+import { 
+  AUTH_CHECKED,
+  SIGN_IN,
+  SIGN_UP,
+  SIGN_OUT,
+  FORGOT_PASSWORD
+} from '../action-types';
 
 interface AuthState {
   isAuthenticated?: boolean;
+  email?: string;
 }
 
 interface AuthAction extends Action {
@@ -34,6 +41,12 @@ export const authReducer = (state = initState, action: AuthAction): AuthState =>
       return {
         ...state,
         isAuthenticated: false
+      }
+    }
+    case FORGOT_PASSWORD: {
+      return {
+        ...state,
+        email: action.payload.email
       }
     }
   }

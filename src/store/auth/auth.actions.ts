@@ -1,3 +1,4 @@
+import { AppState } from '@store/index';
 import { Dispatch } from "redux";
 import { 
   CognitoAuth,
@@ -5,14 +6,14 @@ import {
   USER_ALREADY_EXISTS_EXCEPTION
 } from "@api/auth";
 import { Credentials } from "@models/user";
+import { ForgotPasswordResult } from '@models/auth';
 import errorHandler from '@store/errorHandler';
 import { 
   SIGN_IN,
   SIGN_UP,
-  CONFIRM_EMAIL,
-  RESEND_CONFIRMATION_CODE,
   AUTH_CHECKED,
-  SIGN_OUT
+  SIGN_OUT,
+  FORGOT_PASSWORD
 } from "@store/action-types";
 
 export const retrieveAuthenticatedUser = (): any => (
@@ -34,15 +35,18 @@ export const retrieveAuthenticatedUser = (): any => (
   }
 )
 
-export const signIn = (credentials: Credentials, confirmationExceptionHandler?: Function): any => (
+export const signIn = (
+  credentials: Credentials,
+  confirmationExceptionHandler?: Function
+): any => (
   async (dispatch: Dispatch) => {
     try {
-      const user = await CognitoAuth.signIn(credentials);
+      const payload = await CognitoAuth.signIn(credentials);
 
       dispatch({
         type: SIGN_IN,
         payload: {
-          isAuthenticated: !!user
+          isAuthenticated: !!payload
         }
       });
 
@@ -59,15 +63,18 @@ export const signIn = (credentials: Credentials, confirmationExceptionHandler?: 
   }
 )
 
-export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Function): any => (
+export const signUp = (
+  credentials: Credentials,
+  userExistsExceptionHandler?: Function
+): any => (
   async (dispatch: Dispatch) => {
     try {
-      const { user } = await CognitoAuth.signUp(credentials);
+      const payload = await CognitoAuth.signUp(credentials);
 
       dispatch({
         type: SIGN_UP,
         payload: {
-          isAuthenticated: !!user
+          isAuthenticated: !!payload
         }
       });
 
@@ -85,9 +92,9 @@ export const signUp = (credentials: Credentials, userExistsExceptionHandler?: Fu
 )
 
 export const signOut = (): any => (
-  async (dispatch: Dispatch) => {
+  (dispatch: Dispatch) => {
     try {
-      await CognitoAuth.signOut();
+      CognitoAuth.signOut();
       dispatch({ type: SIGN_OUT });
     } catch (err) {
       errorHandler(err);
@@ -95,15 +102,18 @@ export const signOut = (): any => (
   }
 )
 
-export const confirmEmail = (confirmationCode: string, credentials: Credentials): any => (
+export const confirmEmail = (
+  confirmationCode: string,
+  credentials: Credentials
+): any => (
   async (dispatch: Dispatch) => {
     try {
-      const res = await CognitoAuth.confirmEmail(confirmationCode, credentials);
-
-      dispatch({
-        type: CONFIRM_EMAIL,
-        payload: res
-      });
+      await CognitoAuth.confirmEmail(confirmationCode, credentials.email);
+      
+      // dispatch({
+      //   type: CONFIRM_EMAIL,
+      //   payload: res
+      // });
 
       return true;
     } catch (err) {
@@ -115,12 +125,12 @@ export const confirmEmail = (confirmationCode: string, credentials: Credentials)
 export const resendConfirmationCode = (credentials: Credentials): any => (
   async (dispatch: Dispatch) => {
     try {
-      const res = await CognitoAuth.resendConfirmationCode(credentials);
+      await CognitoAuth.resendConfirmationCode(credentials.email);
 
-      dispatch({
-        type: RESEND_CONFIRMATION_CODE,
-        payload: res
-      });
+      // dispatch({
+      //   type: RESEND_CONFIRMATION_CODE,
+      //   payload: res
+      // });
 
       return true;
     } catch (err) {
@@ -129,20 +139,41 @@ export const resendConfirmationCode = (credentials: Credentials): any => (
   }
 )
 
-export const forgotPassword = (email: string): any => (
-  async (dispatch: Dispatch) => {
+export const forgotPassword = (
+  email: string,
+  onCompletedCb?: (data: any) => void
+): any => (
+  async (dispatch: Dispatch): Promise<ForgotPasswordResult | undefined> => {
     try {
-      const res = await CognitoAuth.forgotPassword(email);
+      const result = await CognitoAuth.forgotPassword(email, onCompletedCb);
+
+      dispatch({
+        type: FORGOT_PASSWORD,
+        payload: { email }
+      });
+
+      return result;
     } catch (err) {
       errorHandler(err);
     }
   }
 )
 
-export const confirmNewPassword = (email: string, verificationCode: string, newPassword: string): any => (
-  async (dispatch: Dispatch) => {
+export const confirmNewPassword = (
+  verificationCode: string,
+  newPassword: string
+): any => (
+  async (dispatch: Dispatch, getState: () => AppState): Promise<boolean | undefined> => {
+    const { authModule: { email } } = getState();
+
     try {
-      const res = await CognitoAuth.confirmNewPassword(email, verificationCode, newPassword);
+      await CognitoAuth.confirmNewPassword(
+        email!,
+        verificationCode,
+        newPassword
+      );
+
+      return true;
     } catch (err) {
       errorHandler(err);
     }

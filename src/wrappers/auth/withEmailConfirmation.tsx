@@ -33,7 +33,7 @@ export const withEmailConfirmation = <P extends object>(Component: React.Compone
           text: 'Ok',
           onPress: () => this.props.openModal(confirmRegistrationDialog)
         }],
-        {cancelable: false}
+        { cancelable: false }
       )
     }
 

@@ -9,20 +9,26 @@ import {
 } from 'amazon-cognito-identity-js';
 import { Credentials } from '@models/user';
 import { promisify } from 'es6-promisify';
-import awsmobile from '../../aws-exports';
-import { CognitoIdentityCredentials } from 'aws-sdk';
+import awsconfig from '../../aws-exports';
+import { 
+  AWSCredentialsResult,
+  SignInResult,
+  ForgotPasswordResult
+} from '@models/auth';
 
-interface ISignInResult {
-  session: CognitoUserSession,
-  userConfirmationNecessary?: boolean
-}
+const {
+  aws_user_pools_id,
+  aws_user_pools_web_client_id,
+  aws_cognito_region,
+  aws_cognito_identity_pool_id
+} = awsconfig;
 
 export const USER_IS_NOT_CONFIRMED_EXCEPTION = 'UserNotConfirmedException';
 export const USER_ALREADY_EXISTS_EXCEPTION = 'UsernameExistsException';
 
 const poolData = {
-  UserPoolId: awsmobile.aws_user_pools_id,
-  ClientId: awsmobile.aws_user_pools_web_client_id
+  UserPoolId: aws_user_pools_id,
+  ClientId: aws_user_pools_web_client_id
 };
 const userPool = new CognitoUserPool(poolData);
 
@@ -35,8 +41,8 @@ export class CognitoAuth {
     return new CognitoUser(userData);
   }
 
-  static async getAwsConfigCredentials(): Promise<CognitoIdentityCredentials.CognitoIdentityOptions | undefined> {
-    const awsIdentityLogin = `cognito-idp.${awsmobile.aws_cognito_region}.amazonaws.com/${awsmobile.aws_user_pools_id}`;
+  static async getAwsConfigCredentials(): Promise<AWSCredentialsResult> {
+    const awsIdentityLogin = `cognito-idp.${aws_cognito_region}.amazonaws.com/${aws_user_pools_id}`;
 
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
@@ -46,7 +52,7 @@ export class CognitoAuth {
       const session = await getSession();
       if (session instanceof CognitoUserSession) {
         return {
-          IdentityPoolId: awsmobile.aws_cognito_identity_pool_id,
+          IdentityPoolId: aws_cognito_identity_pool_id,
           Logins: {
             [awsIdentityLogin]: session.getIdToken().getJwtToken()
           }
@@ -55,7 +61,7 @@ export class CognitoAuth {
     }
   }
 
-  static async retrieveAuthenticatedUser(): Promise<CognitoUser> {
+  static async retrieveAuthenticatedUser(): Promise<CognitoUser | undefined > {
     const syncStorage = promisify(userPool.storage.sync);
     await syncStorage();
 
@@ -63,7 +69,7 @@ export class CognitoAuth {
     return cognitoUser!;
   }
 
-  static signIn(credentials: Credentials): Promise<ISignInResult> {
+  static signIn(credentials: Credentials): Promise<SignInResult | undefined> {
     const { email, password } = credentials;
     const authDetails = new AuthenticationDetails({
       Username: email,
@@ -71,10 +77,15 @@ export class CognitoAuth {
     });
     const cognitoUser = this.initCognitoUser(email);
 
-    const signInPromise = new Promise((resolve: (session: ISignInResult) => void, reject) => {
+    const signInPromise = new Promise((
+      resolve: (payload: SignInResult) => void,
+      reject
+    ) => {
       cognitoUser.authenticateUser(authDetails, {
-        onSuccess: (session: CognitoUserSession, userConfirmationNecessary?: boolean) =>
-          resolve({session, userConfirmationNecessary}),
+        onSuccess: (
+          session: CognitoUserSession,
+          userConfirmationNecessary?: boolean
+        ) => resolve({session, userConfirmationNecessary}),
         onFailure: reject,
         mfaRequired: () => reject('MFA required')
       });
@@ -83,7 +94,7 @@ export class CognitoAuth {
     return signInPromise;
   }
 
-  static signUp(credentials: Credentials): Promise<ISignUpResult> {
+  static signUp(credentials: Credentials): Promise<ISignUpResult | undefined> {
     const { email, password } = credentials;
 
     const attributeEmail = new CognitoUserAttribute({
@@ -94,8 +105,7 @@ export class CognitoAuth {
       attributeEmail
     ];
 
-    const signUp = promisify(
-      (
+    const signUp = promisify((
         username: string,
         password: string,
         userAttributes: CognitoUserAttribute[],
@@ -120,10 +130,12 @@ export class CognitoAuth {
     }
   }
 
-  static confirmEmail(confirmationCode: string, credentials: Credentials) {
-    const cognitoUser = this.initCognitoUser(credentials.email);
-    const confirmRegistration = promisify(
-      (
+  static confirmEmail(
+    confirmationCode: string,
+    email: string
+  ): Promise<'SUCCESS' | undefined> {
+    const cognitoUser = this.initCognitoUser(email);
+    const confirmRegistration = promisify((
         code: string,
         forceAliasCreation: boolean,
         callback: NodeCallback<any, any>
@@ -137,8 +149,8 @@ export class CognitoAuth {
     return confirmRegistration(confirmationCode, true);
   }
 
-  static resendConfirmationCode(credentials: Credentials) {
-    const cognitoUser = this.initCognitoUser(credentials.email);
+  static resendConfirmationCode(email: string): Promise<'SUCCESS' | undefined> {
+    const cognitoUser = this.initCognitoUser(email);
     const resendConfirmationCode = promisify(
       (callback: NodeCallback<Error, 'SUCCESS'>) => 
         cognitoUser.resendConfirmationCode(callback)
@@ -147,33 +159,41 @@ export class CognitoAuth {
     return resendConfirmationCode();
   }
 
-  //TODO
-  static forgotPassword(email: string) {
+  static forgotPassword(
+    email: string,
+    onCompletedCb?: (data: any) => void
+  ): Promise<ForgotPasswordResult | undefined> {
     const cognitoUser = this.initCognitoUser(email);
-    const signInPromise = new Promise((resolve, reject) => {
+    const signInPromise = new Promise((
+      resolve: (data: ForgotPasswordResult) => void,
+      reject
+    ) => {
       cognitoUser.forgotPassword({
-        onSuccess: resolve,
+        inputVerificationCode: resolve,
+        // onSuccess unused, as it will be call only after confirmNewPassword() success
+        onSuccess: onCompletedCb,
         onFailure: reject,
-        inputVerificationCode(data) {
-          console.log('VerCode', data)
-          // var verificationCode = prompt('Please input verification code ' ,'');
-          // var newPassword = prompt('Enter new password ' ,'');
-          // cognitoUser.confirmPassword(verificationCode, newPassword, this);
-        }
       })
     });
+
     return signInPromise;
   }
 
-  static confirmNewPassword(email: string, verificationCode: string, newPassword: string) {
+  static confirmNewPassword(
+    email: string,
+    verificationCode: string,
+    newPassword: string
+  ): Promise<undefined> {
     const cognitoUser = this.initCognitoUser(email);
-    const confirmationPromise = new Promise((resolve, reject) => cognitoUser.confirmPassword(
-      verificationCode,
-      newPassword, {
-        onFailure: reject,
-        onSuccess: resolve
-      })
-    );
+    const confirmationPromise = new Promise((resolve, reject) =>
+      cognitoUser.confirmPassword(
+        verificationCode,
+        newPassword, {
+          onSuccess: resolve,
+          onFailure: reject,
+        })
+      );
+      
     return confirmationPromise;
   }
 }
