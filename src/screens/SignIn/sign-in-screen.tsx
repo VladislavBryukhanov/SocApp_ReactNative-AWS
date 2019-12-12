@@ -30,7 +30,6 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
 
   const onUserIsNotConfirmedHandler = () => {
     props.confirmRegistration(
-      { email, password },
       'You still doesn\'t confirm your email, please check your inbox and input code'
     );
   }

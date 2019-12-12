@@ -52,7 +52,6 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
       // await this.props.createUser({ ...this.state });
 
       this.props.confirmRegistration(
-        { email, password },
         'Confirmation code sent to your inbox, please check it and input code'
       );
     }

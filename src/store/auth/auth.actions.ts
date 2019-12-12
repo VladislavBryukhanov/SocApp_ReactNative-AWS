@@ -46,7 +46,8 @@ export const signIn = (
       dispatch({
         type: SIGN_IN,
         payload: {
-          isAuthenticated: !!payload
+          isAuthenticated: !!payload,
+          email: credentials.email
         }
       });
 
@@ -74,7 +75,8 @@ export const signUp = (
       dispatch({
         type: SIGN_UP,
         payload: {
-          isAuthenticated: !!payload
+          isAuthenticated: !!payload,
+          email: credentials.email
         }
       });
 
@@ -102,18 +104,12 @@ export const signOut = (): any => (
   }
 )
 
-export const confirmEmail = (
-  confirmationCode: string,
-  credentials: Credentials
-): any => (
-  async (dispatch: Dispatch) => {
+export const confirmEmail = (confirmationCode: string): any => (
+  async (dispatch: Dispatch, getState: () => AppState) => {
     try {
-      await CognitoAuth.confirmEmail(confirmationCode, credentials.email);
-      
-      // dispatch({
-      //   type: CONFIRM_EMAIL,
-      //   payload: res
-      // });
+      const { authModule: { email } } = getState();
+
+      await CognitoAuth.confirmEmail(confirmationCode, email!);
 
       return true;
     } catch (err) {
@@ -122,15 +118,12 @@ export const confirmEmail = (
   }
 )
 
-export const resendConfirmationCode = (credentials: Credentials): any => (
-  async (dispatch: Dispatch) => {
+export const resendConfirmationCode = (): any => (
+  async (dispatch: Dispatch, getState: () => AppState) => {
     try {
-      await CognitoAuth.resendConfirmationCode(credentials.email);
+      const { authModule: { email } } = getState();
 
-      // dispatch({
-      //   type: RESEND_CONFIRMATION_CODE,
-      //   payload: res
-      // });
+      await CognitoAuth.resendConfirmationCode(email!);
 
       return true;
     } catch (err) {
@@ -164,9 +157,9 @@ export const confirmNewPassword = (
   newPassword: string
 ): any => (
   async (dispatch: Dispatch, getState: () => AppState): Promise<boolean | undefined> => {
-    const { authModule: { email } } = getState();
-
     try {
+      const { authModule: { email } } = getState();
+
       await CognitoAuth.confirmNewPassword(
         email!,
         verificationCode,

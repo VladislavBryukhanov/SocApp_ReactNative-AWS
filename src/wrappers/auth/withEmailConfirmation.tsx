@@ -12,18 +12,15 @@ export interface AuthComponentProps extends NavigationParams {
   closeModal: () => void;
 
   // child
-  confirmRegistration: (credentials: Credentials, description: string) => void;
+  confirmRegistration: (description: string) => void;
 }
 
 export const withEmailConfirmation = <P extends object>(Component: React.ComponentType<P>) => {
   
   class WrappedComponent extends React.Component<P & AuthComponentProps> {
-    confirmRegistration = (credentials: Credentials, description: string) => {
+    confirmRegistration = (description: string) => {
       const confirmRegistrationDialog = (
-        <SignUpConfirmation
-          credentials={credentials}
-          onComplete={this.onRegestrationComplete}
-        />
+        <SignUpConfirmation onComplete={this.onRegestrationComplete}/>
       );
 
       Alert.alert(

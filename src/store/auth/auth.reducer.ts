@@ -25,17 +25,17 @@ export const authReducer = (state = initState, action: AuthAction): AuthState =>
     case AUTH_CHECKED:
       return {
         ...state,
-        isAuthenticated: action.payload.isAuthenticated
+        ...action.payload
       }
     case SIGN_IN: 
       return {
         ...state,
-        isAuthenticated: action.payload.isAuthenticated
+        ...action.payload
       }
     case SIGN_UP: 
       return {
         ...state,
-        isAuthenticated: action.payload.isAuthenticated
+        ...action.payload
       }
     case SIGN_OUT: {
       return {

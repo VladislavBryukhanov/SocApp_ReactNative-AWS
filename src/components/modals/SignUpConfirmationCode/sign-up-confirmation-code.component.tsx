@@ -10,9 +10,8 @@ import { confirmEmail, resendConfirmationCode } from '@store/auth/auth.actions';
 import styles from './styles';
 
 interface SignUpConfirmationProps {
-  credentials: Credentials,
   onComplete: () => void,
-  confirmEmail: (code: string, credentials: Credentials) => Promise<boolean>;
+  confirmEmail: (code: string) => Promise<boolean>;
   resendConfirmationCode: (credentials: Credentials) => Promise<boolean>;
 }
 
@@ -20,14 +19,14 @@ const SignUpConfirmation: React.FC<SignUpConfirmationProps> = (props: SignUpConf
   const [code, setCode] = useState('');
   
   const onCompleteRegistration = async () => {
-    const res = await props.confirmEmail(code, props.credentials);
+    const res = await props.confirmEmail(code);
     if (res) {
       props.onComplete();
     }
   }
 
   const onSendCodeAgaint = () => {
-    props.resendConfirmationCode(props.credentials);
+    props.resendConfirmationCode();
     Alert.alert(
       'Complete registration',
       'Confirmation code sent to your inbox, please check it and input code',
@@ -58,10 +57,10 @@ const SignUpConfirmation: React.FC<SignUpConfirmationProps> = (props: SignUpConf
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  confirmEmail: (code: string, credentials: Credentials) =>
-    dispatch(confirmEmail(code, credentials)),
-  resendConfirmationCode: (credentials: Credentials) => 
-    dispatch(resendConfirmationCode(credentials))
+  confirmEmail: (code: string) =>
+    dispatch(confirmEmail(code)),
+  resendConfirmationCode: () => 
+    dispatch(resendConfirmationCode())
 })
 
 export default connect(
