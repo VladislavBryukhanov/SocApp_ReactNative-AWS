@@ -1,3 +1,4 @@
+import { handleActions } from 'redux-actions';
 import { Action } from "redux";
 import { 
   AUTH_CHECKED,
@@ -20,35 +21,22 @@ const initState: AuthState = {
   isAuthenticated: false
 };
 
-export const authReducer = (state = initState, action: AuthAction): AuthState => {
-  switch(action.type) {
-    case AUTH_CHECKED:
-      return {
-        ...state,
-        ...action.payload
-      }
-    case SIGN_IN: 
-      return {
-        ...state,
-        ...action.payload
-      }
-    case SIGN_UP: 
-      return {
-        ...state,
-        ...action.payload
-      }
-    case SIGN_OUT: {
-      return {
-        ...state,
-        isAuthenticated: false
-      }
-    }
-    case FORGOT_PASSWORD: {
-      return {
-        ...state,
-        email: action.payload.email
-      }
-    }
-  }
-  return state;
-}
+export const authReducer = handleActions({
+  [AUTH_CHECKED]: (
+    state: AuthState,
+    { payload: { isAuthenticated } }: AuthAction
+  ) => ({ ...state, isAuthenticated }),
+  [SIGN_IN]: (
+    state: AuthState,
+    { payload: { email, isAuthenticated } }: AuthAction
+  ) => ({ ...state, email, isAuthenticated }),
+  [SIGN_UP]: (
+    state: AuthState,
+    { payload: { email } }: AuthAction
+  ) => ({ ...state, email }),
+  [SIGN_OUT]: (state: AuthState) => ({ ...state, isAuthenticated: false }),
+  [FORGOT_PASSWORD]: (
+    state: AuthState,
+    { payload: { email } }: AuthAction
+  ) => ({ ...state, email }),
+}, initState)

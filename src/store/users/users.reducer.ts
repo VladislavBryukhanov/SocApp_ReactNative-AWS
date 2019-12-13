@@ -1,6 +1,7 @@
-import { Action } from 'redux';
+import { Action, Reducer } from 'redux';
 import { User } from '@models/user';
 import { FETCH_USERS, CREATE_USER } from '@store/action-types';
+import { handleActions } from 'redux-actions';
 
 interface UserState {
   users: User[]
@@ -19,24 +20,13 @@ const initState: UserState = {
   users: []
 };
 
-export const usersReducer = (state = initState, action: UserAction): UserState => {
-  switch(action.type) {
-    case FETCH_USERS:
-      return {
-        users: [
-          ...state.users,
-          ...action.payload.fetchedUsers!
-        ]
-      };
-    case CREATE_USER:
-      return {
-        users: [
-          ...state.users,
-          action.payload.newUser!
-        ]
-      }
-
-    default: 
-      return state;
-  }
-}
+export const usersReducer: Reducer<UserState, UserAction> = handleActions({
+  [FETCH_USERS]: (
+    state: UserState,
+    { payload: { fetchedUsers } }: UserAction
+  ) => ({ users: [ ...state.users, ...fetchedUsers! ] }),
+  [CREATE_USER]: (
+    state: UserState,
+    { payload: { newUser } }: UserAction
+  ) => ({ users: [ ...state.users, newUser! ]})
+}, initState);
