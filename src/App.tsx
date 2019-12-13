@@ -7,7 +7,7 @@ import SignInScreen from '@screens/SignIn/sign-in-screen';
 import UserListScreen from '@screens/UserList/user-list-screen';
 import ProfileScreen from '@screens/Profile/profile-screen';
 import SignUpScreen from '@screens/SignUp/sign-up-screen';
-import ModalDialog from '@components/modals/ModalDialog/modal-dialog.component';
+import ModalDialog from '@components/ModalDialog/modal-dialog.component';
 
 const AppStack = createStackNavigator({
   UserList: { 

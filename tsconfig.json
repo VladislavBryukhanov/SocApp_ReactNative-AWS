@@ -59,6 +59,7 @@
     "paths": {
       "@api/*": ["api/*"],
       "@assets/*": ["assets/*"],
+      "@constants/*": ["constants/*"],
       "@components/*": ["components/*"],
       "@screens/*": ["screens/*"],
       "@store/*": ["store/*"],

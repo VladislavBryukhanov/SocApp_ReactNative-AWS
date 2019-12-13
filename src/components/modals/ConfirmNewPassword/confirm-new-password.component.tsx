@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Dispatch } from 'redux';
 import { Text, View, Button, ToastAndroid, ScrollView } from 'react-native';
-import styles from './styles';
-import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
+import styles from '../modal.styles';
+import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import { confirmNewPassword } from '@store/auth/auth.actions';
 import { connect } from 'react-redux';
 import { closeModal } from '@store/modal/modal.actions';
+import { PASSWORDS_DO_NOT_MATCH, PASSWORD_CHANGED } from '@constants/text-auth';
 
 interface ConfirmNewPasswordProps {
   confirmNewPassword: (code: string, newPassword: string) => Promise<boolean>;
@@ -19,12 +20,12 @@ const ConfirmNewPassword: React.FC<ConfirmNewPasswordProps> = (props: ConfirmNew
 
   const onConfirmNewPassword = async () => {
     if (password !== confirmPassword) {
-      return ToastAndroid.show('The passwords do not match', ToastAndroid.LONG);
+      return ToastAndroid.show(PASSWORDS_DO_NOT_MATCH, ToastAndroid.LONG);
     }
     
     const response = await props.confirmNewPassword(code, password);
     if (response) {
-      ToastAndroid.show('Password changed successfully', ToastAndroid.LONG);
+      ToastAndroid.show(PASSWORD_CHANGED, ToastAndroid.LONG);
       props.closeModal();
     }
   };

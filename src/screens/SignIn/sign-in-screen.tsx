@@ -4,13 +4,14 @@ import { NavigationParams } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
 import { Credentials } from '@models/user';
-import baseStyles from '@components/base.styles';
-import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
+import baseStyles from '@components/atoms/base.styles';
+import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import ForgotPassword from '@components/modals/ForgotPassword/forgot-password.component';
 import { withEmailConfirmation, AuthComponentProps } from '@wrappers/auth/withEmailConfirmation';
 import { signIn } from '@store/auth/auth.actions';
 import { openModal } from '@store/modal/modal.actions';
 import styles from './styles';
+import { EMAIL_NOT_CONFIRMED } from '@constants/text-auth';
 
 interface SignInProps extends NavigationParams, AuthComponentProps {
   signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
@@ -28,10 +29,9 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
     }
   }
 
-  const onUserIsNotConfirmedHandler = () => {
-    props.confirmRegistration(
-      'You still doesn\'t confirm your email, please check your inbox and input code'
-    );
+  const onUserIsNotConfirmedHandler = async () => {
+    await props.confirmRegistration(EMAIL_NOT_CONFIRMED);
+    props.onRegestrationComplete();
   }
 
   const goToSignUp = () => {

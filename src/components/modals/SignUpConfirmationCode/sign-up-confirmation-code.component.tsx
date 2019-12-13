@@ -3,16 +3,16 @@ import React, { useState } from 'react';
 import { View, Button, Text, Alert } from 'react-native';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
-import baseStyles from '@components/base.styles';
+import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
+import baseStyles from '@components/atoms/base.styles';
 import { Credentials } from '@models/user';
 import { confirmEmail, resendConfirmationCode } from '@store/auth/auth.actions';
-import styles from './styles';
+import styles from '../modal.styles';
 
 interface SignUpConfirmationProps {
   onComplete: () => void,
   confirmEmail: (code: string) => Promise<boolean>;
-  resendConfirmationCode: (credentials: Credentials) => Promise<boolean>;
+  resendConfirmationCode: () => Promise<boolean>;
 }
 
 const SignUpConfirmation: React.FC<SignUpConfirmationProps> = (props: SignUpConfirmationProps) => {

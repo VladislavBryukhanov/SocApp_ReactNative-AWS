@@ -15,7 +15,6 @@ export default StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 30
   },
   description: {
     color: Colors.white,

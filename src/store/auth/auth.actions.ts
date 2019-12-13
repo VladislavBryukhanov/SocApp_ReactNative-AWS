@@ -70,12 +70,11 @@ export const signUp = (
 ): any => (
   async (dispatch: Dispatch) => {
     try {
-      const payload = await CognitoAuth.signUp(credentials);
+      await CognitoAuth.signUp(credentials);
 
       dispatch({
         type: SIGN_UP,
         payload: {
-          isAuthenticated: !!payload,
           email: credentials.email
         }
       });

@@ -12,27 +12,29 @@ export interface AuthComponentProps extends NavigationParams {
   closeModal: () => void;
 
   // child
-  confirmRegistration: (description: string) => void;
+  confirmRegistration: (description: string) => Promise<undefined>;
+  onRegestrationComplete: () => void;
 }
 
 export const withEmailConfirmation = <P extends object>(Component: React.ComponentType<P>) => {
-  
   class WrappedComponent extends React.Component<P & AuthComponentProps> {
-    confirmRegistration = (description: string) => {
-      const confirmRegistrationDialog = (
-        <SignUpConfirmation onComplete={this.onRegestrationComplete}/>
-      );
 
-      Alert.alert(
-        'Complete registration',
-        description,
-        [{
-          text: 'Ok',
-          onPress: () => this.props.openModal(confirmRegistrationDialog)
-        }],
-        { cancelable: false }
-      )
-    }
+    confirmRegistration = (description: string): Promise<undefined> => 
+      new Promise((resolve, reject) => {
+        const confirmRegistrationDialog = (
+          <SignUpConfirmation onComplete={resolve}/>
+        );
+
+        Alert.alert(
+          'Complete registration',
+          description,
+          [{
+            text: 'Ok',
+            onPress: () => this.props.openModal(confirmRegistrationDialog)
+          }],
+          { cancelable: false }
+        )
+      })
 
     onRegestrationComplete = () => {
       this.props.closeModal();
@@ -40,7 +42,11 @@ export const withEmailConfirmation = <P extends object>(Component: React.Compone
     }
     
     render() {
-      return <Component {...this.props as P} confirmRegistration={this.confirmRegistration}/>
+      return <Component
+        {...this.props as P}
+        confirmRegistration={this.confirmRegistration}
+        onRegestrationComplete={this.onRegestrationComplete}
+      />
     }
   }
 

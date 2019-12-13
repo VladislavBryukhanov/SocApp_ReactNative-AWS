@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Dispatch } from 'redux';
 import { Text, View, Button, Alert } from 'react-native';
-import styles from './styles';
-import { BasicTextField } from '@components/BasicTextField/basic-text-field.component';
+import styles from '../modal.styles';
+import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import { forgotPassword } from '@store/auth/auth.actions';
 import { connect } from 'react-redux';
 import { ForgotPasswordResult } from '@models/auth';

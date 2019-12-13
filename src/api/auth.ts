@@ -62,8 +62,7 @@ export class CognitoAuth {
   }
 
   static async retrieveAuthenticatedUser(): Promise<CognitoUser | undefined > {
-    const syncStorage = promisify(userPool.storage.sync);
-    await syncStorage();
+    await promisify(userPool.storage.sync);
 
     const cognitoUser = userPool.getCurrentUser();
     return cognitoUser!;
