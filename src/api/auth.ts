@@ -43,6 +43,9 @@ export class CognitoAuth {
 
   static async getAwsConfigCredentials(): Promise<AWSCredentialsResult> {
     const awsIdentityLogin = `cognito-idp.${aws_cognito_region}.amazonaws.com/${aws_user_pools_id}`;
+    const credentials: AWSCredentialsResult = {
+      IdentityPoolId: aws_cognito_identity_pool_id
+    };
 
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
@@ -50,19 +53,19 @@ export class CognitoAuth {
         (callback) => cognitoUser.getSession(callback)
       );
       const session = await getSession();
+
       if (session instanceof CognitoUserSession) {
-        return {
-          IdentityPoolId: aws_cognito_identity_pool_id,
-          Logins: {
-            [awsIdentityLogin]: session.getIdToken().getJwtToken()
-          }
+        credentials.Logins = {
+          [awsIdentityLogin]: session.getIdToken().getJwtToken()
         }
       }
     }
+    return credentials;
   }
 
   static async retrieveAuthenticatedUser(): Promise<CognitoUser | undefined > {
-    await promisify(userPool.storage.sync);
+    const sync = promisify(userPool.storage.sync);
+    await sync();
 
     const cognitoUser = userPool.getCurrentUser();
     return cognitoUser!;
@@ -170,7 +173,7 @@ export class CognitoAuth {
       cognitoUser.forgotPassword({
         inputVerificationCode: resolve,
         // onSuccess unused, as it will be call only after confirmNewPassword() success
-        onSuccess: onCompletedCb,
+        onSuccess: onCompletedCb!,
         onFailure: reject,
       })
     });

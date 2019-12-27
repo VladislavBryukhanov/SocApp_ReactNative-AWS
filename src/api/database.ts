@@ -1,18 +1,19 @@
-import AWS, { DynamoDB, AWSError } from 'aws-sdk';
+import AWS, { DynamoDB, AWSError, CognitoIdentityCredentials } from 'aws-sdk';
 import { promisify } from 'es6-promisify';
 import { CognitoAuth } from './auth';
 import awsmobile from '../../aws-exports';
 
-export class DatabaseInstance {
-  dynamoDb?: DynamoDB;
+// Experimental - insecure as directly db access
+class DatabaseInstance {
+  dynamoDb?: DynamoDB.DocumentClient;
 
   async getDbInstance() {
     if (!this.dynamoDb) {
       const credentials = await CognitoAuth.getAwsConfigCredentials();
-      AWS.config.credentials = new AWS.CognitoIdentityCredentials(credentials);
+      AWS.config.credentials = new CognitoIdentityCredentials(credentials);
       AWS.config.update({ region: awsmobile.aws_project_region });
   
-      this.dynamoDb = new AWS.DynamoDB({
+      this.dynamoDb = new DynamoDB.DocumentClient({
         correctClockSkew: true
       });
     }
@@ -20,37 +21,34 @@ export class DatabaseInstance {
     return this.dynamoDb;
   }
 
-  async scan(requestParams: DynamoDB.Types.ScanInput): Promise<DynamoDB.Types.ScanOutput> {
+  async scan(requestParams: DynamoDB.DocumentClient.ScanInput): Promise<DynamoDB.DocumentClient.ScanOutput> {
     const db = await this.getDbInstance();
-    const scanDb = promisify(
-      (
-        params: DynamoDB.Types.ScanInput,
+    const scanDb = promisify((
+        params: DynamoDB.DocumentClient.ScanInput,
         callback: (
           err: AWSError,
-          data: DynamoDB.Types.ScanOutput
+          data: DynamoDB.DocumentClient.ScanOutput
         ) => void
       ) => db.scan(params, callback)
     );
 
-    // const dynamodb = new AWS.DynamoDB.DocumentClient();
-
-    const items = await scanDb(requestParams);
-    return items;
+    return scanDb(requestParams);
   }
 
-  async create(item: DynamoDB.Types.PutItemInput) {
+  async create(requestParams: DynamoDB.DocumentClient.PutItemInput) {
     const db = await this.getDbInstance();
-    const putItem = promisify(
-      (
-        params: DynamoDB.Types.PutItemInput,
+    const putItem = promisify((
+        params: DynamoDB.DocumentClient.PutItemInput,
         callback: (
           err: AWSError,
-          data: DynamoDB.Types.ScanOutput
+          data: DynamoDB.DocumentClient.PutItemOutput
         ) => void
-      ) => db.putItem(params, callback)
+      ) => db.put(params, callback)
     );
 
-    const items = await putItem(item);
-    return items;
+    await putItem(requestParams);
+    return requestParams.Item;
   }
 }
+
+export default new DatabaseInstance();
