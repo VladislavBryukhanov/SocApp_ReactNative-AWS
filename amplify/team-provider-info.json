@@ -1,21 +1,24 @@
 {
-    "env": {
-        "awscloudformation": {
-            "AuthRoleName": "soc-app-env-20191024191923-authRole",
-            "UnauthRoleArn": "arn:aws:iam::606853744219:role/soc-app-env-20191024191923-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::606853744219:role/soc-app-env-20191024191923-authRole",
-            "Region": "us-east-1",
-            "DeploymentBucketName": "soc-app-env-20191024191923-deployment",
-            "UnauthRoleName": "soc-app-env-20191024191923-unauthRole",
-            "StackName": "soc-app-env-20191024191923",
-            "StackId": "arn:aws:cloudformation:us-east-1:606853744219:stack/soc-app-env-20191024191923/0abfdd60-f67a-11e9-835c-12b44143da02"
-        },
-        "categories": {
-            "auth": {
-                "socapp0dae7dcc": {},
-                "socapp175788bc": {},
-                "socapp1b1fa1e9": {}
-            }
-        }
-    }
+	"dev": {
+		"awscloudformation": {
+			"AuthRoleName": "amplify-soc-app-dev-151321-authRole",
+			"UnauthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-dev-151321-unauthRole",
+			"AuthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-dev-151321-authRole",
+			"Region": "us-east-1",
+			"DeploymentBucketName": "amplify-soc-app-dev-151321-deployment",
+			"UnauthRoleName": "amplify-soc-app-dev-151321-unauthRole",
+			"StackName": "amplify-soc-app-dev-151321",
+			"StackId": "arn:aws:cloudformation:us-east-1:606853744219:stack/amplify-soc-app-dev-151321/27c45d80-2b06-11ea-90f9-0a0faac5843d"
+		},
+		"categories": {
+			"auth": {
+				"SocAppMobile": {}
+			},
+			"function": {
+				"dbConnection": {},
+				"createUser": {},
+				"userList": {}
+			}
+		}
+	}
 }
