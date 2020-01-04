@@ -7,7 +7,7 @@ import {
   NodeCallback,
   CognitoUserSession
 } from 'amazon-cognito-identity-js';
-import { Credentials } from '@models/user';
+import { Credentials, UserAttributes } from '@models/user';
 import { promisify } from 'es6-promisify';
 import awsconfig from '../../aws-exports';
 import { 
@@ -15,6 +15,7 @@ import {
   SignInResult,
   ForgotPasswordResult
 } from '@models/auth';
+import each from 'lodash/each';
 
 const {
   aws_user_pools_id,
@@ -96,15 +97,28 @@ export class CognitoAuth {
     return signInPromise;
   }
 
-  static signUp(credentials: Credentials): Promise<ISignUpResult | undefined> {
+  static signUp(
+    credentials: Credentials,
+    userAttributes: UserAttributes
+  ): Promise<ISignUpResult | undefined> {
     const { email, password } = credentials;
 
     const attributeEmail = new CognitoUserAttribute({
       Name: 'email',
       Value: email
     });
+
+    const attributes: CognitoUserAttribute[] = [];
+    each(userAttributes, (value, key) => attributes.push(
+      new CognitoUserAttribute({
+        Name: `custom:${key}`,
+        Value: String(value)
+      })
+    ));
+
     const attributeList = [
-      attributeEmail
+      attributeEmail,
+      ...attributes
     ];
 
     const signUp = promisify((

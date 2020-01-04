@@ -1,6 +1,6 @@
 import { Dispatch } from "redux";
 import { User } from '@models/user';
-import UsersRepository from "@api/users.repository";
+import UsersRepository from "@api/repositories/users.repository";
 import { FETCH_USERS, CREATE_USER } from "@store/action-types";
 import errorHandler from "@store/errorHandler";
 

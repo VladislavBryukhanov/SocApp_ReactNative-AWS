@@ -5,7 +5,7 @@ import {
   USER_IS_NOT_CONFIRMED_EXCEPTION,
   USER_ALREADY_EXISTS_EXCEPTION
 } from "@api/auth";
-import { Credentials } from "@models/user";
+import { Credentials, UserAttributes } from "@models/user";
 import { ForgotPasswordResult } from '@models/auth';
 import errorHandler from '@store/errorHandler';
 import { 
@@ -66,11 +66,12 @@ export const signIn = (
 
 export const signUp = (
   credentials: Credentials,
+  userAttributes: UserAttributes,
   userExistsExceptionHandler?: Function
 ): any => (
   async (dispatch: Dispatch) => {
     try {
-      await CognitoAuth.signUp(credentials);
+      await CognitoAuth.signUp(credentials, userAttributes);
 
       dispatch({
         type: SIGN_UP,

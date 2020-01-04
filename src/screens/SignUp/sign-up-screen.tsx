@@ -3,7 +3,7 @@ import { ToastAndroid, ScrollView, View, Button } from 'react-native';
 import { NavigationParams } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
-import { Credentials, User } from '@models/user';
+import { Credentials, UserAttributes } from '@models/user';
 import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import { signUp, signIn } from '@store/auth/auth.actions';
 import { createUser } from '@store/users/users.actions';
@@ -14,9 +14,15 @@ import styles from './styles';
 type StateKeys = 'email' | 'password' | 'confirmPassword' | 'nickname' | 'username';
 
 interface SignUpProps extends NavigationParams, AuthComponentProps {
-  signUp: (user: Credentials, onUserExistsHandler?: Function) => Promise<boolean>;
-  signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
-  createUser: (user: User) => Promise<void>;
+  signUp: (
+    user: Credentials,
+    userAttributes: UserAttributes,
+    onUserExistsHandler?: Function
+  ) => Promise<boolean>;
+  signIn: (
+    user: Credentials,
+    confirmationExceptionHandler?: Function
+  ) => Promise<boolean>;
 }
 
 interface SignUpState {
@@ -38,7 +44,7 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
   }
 
   onSignUp = async () => {
-    const { email, password, confirmPassword } = this.state;
+    const { email, password, username, nickname, confirmPassword } = this.state;
 
     if (password !== confirmPassword) {
       return ToastAndroid.show(PASSWORDS_DO_NOT_MATCH, ToastAndroid.LONG);
@@ -46,14 +52,13 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
 
     const user = await this.props.signUp(
       { email, password },
+      { username, nickname },
       this.onUserExistsHandler
     );
 
     if(user) {
       await this.props.confirmRegistration(CONFIRM_REGISTRATION);
       await this.props.signIn({ email, password });
-      // TODO check is user created
-      // await this.props.createUser({ ...this.state });
       this.props.onRegestrationComplete();
     }
   }
@@ -119,11 +124,13 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  signUp: (user: Credentials, onUserExistsHandler?: Function) =>
-    dispatch(signUp(user, onUserExistsHandler)),
+  signUp: (
+    user: Credentials,
+    userAttributes: UserAttributes,
+    onUserExistsHandler?: Function
+  ) => dispatch(signUp(user, userAttributes, onUserExistsHandler)),
   signIn: (credentials: Credentials, confirmationExceptionHandler?: Function) => 
     dispatch(signIn(credentials, confirmationExceptionHandler)),
-  createUser: (user: User) => dispatch(createUser(user)),
 });
 
 export default compose<SignUpProps>(
