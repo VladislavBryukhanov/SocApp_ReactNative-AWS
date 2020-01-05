@@ -1,14 +1,8 @@
-import { Alert, ToastAndroid } from "react-native";
+import { ToastAndroid } from "react-native";
 
-export default (err: Error) => {
-  console.log(err);
+export default (err: Error, moduleName: string) => {
+  console.log('Action name: ', moduleName);
+  console.log('Error stack: ', err);
 
   ToastAndroid.show(err.message, ToastAndroid.LONG);
-  // Alert.alert(
-  //   'Error has occured',
-  //   err.message, 
-  //   [
-  //     { text: 'Ok' }     
-  //   ]
-  // )
 }

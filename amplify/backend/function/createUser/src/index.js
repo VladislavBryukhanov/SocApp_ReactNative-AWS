@@ -8,9 +8,9 @@ var storageUserListArn = process.env.STORAGE_USERLIST_ARN
 Amplify Params - DO NOT EDIT */
 
 const uuidv4 = require('uuid/v4');
-const AWS = require('aws-sdk')
+const AWS = require('aws-sdk');
 
-AWS.config.update({ region: process.env.TABLE_REGION });
+AWS.config.update({ region: process.env.REGION });
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 const customAttributePrefix = 'custom:';

@@ -6,9 +6,9 @@ import { connect } from 'react-redux';
 import { Credentials, UserAttributes } from '@models/user';
 import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import { signUp, signIn } from '@store/auth/auth.actions';
-import { createUser } from '@store/users/users.actions';
 import { AuthComponentProps, withEmailConfirmation } from '@wrappers/auth/withEmailConfirmation';
 import { CONFIRM_REGISTRATION, USER_EXISTS, PASSWORDS_DO_NOT_MATCH } from '@constants/text-auth';
+import startCase from 'lodash/startCase';
 import styles from './styles';
 
 type StateKeys = 'email' | 'password' | 'confirmPassword' | 'nickname' | 'username';
@@ -50,9 +50,12 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
       return ToastAndroid.show(PASSWORDS_DO_NOT_MATCH, ToastAndroid.LONG);
     }
 
+    const credentials = { email: email.toLowerCase(), password };
+    const userAttributes = { username, nickname };
+
     const user = await this.props.signUp(
-      { email, password },
-      { username, nickname },
+      credentials,
+      userAttributes,
       this.onUserExistsHandler
     );
 
@@ -68,7 +71,8 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     this.props.navigation.navigate('SignIn');
   }
 
-  commonProps = (fieldName: StateKeys) => ({
+  commonProps = (fieldName: StateKeys, required?: boolean) => ({
+    label: startCase(fieldName) + (required ? '*' : ''),
     value: this.state[fieldName],
     onChangeText: (text: string) => this.setState({
       [fieldName]: text
@@ -84,31 +88,24 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
       >
         
         <View style={styles.authForm}>
-          <BasicTextField
-            label='Email*'
-            {...this.commonProps('email')}
-          />
+          <BasicTextField {...this.commonProps('email', true)}/>
 
           <BasicTextField
-            label='Password*'
             secureTextEntry={true}
-            {...this.commonProps('password')}
+            {...this.commonProps('password', true)}
           />
         
           <BasicTextField
-            label='Confirm password*'
             secureTextEntry={true}
             {...this.commonProps('confirmPassword')}
           />
 
           <BasicTextField
-            label='Username*'
-            description='Unique name of your user'
+            description='Unique name of your account, which will provide an opportunity for other users to find you'
             {...this.commonProps('username')}
           />
 
           <BasicTextField
-            label='Nickname'
             description='Nickname which will be displayed for your user'
             {...this.commonProps('nickname')}
           />

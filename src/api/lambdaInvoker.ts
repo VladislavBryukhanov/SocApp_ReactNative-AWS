@@ -3,12 +3,10 @@ import AWS, { AWSError, CognitoIdentityCredentials } from 'aws-sdk';
 import { CognitoAuth } from '@api/auth';
 import awsmobile from '../../aws-exports';
 import { promisify } from 'es6-promisify';
+import { AMPLIFY_ENV} from 'react-native-dotenv';
 
 type LambdaResultCb = (err: AWSError, data: InvocationResponse) => void;
 type LambdaFunctionName = 'listUsers' | 'createUser';
-
-// TODO replacr with local env
-const ENV = 'dev';
 
 class LambdaInvoker {
   private _lambda?: AWS.Lambda;
@@ -16,7 +14,7 @@ class LambdaInvoker {
   private async getLambdaInstance() {
     if (!this._lambda) {
       const credentials = await CognitoAuth.getAwsConfigCredentials();
-      
+
       AWS.config.credentials = new CognitoIdentityCredentials(credentials);
       AWS.config.update({ region: awsmobile.aws_project_region });
 
@@ -29,7 +27,7 @@ class LambdaInvoker {
   async invoke<T>(functionName: LambdaFunctionName) {
     const lambda = await this.getLambdaInstance();
     const params = {
-      FunctionName: `${functionName}-${ENV}` 
+      FunctionName: `${functionName}-${AMPLIFY_ENV}` 
     };
     
     const lambdaResult = promisify(

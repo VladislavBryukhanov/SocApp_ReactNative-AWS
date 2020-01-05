@@ -1,6 +1,4 @@
 import { User } from '@models/user';
-import database from '../experimental/database';
-import uuidv4 from 'uuid/v4';
 import lambdaInvoker from '../lambdaInvoker';
 
 class UsersRepository {

@@ -54,6 +54,20 @@
 					]
 				}
 			]
+		},
+		"validateNewUser": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true,
+			"dependsOn": [
+				{
+					"category": "auth",
+					"resourceName": "SocAppMobile",
+					"attributes": [
+						"UserPoolId"
+					]
+				}
+			]
 		}
 	},
 	"api": {

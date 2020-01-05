@@ -26,6 +26,7 @@ const {
 
 export const USER_IS_NOT_CONFIRMED_EXCEPTION = 'UserNotConfirmedException';
 export const USER_ALREADY_EXISTS_EXCEPTION = 'UsernameExistsException';
+export const USER_VALIDATION_EXCEPTION = 'UserLambdaValidationException';
 
 const poolData = {
   UserPoolId: aws_user_pools_id,
@@ -98,27 +99,23 @@ export class CognitoAuth {
   }
 
   static signUp(
-    credentials: Credentials,
-    userAttributes: UserAttributes
+    { email, password }: Credentials,
+    { nickname, username }: UserAttributes
   ): Promise<ISignUpResult | undefined> {
-    const { email, password } = credentials;
 
-    const attributeEmail = new CognitoUserAttribute({
-      Name: 'email',
-      Value: email
-    });
-
-    const attributes: CognitoUserAttribute[] = [];
-    each(userAttributes, (value, key) => attributes.push(
+    const attributes: CognitoUserAttribute[] = [
       new CognitoUserAttribute({
-        Name: `custom:${key}`,
-        Value: String(value)
+        Name: 'nickname',
+        Value: nickname
+      }),
+      new CognitoUserAttribute({
+        Name: 'preferred_username',
+        Value: username
+      }),
+      new CognitoUserAttribute({
+        Name: 'email',
+        Value: email
       })
-    ));
-
-    const attributeList = [
-      attributeEmail,
-      ...attributes
     ];
 
     const signUp = promisify((
@@ -136,7 +133,7 @@ export class CognitoAuth {
       )
     );
 
-    return signUp(email, password, attributeList, []);
+    return signUp(email, password, attributes, []);
   }
 
   static signOut() {
