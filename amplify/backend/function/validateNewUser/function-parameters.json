@@ -1,0 +1,9 @@
+{
+    "permissions": {
+        "auth": {
+            "SocAppMobile": [
+                "read"
+            ]
+        }
+    }
+}

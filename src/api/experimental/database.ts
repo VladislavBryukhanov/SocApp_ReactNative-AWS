@@ -1,7 +1,7 @@
 import AWS, { DynamoDB, AWSError, CognitoIdentityCredentials } from 'aws-sdk';
 import { promisify } from 'es6-promisify';
-import { CognitoAuth } from './auth';
-import awsmobile from '../../aws-exports';
+import { CognitoAuth } from '@api/auth';
+import awsmobile from '../../../aws-exports';
 
 // Experimental - insecure as directly db access
 class DatabaseInstance {

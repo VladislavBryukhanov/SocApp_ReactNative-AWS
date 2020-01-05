@@ -1,8 +1,8 @@
 {
-    "identityPoolName": "socapp1b1fa1e9_identitypool_1b1fa1e9",
+    "identityPoolName": "socAppMobile_identitypool_1b1fa1e9",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "socapp1b1fa1e9",
-    "userPoolName": "socapp1b1fa1e9_userpool_1b1fa1e9",
+    "resourceNameTruncated": "socAppMobile",
+    "userPoolName": "socAppMobile_userpool_1b1fa1e9",
     "autoVerifiedAttributes": [
         "email"
     ],
@@ -28,9 +28,9 @@
     "userpoolClientReadAttributes": [
         "email"
     ],
-    "userpoolClientLambdaRole": "socapp1b1fa1e9_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "socAppMobile_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "resourceName": "socapp1b1fa1e9",
+    "resourceName": "socAppMobile",
     "authSelections": "identityPoolAndUserPool",
     "authRoleArn": {
         "Fn::GetAtt": [

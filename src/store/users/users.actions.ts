@@ -1,7 +1,6 @@
 import { Dispatch } from "redux";
-import { User } from '@models/user';
-import UsersRepository from "@api/users.repository";
-import { FETCH_USERS, CREATE_USER } from "@store/action-types";
+import UsersRepository from "@api/repositories/users.repository";
+import { FETCH_USERS } from "@store/action-types";
 import errorHandler from "@store/errorHandler";
 
 export const fetchUsers = (): any => (
@@ -15,21 +14,7 @@ export const fetchUsers = (): any => (
         }
       });
     } catch (err) {
-      errorHandler(err);
-    }
-  }
-)
-
-export const createUser = (user: User): any => (
-  async (dispatch: Dispatch) => {
-    try {
-      const newUser = await UsersRepository.create(user);
-      dispatch({
-        type: CREATE_USER,
-        payload: { newUser }
-      });
-    } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'fetchUsers');
     }
   }
 )

@@ -3,9 +3,10 @@ import { Dispatch } from "redux";
 import { 
   CognitoAuth,
   USER_IS_NOT_CONFIRMED_EXCEPTION,
-  USER_ALREADY_EXISTS_EXCEPTION
+  USER_ALREADY_EXISTS_EXCEPTION,
+  USER_VALIDATION_EXCEPTION
 } from "@api/auth";
-import { Credentials } from "@models/user";
+import { Credentials, UserAttributes } from "@models/user";
 import { ForgotPasswordResult } from '@models/auth';
 import errorHandler from '@store/errorHandler';
 import { 
@@ -30,7 +31,7 @@ export const retrieveAuthenticatedUser = (): any => (
 
       return user;
     } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'retrieveAuthenticatedUser');
     }
   }
 )
@@ -56,9 +57,9 @@ export const signIn = (
       if (err.code === USER_IS_NOT_CONFIRMED_EXCEPTION) {
         confirmationExceptionHandler 
           ? confirmationExceptionHandler()
-          : errorHandler(err);
+          : errorHandler(err, 'signIn');
       } else {
-        errorHandler(err);
+        errorHandler(err, 'signIn');
       }
     }
   }
@@ -66,11 +67,12 @@ export const signIn = (
 
 export const signUp = (
   credentials: Credentials,
+  userAttributes: UserAttributes,
   userExistsExceptionHandler?: Function
 ): any => (
   async (dispatch: Dispatch) => {
     try {
-      await CognitoAuth.signUp(credentials);
+      await CognitoAuth.signUp(credentials, userAttributes);
 
       dispatch({
         type: SIGN_UP,
@@ -81,12 +83,24 @@ export const signUp = (
 
       return true;
     } catch (err) {
-      if (err.code === USER_ALREADY_EXISTS_EXCEPTION) {
-        userExistsExceptionHandler 
-          ? userExistsExceptionHandler()
-          : errorHandler(err);
-      } else {
-        errorHandler(err);
+      switch(err.code) {
+        case USER_VALIDATION_EXCEPTION: {
+          const errorPrefix = 'PreSignUp failed with error ';
+          const error = {
+            ...err,
+            message: err.message.slice(errorPrefix.length)
+          };
+
+          return errorHandler(error, 'signUp')
+        }
+        case USER_ALREADY_EXISTS_EXCEPTION: {
+          return userExistsExceptionHandler
+            ? userExistsExceptionHandler()
+            : errorHandler(err, 'signUp');
+        }
+        default: {
+          return errorHandler(err, 'signUp');
+        }
       }
     }
   }
@@ -98,7 +112,7 @@ export const signOut = (): any => (
       CognitoAuth.signOut();
       dispatch({ type: SIGN_OUT });
     } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'signOut');
     }
   }
 )
@@ -112,7 +126,7 @@ export const confirmEmail = (confirmationCode: string): any => (
 
       return true;
     } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'confirmEmail');
     }
   }
 )
@@ -126,7 +140,7 @@ export const resendConfirmationCode = (): any => (
 
       return true;
     } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'resendConfirmationCode');
     }
   }
 )
@@ -146,7 +160,7 @@ export const forgotPassword = (
 
       return result;
     } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'forgotPassword');
     }
   }
 )
@@ -167,7 +181,7 @@ export const confirmNewPassword = (
 
       return true;
     } catch (err) {
-      errorHandler(err);
+      errorHandler(err, 'confirmNewPassword');
     }
   }
 )

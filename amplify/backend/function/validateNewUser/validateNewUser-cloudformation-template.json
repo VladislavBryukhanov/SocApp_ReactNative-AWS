@@ -5,13 +5,9 @@
 		"env": {
 			"Type": "String"
 		},
-		"storageuserListName": {
+		"authSocAppMobileUserPoolId": {
 			"Type": "String",
-			"Default": "storageuserListName"
-		},
-		"storageuserListArn": {
-			"Type": "String",
-			"Default": "storageuserListArn"
+			"Default": "authSocAppMobileUserPoolId"
 		}
 	},
 	"Conditions": {
@@ -36,12 +32,12 @@
 				"FunctionName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"dbConnection",
+						"validateNewUser",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"dbConnection",
+									"validateNewUser",
 									"-",
 									{
 										"Ref": "env"
@@ -59,11 +55,8 @@
 						"REGION": {
 							"Ref": "AWS::Region"
 						},
-						"STORAGE_USERLIST_NAME": {
-							"Ref": "storageuserListName"
-						},
-						"STORAGE_USERLIST_ARN": {
-							"Ref": "storageuserListArn"
+						"AUTH_SOCAPPMOBILE_USERPOOLID": {
+							"Ref": "authSocAppMobileUserPoolId"
 						}
 					}
 				},
@@ -77,7 +70,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-dev-151321-deployment",
-					"S3Key": "amplify-builds/dbConnection-494a524b2b3936326b37-build.zip"
+					"S3Key": "amplify-builds/validateNewUser-32416c392f6f6c654834-build.zip"
 				}
 			}
 		},
@@ -87,12 +80,12 @@
 				"RoleName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"socappLambdaRoleb81432f7",
+						"socappLambdaRole38bb15f3",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"socappLambdaRoleb81432f7",
+									"socappLambdaRole38bb15f3",
 									"-",
 									{
 										"Ref": "env"
@@ -158,33 +151,6 @@
 									}
 								]
 							}
-						},
-						{
-							"Effect": "Allow",
-							"Action": [
-								"dynamodb:GetItem",
-								"dynamodb:Query",
-								"dynamodb:Scan",
-								"dynamodb:PutItem",
-								"dynamodb:UpdateItem",
-								"dynamodb:DeleteItem"
-							],
-							"Resource": [
-								{
-									"Ref": "storageuserListArn"
-								},
-								{
-									"Fn::Join": [
-										"/",
-										[
-											{
-												"Ref": "storageuserListArn"
-											},
-											"index/*"
-										]
-									]
-								}
-							]
 						}
 					]
 				}
@@ -208,22 +174,40 @@
 						{
 							"Effect": "Allow",
 							"Action": [
-								"dynamodb:Put*",
-								"dynamodb:Create*",
-								"dynamodb:BatchWriteItem",
-								"dynamodb:Get*",
-								"dynamodb:BatchGetItem",
-								"dynamodb:List*",
-								"dynamodb:Describe*",
-								"dynamodb:Scan",
-								"dynamodb:Query",
-								"dynamodb:Update*",
-								"dynamodb:RestoreTable*",
-								"dynamodb:Delete*"
+								"cognito-identity:Describe*",
+								"cognito-identity:Get*",
+								"cognito-identity:List*",
+								"cognito-idp:Describe*",
+								"cognito-idp:AdminGetDevice",
+								"cognito-idp:AdminGetUser",
+								"cognito-idp:AdminList*",
+								"cognito-idp:List*",
+								"cognito-sync:Describe*",
+								"cognito-sync:Get*",
+								"cognito-sync:List*",
+								"iam:ListOpenIdConnectProviders",
+								"iam:ListRoles",
+								"sns:ListPlatformApplications"
 							],
 							"Resource": [
 								{
-									"Ref": "storageuserListArn"
+									"Fn::Join": [
+										"",
+										[
+											"arn:aws:cognito-idp:",
+											{
+												"Ref": "AWS::Region"
+											},
+											":",
+											{
+												"Ref": "AWS::AccountId"
+											},
+											":userpool/",
+											{
+												"Ref": "authSocAppMobileUserPoolId"
+											}
+										]
+									]
 								}
 							]
 						}

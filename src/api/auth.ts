@@ -7,7 +7,7 @@ import {
   NodeCallback,
   CognitoUserSession
 } from 'amazon-cognito-identity-js';
-import { Credentials } from '@models/user';
+import { Credentials, UserAttributes } from '@models/user';
 import { promisify } from 'es6-promisify';
 import awsconfig from '../../aws-exports';
 import { 
@@ -15,6 +15,7 @@ import {
   SignInResult,
   ForgotPasswordResult
 } from '@models/auth';
+import each from 'lodash/each';
 
 const {
   aws_user_pools_id,
@@ -25,6 +26,7 @@ const {
 
 export const USER_IS_NOT_CONFIRMED_EXCEPTION = 'UserNotConfirmedException';
 export const USER_ALREADY_EXISTS_EXCEPTION = 'UsernameExistsException';
+export const USER_VALIDATION_EXCEPTION = 'UserLambdaValidationException';
 
 const poolData = {
   UserPoolId: aws_user_pools_id,
@@ -96,15 +98,24 @@ export class CognitoAuth {
     return signInPromise;
   }
 
-  static signUp(credentials: Credentials): Promise<ISignUpResult | undefined> {
-    const { email, password } = credentials;
+  static signUp(
+    { email, password }: Credentials,
+    { nickname, username }: UserAttributes
+  ): Promise<ISignUpResult | undefined> {
 
-    const attributeEmail = new CognitoUserAttribute({
-      Name: 'email',
-      Value: email
-    });
-    const attributeList = [
-      attributeEmail
+    const attributes: CognitoUserAttribute[] = [
+      new CognitoUserAttribute({
+        Name: 'nickname',
+        Value: nickname
+      }),
+      new CognitoUserAttribute({
+        Name: 'preferred_username',
+        Value: username
+      }),
+      new CognitoUserAttribute({
+        Name: 'email',
+        Value: email
+      })
     ];
 
     const signUp = promisify((
@@ -122,7 +133,7 @@ export class CognitoAuth {
       )
     );
 
-    return signUp(email, password, attributeList, []);
+    return signUp(email, password, attributes, []);
   }
 
   static signOut() {
