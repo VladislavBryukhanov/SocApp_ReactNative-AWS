@@ -7,17 +7,15 @@ var authSocAppMobileUserPoolId = process.env.AUTH_SOCAPPMOBILE_USERPOOLID
 Amplify Params - DO NOT EDIT */
 
 const AWS = require('aws-sdk');
-
 AWS.config.update({ region: process.env.REGION });
+
 const cisp = new AWS.CognitoIdentityServiceProvider();
 
-exports.handler = function (event, context, callback) {
-  context.callbackWaitsForEmptyEventLoop = false;
-
+exports.handler = async function (event) {
   const { email, preferred_username } = event.request.userAttributes;
 
   if (email.toLowerCase() !== email) {
-    return callback('Email must be lowercase');
+    throw Error('Email must be lowercase');
   }
 
   const params = {
@@ -25,11 +23,10 @@ exports.handler = function (event, context, callback) {
     Filter: `preferred_username="${preferred_username}"`
   };
 
-  cisp.listUsers(params, (err, data) => {
-    if (data.Users.length > 0) {
-      callback('Such username already exists');
-    } else {
-      callback(null, event);
-    }
-  });
+  const data = await cisp.listUsers(params).promise();
+  if (data.Users.length > 0) {
+    throw Error('Such username already exists');
+  } else {
+    return event;
+  }
 };

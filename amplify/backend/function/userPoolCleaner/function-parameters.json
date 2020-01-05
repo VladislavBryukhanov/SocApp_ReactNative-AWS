@@ -1,0 +1,10 @@
+{
+    "permissions": {
+        "auth": {
+            "SocAppMobile": [
+                "read",
+                "delete"
+            ]
+        }
+    }
+}

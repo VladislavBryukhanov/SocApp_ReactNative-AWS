@@ -1,3 +1,4 @@
+import AWS, { CognitoIdentityCredentials } from 'aws-sdk';
 import {
   CognitoUserPool,
   CognitoUserAttribute,
@@ -15,13 +16,13 @@ import {
   SignInResult,
   ForgotPasswordResult
 } from '@models/auth';
-import each from 'lodash/each';
 
 const {
   aws_user_pools_id,
   aws_user_pools_web_client_id,
   aws_cognito_region,
-  aws_cognito_identity_pool_id
+  aws_cognito_identity_pool_id,
+  aws_project_region
 } = awsconfig;
 
 export const USER_IS_NOT_CONFIRMED_EXCEPTION = 'UserNotConfirmedException';
@@ -43,7 +44,7 @@ export class CognitoAuth {
     return new CognitoUser(userData);
   }
 
-  static async getAwsConfigCredentials(): Promise<AWSCredentialsResult> {
+  private static async getAwsConfigCredentials(): Promise<AWSCredentialsResult> {
     const awsIdentityLogin = `cognito-idp.${aws_cognito_region}.amazonaws.com/${aws_user_pools_id}`;
     const credentials: AWSCredentialsResult = {
       IdentityPoolId: aws_cognito_identity_pool_id
@@ -63,6 +64,13 @@ export class CognitoAuth {
       }
     }
     return credentials;
+  }
+
+  static async updateAWSConfig() {
+    const credentials = await this.getAwsConfigCredentials();
+
+    AWS.config.credentials = new CognitoIdentityCredentials(credentials);
+    AWS.config.update({ region: aws_project_region });
   }
 
   static async retrieveAuthenticatedUser(): Promise<CognitoUser | undefined > {

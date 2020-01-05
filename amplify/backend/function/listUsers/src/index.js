@@ -8,8 +8,8 @@ var storageUserListArn = process.env.STORAGE_USERLIST_ARN
 Amplify Params - DO NOT EDIT */
 
 const AWS = require('aws-sdk');
-
 AWS.config.update({ region: process.env.REGION });
+
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 let tableName = "userList";

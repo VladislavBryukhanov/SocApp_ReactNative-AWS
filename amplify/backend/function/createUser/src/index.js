@@ -9,12 +9,15 @@ Amplify Params - DO NOT EDIT */
 
 const uuidv4 = require('uuid/v4');
 const AWS = require('aws-sdk');
-
 AWS.config.update({ region: process.env.REGION });
+
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const customAttributePrefix = 'custom:';
 const targetTriggerSource = 'PostConfirmation_ConfirmSignUp';
+const targetAttributes = [
+  { userPoolKey: 'nickname', dynamoDbKey: 'nickname' },
+  { userPoolKey: 'preferred_username', dynamoDbKey: 'username' }
+];
 
 let tableName = "userList";
 if(process.env.ENV && process.env.ENV !== "NONE") {
@@ -30,19 +33,11 @@ exports.handler = function (event, context, callback) {
     return callback(null, event);
   }
 
-  const userItem = Object.keys(userAttributes).reduce((acc, attribute) => {
-    if (attribute.includes(customAttributePrefix)) {
-      const key = attribute.slice(customAttributePrefix.length);
-
-      return {
-        ...acc,
-        [key]: userAttributes[attribute]
-      }
-    }
-
-    return acc;
-  }, {});
-
+  const userItem = targetAttributes.reduce((acc, { userPoolKey, dynamoDbKey  }) => ({
+    ...acc,
+    [dynamoDbKey]: userAttributes[userPoolKey]
+  }), {});
+  
   const queryParams = {
     TableName: tableName,
     Item: {
