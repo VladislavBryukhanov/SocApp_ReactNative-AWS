@@ -7,7 +7,7 @@ import { User } from '@models/user';
 import { AppState } from '@store/index';
 import { fetchUsers } from '@store/users/users.actions';
 import defaultAvatar from '@assets/icons/user.png';
-import SignOutButton from '@components/SignOutButton/sign-out-button.component';
+import AppMenu from '@components/Menu/menu.component';
 import styles from './styles';
 
 interface UserListProps extends NavigationParams {
@@ -23,7 +23,7 @@ class UserListScreen extends React.Component<UserListProps> {
   }
 
   static navigationOptions = {
-    headerRight: () => <SignOutButton/>,
+    headerRight: () => <AppMenu/>,
   };
 
   onOpenProfile = (user: User) => {

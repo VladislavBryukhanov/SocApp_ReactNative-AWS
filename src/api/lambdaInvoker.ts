@@ -1,8 +1,4 @@
-import { InvocationResponse } from 'aws-sdk/clients/lambda';
-import AWS, { AWSError, CognitoIdentityCredentials } from 'aws-sdk';
-import { CognitoAuth } from '@api/auth';
-import awsmobile from '../../aws-exports';
-import { promisify } from 'es6-promisify';
+import AWS from 'aws-sdk';
 import { AMPLIFY_ENV} from 'react-native-dotenv';
 
 class LambdaInvoker {

@@ -1,11 +1,11 @@
 import React from 'react';
 import { ScrollView, Image, Text, View } from 'react-native';
-import { NavigationParams, NavigationScreenProp } from 'react-navigation';
+import { NavigationScreenProp, NavigationSwitchScreenProps } from 'react-navigation';
 import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
 
-interface ProfileScreeProps extends NavigationParams {}
+interface ProfileScreeProps extends NavigationSwitchScreenProps {}
 
 type NavigationProps = NavigationScreenProp<ScreenParams>;
 type ScreenParams = {

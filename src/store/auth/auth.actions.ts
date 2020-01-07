@@ -44,6 +44,7 @@ export const signIn = (
   async (dispatch: Dispatch) => {
     try {
       const payload = await CognitoAuth.signIn(credentials);
+      await CognitoAuth.updateAWSConfig();
 
       dispatch({
         type: SIGN_IN,

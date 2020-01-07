@@ -23,8 +23,12 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [password, setPassword] = useState('');
 
   const onSignIn = async () => {
-    const user = await props.signIn({ email, password }, onUserIsNotConfirmedHandler);
-    if (user) {
+    const res = await props.signIn(
+      { email: email.toLowerCase(), password },
+      onUserIsNotConfirmedHandler
+    );
+    
+    if (res) {
       props.navigation.navigate('App');
     }
   }
