@@ -1,6 +1,6 @@
 import React from 'react';
 import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-native';
-import { NavigationParams } from 'react-navigation';
+import { NavigationSwitchScreenProps } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { User } from '@models/user';
@@ -9,8 +9,9 @@ import { fetchUsers } from '@store/users/users.actions';
 import defaultAvatar from '@assets/icons/user.png';
 import AppMenu from '@components/Menu/menu.component';
 import styles from './styles';
+import { Preloader } from '@components/atoms/Prloader/preloader.component';
 
-interface UserListProps extends NavigationParams {
+interface UserListProps extends NavigationSwitchScreenProps {
   userList: User[];
   fetchUsers: () => Promise<void>;
 }
@@ -55,13 +56,14 @@ class UserListScreen extends React.Component<UserListProps> {
   }
 
   render() {
-    return (
+    return this.props.userList.length ? (
       <FlatList
         data={this.props.userList}
         renderItem={this.userTemplate}
       />
-    )
+    ) : <Preloader/>;
   }
+  
 }
 
 const mapStateToProps = (store: AppState) => ({

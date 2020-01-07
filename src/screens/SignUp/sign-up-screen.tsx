@@ -1,6 +1,6 @@
 import React from 'react';
 import { ToastAndroid, ScrollView, View, Button } from 'react-native';
-import { NavigationParams } from 'react-navigation';
+import { NavigationSwitchScreenProps } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
 import { Credentials, UserAttributes } from '@models/user';
@@ -13,7 +13,7 @@ import styles from './styles';
 
 type StateKeys = 'email' | 'password' | 'confirmPassword' | 'nickname' | 'username';
 
-interface SignUpProps extends NavigationParams, AuthComponentProps {
+interface SignUpProps extends NavigationSwitchScreenProps, AuthComponentProps {
   signUp: (
     user: Credentials,
     userAttributes: UserAttributes,

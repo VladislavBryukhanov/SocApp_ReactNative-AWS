@@ -1,12 +1,12 @@
 import React from 'react';
 import { Alert } from 'react-native';
-import { NavigationParams } from 'react-navigation';
+import { NavigationSwitchScreenProps } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import SignUpConfirmation from '@components/modals/SignUpConfirmationCode/sign-up-confirmation-code.component';
 import { openModal, closeModal } from '@store/modal/modal.actions';
 
-export interface AuthComponentProps extends NavigationParams {
+export interface AuthComponentProps extends NavigationSwitchScreenProps {
   openModal: (element: React.ReactNode) => void;
   closeModal: () => void;
 

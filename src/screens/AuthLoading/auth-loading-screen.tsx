@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, ActivityIndicator, StatusBar } from 'react-native';
-import { NavigationParams } from 'react-navigation';
+import { NavigationSwitchScreenProps } from 'react-navigation';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { retrieveAuthenticatedUser } from '@store/auth/auth.actions';
 import styles from './styles';
+import { Preloader } from '@components/atoms/Prloader/preloader.component';
 
-interface AuthLoadingScreenProps extends NavigationParams {
+interface AuthLoadingScreenProps extends NavigationSwitchScreenProps {
   retrieveAuthenticatedUser: () => any
 }
 
@@ -23,8 +24,7 @@ class AuthLoadingScreen extends React.Component<AuthLoadingScreenProps> {
   render() {
     return (
       <View style={styles.container}>
-        <StatusBar barStyle="default" />
-        <ActivityIndicator size={80} color={Colors.primary}/>
+        <Preloader/>
       </View>
     );
   }

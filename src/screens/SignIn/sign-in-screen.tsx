@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Button, Text } from 'react-native';
-import { NavigationParams } from 'react-navigation';
+import { NavigationSwitchScreenProps } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
 import { Credentials } from '@models/user';
@@ -13,7 +13,7 @@ import { openModal } from '@store/modal/modal.actions';
 import styles from './styles';
 import { EMAIL_NOT_CONFIRMED } from '@constants/text-auth';
 
-interface SignInProps extends NavigationParams, AuthComponentProps {
+interface SignInProps extends NavigationSwitchScreenProps, AuthComponentProps {
   signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
   openModal: (element: React.ReactNode) => void;
 }
