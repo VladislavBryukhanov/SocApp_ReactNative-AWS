@@ -1,3 +1,4 @@
+import { fetchProfile } from '@store/users/users.actions';
 import { AppState } from '@store/index';
 import { Dispatch } from "redux";
 import { 
@@ -21,16 +22,18 @@ export const retrieveAuthenticatedUser = (): any => (
   async (dispatch: Dispatch) => {
     try {
       const user = await CognitoAuth.retrieveAuthenticatedUser();
+      const cognitoUsername = user && user.getUsername();
       await CognitoAuth.updateAWSConfig();
-
+      
       dispatch({
         type: AUTH_CHECKED,
         payload: {
+          cognitoUsername,
           isAuthenticated: !!user
         }
       });
 
-      return user;
+      return dispatch(fetchProfile());
     } catch (err) {
       errorHandler(err, 'retrieveAuthenticatedUser');
     }
@@ -44,17 +47,22 @@ export const signIn = (
   async (dispatch: Dispatch) => {
     try {
       const payload = await CognitoAuth.signIn(credentials);
+      const { 'cognito:username': cognitoUsername } = payload!.session
+        .getIdToken()
+        .decodePayload();
+
       await CognitoAuth.updateAWSConfig();
 
       dispatch({
         type: SIGN_IN,
         payload: {
+          cognitoUsername,
           isAuthenticated: !!payload,
           email: credentials.email
         }
       });
 
-      return true;
+      return dispatch(fetchProfile());
     } catch (err) {
       if (err.code === USER_IS_NOT_CONFIRMED_EXCEPTION) {
         confirmationExceptionHandler 

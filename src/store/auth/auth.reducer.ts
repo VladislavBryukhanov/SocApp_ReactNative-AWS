@@ -9,6 +9,7 @@ import {
 } from '../action-types';
 
 interface AuthState {
+  cognitoUsername?: string;
   isAuthenticated?: boolean;
   email?: string;
 }
@@ -24,12 +25,12 @@ const initState: AuthState = {
 export const authReducer = handleActions({
   [AUTH_CHECKED]: (
     state: AuthState,
-    { payload: { isAuthenticated } }: AuthAction
-  ) => ({ ...state, isAuthenticated }),
+    { payload: { isAuthenticated, cognitoUsername } }: AuthAction
+  ) => ({ ...state, isAuthenticated, cognitoUsername }),
   [SIGN_IN]: (
     state: AuthState,
-    { payload: { email, isAuthenticated } }: AuthAction
-  ) => ({ ...state, email, isAuthenticated }),
+    { payload: { email, isAuthenticated, cognitoUsername } }: AuthAction
+  ) => ({ ...state, email, isAuthenticated, cognitoUsername }),
   [SIGN_UP]: (
     state: AuthState,
     { payload: { email } }: AuthAction

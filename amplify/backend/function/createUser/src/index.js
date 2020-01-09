@@ -7,7 +7,6 @@ var storageUserListArn = process.env.STORAGE_USERLIST_ARN
 
 Amplify Params - DO NOT EDIT */
 
-const uuidv4 = require('uuid/v4');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
@@ -15,6 +14,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 const targetTriggerSource = 'PostConfirmation_ConfirmSignUp';
 const targetAttributes = [
+  { userPoolKey: 'sub', dynamoDbKey: 'id' },
   { userPoolKey: 'nickname', dynamoDbKey: 'nickname' },
   { userPoolKey: 'preferred_username', dynamoDbKey: 'username' }
 ];
@@ -40,10 +40,7 @@ exports.handler = function (event, context, callback) {
   
   const queryParams = {
     TableName: tableName,
-    Item: {
-      id: uuidv4(),
-      ...userItem
-    }
+    Item: userItem
   };
 
   dynamodb.put(queryParams, (err, data) => callback(err, event));

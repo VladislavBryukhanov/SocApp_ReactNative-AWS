@@ -7,10 +7,6 @@
 		"localDB": {
 			"service": "DynamoDB",
 			"providerPlugin": "awscloudformation"
-		},
-		"socAppMedia": {
-			"service": "S3",
-			"providerPlugin": "awscloudformation"
 		}
 	},
 	"function": {
@@ -78,6 +74,28 @@
 			"providerPlugin": "awscloudformation",
 			"build": true,
 			"dependsOn": [
+				{
+					"category": "auth",
+					"resourceName": "SocAppMobile",
+					"attributes": [
+						"UserPoolId"
+					]
+				}
+			]
+		},
+		"fetchProfile": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true,
+			"dependsOn": [
+				{
+					"category": "storage",
+					"resourceName": "userList",
+					"attributes": [
+						"Name",
+						"Arn"
+					]
+				},
 				{
 					"category": "auth",
 					"resourceName": "SocAppMobile",

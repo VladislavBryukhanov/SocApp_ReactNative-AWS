@@ -11,7 +11,12 @@ export const Screens = {
     }
   },
   Profile: ProfileScreen,
-  EditProfile: EditProfileScreen
+  EditProfile: {
+    screen: EditProfileScreen,
+    navigationOptions: {
+      title: 'My profile'
+    }
+  }
 };
 
 export const AppStack = createStackNavigator(Screens);

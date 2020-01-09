@@ -1,0 +1,14 @@
+{
+    "permissions": {
+        "storage": {
+            "userList": [
+                "read"
+            ]
+        },
+        "auth": {
+            "SocAppMobile": [
+                "read"
+            ]
+        }
+    }
+}

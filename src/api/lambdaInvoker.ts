@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
 import { AMPLIFY_ENV} from 'react-native-dotenv';
+import { InvocationRequest } from 'aws-sdk/clients/lambda';
 
 class LambdaInvoker {
   private _lambda?: AWS.Lambda;
@@ -12,10 +13,14 @@ class LambdaInvoker {
     return this._lambda;
   }
 
-  async invoke<T>(functionName: string) {
+  async invoke<T>(
+    functionName: string,
+    invokationParams?: Partial<InvocationRequest>
+  ) {
     const lambda = await this.getLambdaInstance();
     const params = {
-      FunctionName: `${functionName}-${AMPLIFY_ENV}` 
+      FunctionName: `${functionName}-${AMPLIFY_ENV}`,
+      ...invokationParams
     };
     
     const { Payload } = await lambda.invoke(params).promise();
