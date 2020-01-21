@@ -7,14 +7,13 @@ var storageUserListArn = process.env.STORAGE_USERLIST_ARN
 var authSocAppMobileUserPoolId = process.env.AUTH_SOCAPPMOBILE_USERPOOLID
 
 Amplify Params - DO NOT EDIT */
-
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const cisp = new AWS.CognitoIdentityServiceProvider();
 
-let TableName = "userList";
+let TableName = 'userList';
 if(process.env.ENV && process.env.ENV !== "NONE") {
   TableName = `${TableName}-${process.env.ENV}`;
 }
@@ -25,7 +24,7 @@ const primaryKeys = [
   { dynamodbField: 'username', userPoolAttribute: 'preferred_username' },
 ];
 
-exports.handler = async function (event, context) {
+exports.handler = async (event, context) => {
   const { cognitoUsername } = context.clientContext;
 
   if (!cognitoUsername) {
@@ -44,8 +43,29 @@ exports.handler = async function (event, context) {
     Key[dynamodbField] = Value;
   });
 
-  const queryParams = { TableName, Key };
-  const user = await dynamoDb.get(queryParams).promise();
+  console.log(event);
 
-  return user;
+  const queryParams = { 
+    TableName,
+    Key,
+    // AttributeUpdates: { 
+    //   ...event
+    // },
+    // UpdateExpression: "SET bio = :bio",
+    // ExpressionAttributeValues: { 
+    //     ":bio": "Global Records"
+    // }
+    // AttributeUpdates: { bio: { Action: 'PUT', Value: 'Test' } }
+    AttributeUpdates: (Object.keys(event)).reduce((acc, prop) => {
+      return {
+        ...acc,
+        [prop]: {
+          Action: 'PUT',
+          Value: event[prop]
+        }
+      }
+    }, {})
+  };
+  
+  return dynamoDb.update(queryParams).promise();
 };

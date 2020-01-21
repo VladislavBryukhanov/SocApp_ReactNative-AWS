@@ -19,9 +19,9 @@ const targetAttributes = [
   { userPoolKey: 'preferred_username', dynamoDbKey: 'username' }
 ];
 
-let tableName = "userList";
+let TableName = 'userList';
 if(process.env.ENV && process.env.ENV !== "NONE") {
-  tableName = `${tableName}-${process.env.ENV}`;
+  TableName = `${TableName}-${process.env.ENV}`;
 }
 
 exports.handler = function (event, context, callback) {
@@ -33,15 +33,11 @@ exports.handler = function (event, context, callback) {
     return callback(null, event);
   }
 
-  const userItem = targetAttributes.reduce((acc, { userPoolKey, dynamoDbKey  }) => ({
+  const Item = targetAttributes.reduce((acc, { userPoolKey, dynamoDbKey  }) => ({
     ...acc,
     [dynamoDbKey]: userAttributes[userPoolKey]
   }), {});
   
-  const queryParams = {
-    TableName: tableName,
-    Item: userItem
-  };
-
+  const queryParams = { TableName, Item };
   dynamodb.put(queryParams, (err, data) => callback(err, event));
 };

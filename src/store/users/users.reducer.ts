@@ -1,7 +1,6 @@
-import { FETCH_PROFILE } from './../action-types';
 import { Action, Reducer } from 'redux';
 import { User } from '@models/user';
-import { FETCH_USERS, CREATE_USER } from '@store/action-types';
+import { FETCH_USERS, CREATE_USER, FETCH_PROFILE } from '@store/action-types';
 import { handleActions } from 'redux-actions';
 
 interface UserState {

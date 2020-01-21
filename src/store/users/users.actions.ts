@@ -3,6 +3,7 @@ import UsersRepository from "@api/repositories/users.repository";
 import { FETCH_USERS, FETCH_PROFILE } from "@store/action-types";
 import { AppState } from '@store/index';
 import errorHandler from "@store/errorHandler";
+import { User } from '@models/user';
 
 export const fetchUsers = (): any => (
   async (dispatch: Dispatch) => {
@@ -35,6 +36,26 @@ export const fetchProfile = (): any => (
       return profile;
     } catch (err) {
       errorHandler(err, 'fetchProfile');
+    }
+  }
+);
+
+export const editProfile = (changes: Partial<User>): any => (
+  async (dispatch: Dispatch, getState: () => AppState) => {
+    try {
+      const profile = await UsersRepository.editProfile(
+        getState().authModule.cognitoUsername!,
+        changes
+      );
+      
+      // dispatch({
+      //   type: FETCH_PROFILE,
+      //   payload: { profile }
+      // });
+
+      return profile;
+    } catch (err) {
+      errorHandler(err, 'editProfile');
     }
   }
 );

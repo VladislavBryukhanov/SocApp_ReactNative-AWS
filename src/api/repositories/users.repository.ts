@@ -24,6 +24,25 @@ class UsersRepository {
 
     return profile;
   }
+
+  async editProfile(cognitoUsername: string, changes: Partial<User>) {
+    const clientContextPayload = { cognitoUsername };
+    const ClientContext = AWS.util.base64.encode(
+      JSON.stringify(clientContextPayload)
+    );
+
+    const Payload = JSON.stringify(changes);
+
+    const result = await lambdaInvoker.invoke<string>(
+      'editProfile',
+      { ClientContext, Payload }
+    );
+    const { Item: profile } = JSON.parse(result);
+
+    console.log(profile);
+
+    return profile;
+  }
 }
 
 export default new UsersRepository();
