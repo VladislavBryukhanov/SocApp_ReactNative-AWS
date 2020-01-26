@@ -11,6 +11,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const cisp = new AWS.CognitoIdentityServiceProvider();
 
 let TableName = 'userList';
 if(process.env.ENV && process.env.ENV !== "NONE") {
@@ -23,10 +24,53 @@ const primaryKeys = [
   { dynamodbField: 'username', userPoolAttribute: 'preferred_username' },
 ];
 
-const availableTableProps = ['nickname', 'bio', 'avatar', 'username'];
+const mutableUserEntityProperties = ['nickname', 'bio', 'avatar', 'username'];
+const mutableUserPoolAttributes = ['nickname'];
 
 const validateRequestBody = (body) =>
-  !(Object.keys(body)).some(key => !availableTableProps.includes(key))
+  !(Object.keys(body)).some(key => !mutableUserEntityProperties.includes(key))
+
+const updateUserPool = async (UserAttributes, body) => {
+  const updatedAttributes = (Object.keys(body)).reduce((acc, key) => {
+    if (mutableUserPoolAttributes.includes(key)) {
+      return [ ...acc, {
+          Name: key,
+          Value: body[key]
+        }
+      ]
+    }
+
+    return acc;
+  }, []);
+
+  const params = {
+    UserPoolId: process.env.AUTH_SOCAPPMOBILE_USERPOOLID,
+    Username: UserAttributes['cognito:username'],
+    UserAttributes: updatedAttributes
+  };
+
+  return cisp.adminUpdateUserAttributes(params).promise();
+}
+
+const updateDynamodb = async (UserAttributes, body) => {
+  const Key = {};
+  primaryKeys.forEach(({ userPoolAttribute, dynamodbField }) => {
+    Key[dynamodbField] = UserAttributes[userPoolAttribute];
+  });
+
+  const queryParams = { 
+    TableName,
+    Key,
+    AttributeUpdates: (Object.keys(body)).reduce((acc, prop) => ({ ...acc,
+      [prop]: {
+        Action: 'PUT',
+        Value: body[prop]
+      }
+    }), {})
+  };
+  
+  return dynamoDb.update(queryParams).promise();
+}
 
 exports.handler = async (event, context) => {
   const UserAttributes = event.requestContext.authorizer.claims;
@@ -41,27 +85,10 @@ exports.handler = async (event, context) => {
     };
   }
 
-  const Key = {};
-  primaryKeys.forEach(({ userPoolAttribute, dynamodbField }) => {
-    Key[dynamodbField] = UserAttributes[userPoolAttribute];
-  });
+  await Promise.all([
+    updateUserPool(UserAttributes, body),
+    updateDynamodb(UserAttributes, body),
+  ]);
 
-  const queryParams = { 
-    TableName,
-    Key,
-    AttributeUpdates: (Object.keys(body)).reduce((acc, prop) => ({
-      ...acc,
-      [prop]: {
-        Action: 'PUT',
-        Value: body[prop]
-      }
-    }), {})
-  };
-  
-  const { Item: profile } = await dynamoDb.update(queryParams).promise();
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ profile })
-  };
+  return { statusCode: 200 };
 };
