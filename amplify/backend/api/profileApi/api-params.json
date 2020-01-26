@@ -1,0 +1,60 @@
+{
+    "paths": [
+        {
+            "name": "/fetch",
+            "lambdaFunction": "fetchProfile",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            }
+        },
+        {
+            "name": "/update",
+            "lambdaFunction": "editProfile",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/PUT",
+                    "/PATCH"
+                ]
+            }
+        }
+    ],
+    "resourceName": "profileApi",
+    "apiName": "profileApi",
+    "functionArns": [
+        {
+            "lambdaFunction": "fetchProfile"
+        },
+        {
+            "lambdaFunction": "editProfile"
+        }
+    ],
+    "privacy": {
+        "auth": 2,
+        "unauth": 0,
+        "authRoleName": "amplify-soc-app-dev-151321-authRole",
+        "unAuthRoleName": "amplify-soc-app-dev-151321-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "fetchProfile",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "editProfile",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ],
+    "uuid": "8c09d035"
+}

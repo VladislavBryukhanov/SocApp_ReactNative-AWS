@@ -1,8 +1,29 @@
-import AWS from 'aws-sdk';
+import API from '@aws-amplify/api';
+import { profileApiConf } from '@api/api-configs';
+import { CognitoAuth } from '@api/auth';
 import { User } from '@models/user';
 import lambdaInvoker from '../lambdaInvoker';
+import { HttpApi } from '@api/api-gateway/native-api';
 
 class UsersRepository {
+  // private http?: HttpApi;
+  
+  // get httpApi() {
+  //   if (!this.http) {
+  //     this.http = new HttpApi('https://jopv2yzjvb.execute-api.us-east-1.amazonaws.com/dev/');
+  //   }
+
+  //   return this.http;
+  // }
+
+  // async fetchProfile(): Promise<User> {
+  //   return this.httpApi.get<{ profile: User }>().then(({ profile }) => profile);
+  // }
+
+  // async editProfile(changes: Partial<User>) {
+  //   await this.httpApi.put<{ profile: User }, Partial<User>>(changes);
+  // }
+
   async list(): Promise<User[]> {
     const result = await lambdaInvoker.invoke<string>('listUsers');
     const { Items: userList } = JSON.parse(result);
@@ -10,38 +31,29 @@ class UsersRepository {
     return userList;
   }
 
-  async fetchProfile(cognitoUsername: string): Promise<User> {
-    const clientContextPayload = { cognitoUsername };
-    const ClientContext = AWS.util.base64.encode(
-      JSON.stringify(clientContextPayload)
-    );
+  async fetchProfile(): Promise<User> {
+    const { apiName } = profileApiConf;
+    const token = await CognitoAuth.retreiveSessionToken();
+    const requestParams = { 
+      response: true,
+      headers: { Authorization: token } 
+    };
 
-    const result = await lambdaInvoker.invoke<string>(
-      'fetchProfile',
-      { ClientContext }
-    );
-    const { Item: profile } = JSON.parse(result);
+    const { data: { profile } } = await API.get(apiName, '/fetch', requestParams);
 
     return profile;
   }
 
-  async editProfile(cognitoUsername: string, changes: Partial<User>) {
-    const clientContextPayload = { cognitoUsername };
-    const ClientContext = AWS.util.base64.encode(
-      JSON.stringify(clientContextPayload)
-    );
+  async editProfile(changes: Partial<User>) {
+    const { apiName } = profileApiConf;
+    const token = await CognitoAuth.retreiveSessionToken();
+    const requestParams = { 
+      response: true,
+      headers: { Authorization: token },
+      body: changes 
+    };
 
-    const Payload = JSON.stringify(changes);
-
-    const result = await lambdaInvoker.invoke<string>(
-      'editProfile',
-      { ClientContext, Payload }
-    );
-    const { Item: profile } = JSON.parse(result);
-
-    console.log(profile);
-
-    return profile;
+    return API.put(apiName, '/update', requestParams);
   }
 }
 

@@ -84,7 +84,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-dev-151321-deployment",
-					"S3Key": "amplify-builds/fetchProfile-56656e4e4d6d39464a45-build.zip"
+					"S3Key": "amplify-builds/fetchProfile-6e754746492b53594358-build.zip"
 				}
 			}
 		},

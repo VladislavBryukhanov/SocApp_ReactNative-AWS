@@ -11,7 +11,6 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const cisp = new AWS.CognitoIdentityServiceProvider();
 
 let TableName = 'userList';
 if(process.env.ENV && process.env.ENV !== "NONE") {
@@ -24,48 +23,45 @@ const primaryKeys = [
   { dynamodbField: 'username', userPoolAttribute: 'preferred_username' },
 ];
 
+const availableTableProps = ['nickname', 'bio', 'avatar', 'username'];
+
+const validateRequestBody = (body) =>
+  !(Object.keys(body)).some(key => !availableTableProps.includes(key))
+
 exports.handler = async (event, context) => {
-  const { cognitoUsername } = context.clientContext;
-
-  if (!cognitoUsername) {
-    throw Error('cognitoUsername doesn\'t provided to clientContext');
+  const UserAttributes = event.requestContext.authorizer.claims;
+  const body = JSON.parse(event.body);
+  
+  if (!validateRequestBody(body)) {
+    return {
+      statusCode: 400,
+      // errorType : 'ValidationError',
+      // requestId : context.awsRequestId,
+      // message : 'Request body contain unexpected property.'
+    };
   }
-
-  const params = {
-    UserPoolId: process.env.AUTH_SOCAPPMOBILE_USERPOOLID,
-    Username: cognitoUsername
-  };
-  const { UserAttributes } = await cisp.adminGetUser(params).promise();
 
   const Key = {};
   primaryKeys.forEach(({ userPoolAttribute, dynamodbField }) => {
-    const { Value } = UserAttributes.find(({ Name }) => Name === userPoolAttribute);
-    Key[dynamodbField] = Value;
+    Key[dynamodbField] = UserAttributes[userPoolAttribute];
   });
-
-  console.log(event);
 
   const queryParams = { 
     TableName,
     Key,
-    // AttributeUpdates: { 
-    //   ...event
-    // },
-    // UpdateExpression: "SET bio = :bio",
-    // ExpressionAttributeValues: { 
-    //     ":bio": "Global Records"
-    // }
-    // AttributeUpdates: { bio: { Action: 'PUT', Value: 'Test' } }
-    AttributeUpdates: (Object.keys(event)).reduce((acc, prop) => {
-      return {
-        ...acc,
-        [prop]: {
-          Action: 'PUT',
-          Value: event[prop]
-        }
+    AttributeUpdates: (Object.keys(body)).reduce((acc, prop) => ({
+      ...acc,
+      [prop]: {
+        Action: 'PUT',
+        Value: body[prop]
       }
-    }, {})
+    }), {})
   };
   
-  return dynamoDb.update(queryParams).promise();
+  const { Item: profile } = await dynamoDb.update(queryParams).promise();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ profile })
+  };
 };

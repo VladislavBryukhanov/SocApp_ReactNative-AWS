@@ -11,7 +11,6 @@ import { AppState } from '@store/index';
 import { User } from '@models/user';
 import defaultAvatar from '@assets/icons/user.png';
 import { editProfile, fetchProfile } from '@store/users/users.actions';
-import isEmpty from 'lodash/isEmpty';
 
 interface EditProfileProps {
   profile: User;
@@ -20,6 +19,8 @@ interface EditProfileProps {
 }
 
 interface EditProfileState {
+  avatar?: string;
+  username: string;
   bio?: string;
   nickname: string;
   loading: boolean;
@@ -29,33 +30,37 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
   constructor(props: EditProfileProps) {
     super(props);
 
-    const { bio, nickname } = this.props.profile;
-    this.state = { 
+    const { username, avatar, bio, nickname } = this.props.profile;
+    this.state = {
+      avatar,
       bio,
       nickname,
+      username,
       loading: false
     };
   }
 
   onEdit = async () => {
+    const { nickname, bio } = this.state;
+  
     this.setState({ loading: true });
     
-    await this.props.editProfile(this.state);
-    await this.props.fetchProfile();
+    await this.props.editProfile({ nickname, bio });
 
     this.setState({ loading: false });
   }
 
   render() {
-    console.log(this.state);
-    const { username, avatar } = this.props.profile;
-    const { nickname, bio, loading } = this.state;
+    const { username, avatar , nickname, bio, loading } = this.state;
     const userAvatar = avatar
       ? { uri: avatar }
       : defaultAvatar;
 
     return (
-      <ScrollView style={styles.editPorfileWrapper}>
+      <ScrollView 
+        style={styles.editPorfileWrapper}
+        keyboardShouldPersistTaps='handled'
+      >
         <View>
           <Avatar.Image
             size={148}
@@ -65,6 +70,7 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
           <BasicTextField 
             label='Username'
             value={username}
+            editable={false}
           />
 
           <BasicTextField
@@ -89,6 +95,7 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
         <Button
           mode="outlined"
           loading={loading}
+          disabled={loading}
           style={styles.saveButton}
           color={Colors.primary}
           onPress={this.onEdit}

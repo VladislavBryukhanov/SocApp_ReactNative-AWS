@@ -12,7 +12,6 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-const cisp = new AWS.CognitoIdentityServiceProvider();
 
 let TableName = "userList";
 if(process.env.ENV && process.env.ENV !== "NONE") {
@@ -26,26 +25,18 @@ const primaryKeys = [
 ];
 
 exports.handler = async function (event, context) {
-  const { cognitoUsername } = context.clientContext;
-
-  if (!cognitoUsername) {
-    throw Error('cognitoUsername doesn\'t provided to clientContext');
-  }
-
-  const params = {
-    UserPoolId: process.env.AUTH_SOCAPPMOBILE_USERPOOLID,
-    Username: cognitoUsername
-  };
-  const { UserAttributes } = await cisp.adminGetUser(params).promise();
+  const UserAttributes = event.requestContext.authorizer.claims;
 
   const Key = {};
   primaryKeys.forEach(({ userPoolAttribute, dynamodbField }) => {
-    const { Value } = UserAttributes.find(({ Name }) => Name === userPoolAttribute);
-    Key[dynamodbField] = Value;
+    Key[dynamodbField] = UserAttributes[userPoolAttribute];
   });
-
+  
   const queryParams = { TableName, Key };
-  const user = await dynamoDb.get(queryParams).promise();
-
-  return user;
+  const { Item: profile } = await dynamoDb.get(queryParams).promise();
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ profile })
+  };
 };
