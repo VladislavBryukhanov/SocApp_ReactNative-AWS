@@ -79,9 +79,9 @@ exports.handler = async (event, context) => {
   if (!validateRequestBody(body)) {
     return {
       statusCode: 400,
-      // errorType : 'ValidationError',
-      // requestId : context.awsRequestId,
-      // message : 'Request body contain unexpected property.'
+      body: JSON.stringify({
+        message: 'Request body contain unexpected property.'
+      })
     };
   }
 

@@ -5,6 +5,10 @@
 		"env": {
 			"Type": "String"
 		},
+		"storagemediaResourcesBucketName": {
+			"Type": "String",
+			"Default": "storagemediaResourcesBucketName"
+		},
 		"storageuserListName": {
 			"Type": "String",
 			"Default": "storageuserListName"
@@ -12,10 +16,6 @@
 		"storageuserListArn": {
 			"Type": "String",
 			"Default": "storageuserListArn"
-		},
-		"authSocAppMobileUserPoolId": {
-			"Type": "String",
-			"Default": "authSocAppMobileUserPoolId"
 		}
 	},
 	"Conditions": {
@@ -40,12 +40,12 @@
 				"FunctionName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"editProfile",
+						"uploadAvatar",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"editProfile",
+									"uploadAvatar",
 									"-",
 									{
 										"Ref": "env"
@@ -63,14 +63,14 @@
 						"REGION": {
 							"Ref": "AWS::Region"
 						},
+						"STORAGE_MEDIARESOURCES_BUCKETNAME": {
+							"Ref": "storagemediaResourcesBucketName"
+						},
 						"STORAGE_USERLIST_NAME": {
 							"Ref": "storageuserListName"
 						},
 						"STORAGE_USERLIST_ARN": {
 							"Ref": "storageuserListArn"
-						},
-						"AUTH_SOCAPPMOBILE_USERPOOLID": {
-							"Ref": "authSocAppMobileUserPoolId"
 						}
 					}
 				},
@@ -84,7 +84,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-test-225156-deployment",
-					"S3Key": "amplify-builds/editProfile-432f632b71334e624d48-build.zip"
+					"S3Key": "amplify-builds/uploadAvatar-772f3337736166364f33-build.zip"
 				}
 			}
 		},
@@ -94,12 +94,12 @@
 				"RoleName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"socappLambdaRole6b7cab72",
+						"socappLambdaRoleb7a97c12",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"socappLambdaRole6b7cab72",
+									"socappLambdaRoleb7a97c12",
 									"-",
 									{
 										"Ref": "env"
@@ -200,50 +200,19 @@
 						{
 							"Effect": "Allow",
 							"Action": [
-								"cognito-identity:Describe*",
-								"cognito-identity:Get*",
-								"cognito-identity:List*",
-								"cognito-idp:Describe*",
-								"cognito-idp:AdminGetDevice",
-								"cognito-idp:AdminGetUser",
-								"cognito-idp:AdminList*",
-								"cognito-idp:List*",
-								"cognito-sync:Describe*",
-								"cognito-sync:Get*",
-								"cognito-sync:List*",
-								"iam:ListOpenIdConnectProviders",
-								"iam:ListRoles",
-								"sns:ListPlatformApplications",
-								"cognito-idp:ForgotPassword",
-								"cognito-idp:UpdateAuthEventFeedback",
-								"cognito-idp:UpdateResourceServer",
-								"cognito-idp:UpdateUserPoolClient",
-								"cognito-idp:AdminUpdateUserAttributes",
-								"cognito-idp:UpdateUserAttributes",
-								"cognito-idp:UpdateUserPoolDomain",
-								"cognito-idp:UpdateIdentityProvider",
-								"cognito-idp:UpdateGroup",
-								"cognito-idp:AdminUpdateAuthEventFeedback",
-								"cognito-idp:UpdateDeviceStatus",
-								"cognito-idp:UpdateUserPool"
+								"s3:PutObject",
+								"s3:DeleteObject"
 							],
 							"Resource": [
 								{
 									"Fn::Join": [
 										"",
 										[
-											"arn:aws:cognito-idp:",
+											"arn:aws:s3:::",
 											{
-												"Ref": "AWS::Region"
+												"Ref": "storagemediaResourcesBucketName"
 											},
-											":",
-											{
-												"Ref": "AWS::AccountId"
-											},
-											":userpool/",
-											{
-												"Ref": "authSocAppMobileUserPoolId"
-											}
+											"/*"
 										]
 									]
 								}

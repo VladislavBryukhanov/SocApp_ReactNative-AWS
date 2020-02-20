@@ -76,7 +76,7 @@
 				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "amplify-soc-app-dev-151321-deployment",
+					"S3Bucket": "amplify-soc-app-test-225156-deployment",
 					"S3Key": "amplify-builds/createUser-45686968396652634f35-build.zip"
 				}
 			}

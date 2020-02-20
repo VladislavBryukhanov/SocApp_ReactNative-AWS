@@ -7,6 +7,10 @@
         "localDB": {
             "service": "DynamoDB",
             "providerPlugin": "awscloudformation"
+        },
+        "mediaResources": {
+            "service": "S3",
+            "providerPlugin": "awscloudformation"
         }
     },
     "function": {
@@ -126,6 +130,28 @@
                     ]
                 }
             ]
+        },
+        "uploadAvatar": {
+            "service": "Lambda",
+            "providerPlugin": "awscloudformation",
+            "build": true,
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "userList",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "mediaResources",
+                    "attributes": [
+                        "BucketName"
+                    ]
+                }
+            ]
         }
     },
     "api": {
@@ -158,6 +184,14 @@
                 {
                     "category": "function",
                     "resourceName": "editProfile",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "function",
+                    "resourceName": "uploadAvatar",
                     "attributes": [
                         "Name",
                         "Arn"

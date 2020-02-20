@@ -20,6 +20,16 @@
                     "/PATCH"
                 ]
             }
+        },
+        {
+            "name": "/uploadAvatar",
+            "lambdaFunction": "uploadAvatar",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST"
+                ]
+            }
         }
     ],
     "resourceName": "profileApi",
@@ -30,13 +40,16 @@
         },
         {
             "lambdaFunction": "editProfile"
+        },
+        {
+            "lambdaFunction": "uploadAvatar"
         }
     ],
     "privacy": {
-        "auth": 2,
+        "auth": 3,
         "unauth": 0,
-        "authRoleName": "amplify-soc-app-dev-151321-authRole",
-        "unAuthRoleName": "amplify-soc-app-dev-151321-unauthRole"
+        "authRoleName": "amplify-soc-app-test-225156-authRole",
+        "unAuthRoleName": "amplify-soc-app-test-225156-unauthRole"
     },
     "dependsOn": [
         {
@@ -54,7 +67,15 @@
                 "Name",
                 "Arn"
             ]
+        },
+        {
+            "category": "function",
+            "resourceName": "uploadAvatar",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
         }
     ],
-    "uuid": "8c09d035"
+    "uuid": "6443dc03"
 }

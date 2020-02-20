@@ -1,16 +1,20 @@
 import React from 'react';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
+import { TouchableNativeFeedback } from 'react-native';
 import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import { TextInput, Avatar, Button } from 'react-native-paper';
 import styles from './styles';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import ImagePicker from 'react-native-image-picker';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '@store/index';
 import { User } from '@models/user';
 import defaultAvatar from '@assets/icons/user.png';
 import { editProfile, fetchProfile } from '@store/users/users.actions';
+import s3 from '@api/s3/native-s3';
+import usersRepository from '@api/repositories/users.repository';
 
 interface EditProfileProps {
   profile: User;
@@ -26,11 +30,20 @@ interface EditProfileState {
   loading: boolean;
 }
 
+interface AvatarPayload {
+  data: string;
+  type: string;
+  extension: string;
+}
+
 class EditProfileScreen extends React.Component<EditProfileProps, EditProfileState> {
+  newAvatar?: AvatarPayload;
+
   constructor(props: EditProfileProps) {
     super(props);
 
     const { username, avatar, bio, nickname } = this.props.profile;
+
     this.state = {
       avatar,
       bio,
@@ -42,12 +55,45 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
 
   onEdit = async () => {
     const { nickname, bio } = this.state;
+    const promises: Promise<User | void>[] = [];
   
     this.setState({ loading: true });
     
-    await this.props.editProfile({ nickname, bio });
+    if (this.newAvatar) {
+      const { data, type, extension } = this.newAvatar;
 
+      const promise = usersRepository.uploadProfileAvatar(data, type!, extension)
+        .then(({ s3Key }) => s3.read(s3Key))
+        .then(url => this.setState({ avatar: url }));
+
+      promises.push(promise)
+    }
+    
+    promises.push(
+      this.props.editProfile({ nickname, bio })
+    );
+
+    await Promise.all(promises);
+    
     this.setState({ loading: false });
+  }
+
+  onChangeAvatar = () => {
+    const options = {
+      tintColor: Colors.primary,
+      title: 'Select Avatar',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+
+    ImagePicker.showImagePicker(options, async ({ data, type, fileName, uri }) => {
+      const extension = fileName!.split('.')[1];
+      this.newAvatar = { data, type: type!, extension };
+
+      this.setState({ avatar: uri });
+    });
   }
 
   render() {
@@ -62,10 +108,17 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
         keyboardShouldPersistTaps='handled'
       >
         <View>
-          <Avatar.Image
-            size={148}
-            source={userAvatar}
-          />
+          <TouchableNativeFeedback
+            onPress={() => this.onChangeAvatar()}
+            background={TouchableNativeFeedback.Ripple('#AAF', true)}
+          >
+            <View style={styles.avatarWrapper}>
+              <Avatar.Image
+                size={148}
+                source={userAvatar}
+              />
+            </View>
+          </TouchableNativeFeedback>
 
           <BasicTextField 
             label='Username'
@@ -90,7 +143,7 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
           selectionColor={Colors.primary}
           value={bio}
           onChangeText={(value: string) => this.setState({ bio: value })}
-          />
+        />
 
         <Button
           mode="outlined"

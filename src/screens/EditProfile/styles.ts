@@ -15,5 +15,10 @@ export default StyleSheet.create({
     marginTop: 10,
     marginBottom: 16,
     color: Colors.dark
+  },
+  avatarWrapper: {
+    borderRadius: 45,
+    marginBottom: 16,
+    alignSelf: 'flex-start'
   }
 });
