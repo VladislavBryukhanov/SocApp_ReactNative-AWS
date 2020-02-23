@@ -8,16 +8,10 @@ const profileField: TextStyle = {
 }
 
 export default StyleSheet.create({
-  avatarWrapper: {
-    width: 'auto',
-    height: win.height / 3,
-  },
   avatar: {
     flex: 1,
-    // width: 'auto',
-    // height: win.height / 3, // 33%
-    resizeMode: 'contain',
-    alignItems: 'flex-start',
+    width: 'auto',
+    height: win.height / 3,
     borderWidth: 1,
     borderColor: Colors.dark,
   },

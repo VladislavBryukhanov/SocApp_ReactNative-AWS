@@ -8,11 +8,14 @@ var storageMediaResourcesBucketName = process.env.STORAGE_MEDIARESOURCES_BUCKETN
 
 Amplify Params - DO NOT EDIT */
 
+const updateDb = require('/opt/nodejs/db-utils');
 const uuidv4 = require('uuid/v4');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const bucketName = process.env.STORAGE_MEDIARESOURCES_BUCKETNAME;
+const TableName = process.env.STORAGE_USERLIST_NAME;
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const storage = new AWS.S3({
   signatureVersion: 'v4',
@@ -39,21 +42,21 @@ exports.handler = async (event) => {
   }
 
   const buff = Buffer.from(base64File, 'base64');
-  const objectKey = uuidv4();
+  const objectKey = `${uuidv4()}.${extension}`;
+  const body = JSON.stringify({ avatar: objectKey });
 
   const options = {
     Bucket: bucketName,
-    Key: `${objectKey}.${extension}`,
+    Key: objectKey,
     Body: buff,
     ContentType: fileType
   };
 
   await storage.putObject(options).promise();
-
+  await updateDb({ ...event, body }, dynamoDb, TableName);
+  
   return {
     statusCode: 200,
-    body: JSON.stringify({
-      s3Key: `${objectKey}.${extension}`
-    })
+    body: JSON.stringify({ s3Key: objectKey })
   };
 };

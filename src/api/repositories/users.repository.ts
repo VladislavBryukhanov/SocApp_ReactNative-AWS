@@ -43,7 +43,7 @@ class UsersRepository {
     return profile;
   }
 
-  async editProfile(changes: Partial<User>) {
+  async editProfile(changes: Partial<User>): Promise<User> {
     const { apiName } = profileApiConf;
     const token = await CognitoAuth.retreiveSessionToken();
     const requestParams = { 

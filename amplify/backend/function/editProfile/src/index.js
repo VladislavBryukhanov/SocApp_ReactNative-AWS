@@ -8,7 +8,6 @@ var authSocAppMobileUserPoolId = process.env.AUTH_SOCAPPMOBILE_USERPOOLID
 
 Amplify Params - DO NOT EDIT */
 const updateDb = require('/opt/nodejs/db-utils');
-
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
@@ -40,7 +39,7 @@ const updateUserPool = async (UserAttributes, body) => {
   return cisp.adminUpdateUserAttributes(params).promise();
 }
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   const UserAttributes = event.requestContext.authorizer.claims;
   const body = JSON.parse(event.body);
 

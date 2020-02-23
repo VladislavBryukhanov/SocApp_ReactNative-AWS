@@ -1,9 +1,10 @@
 import React from 'react';
-import { ScrollView, Image, Text, View } from 'react-native';
+import { ScrollView, Text } from 'react-native';
 import { NavigationScreenProp, NavigationSwitchScreenProps } from 'react-navigation';
 import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 
 interface ProfileScreeProps extends NavigationSwitchScreenProps {}
 
@@ -28,15 +29,13 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
     const user = this.props.navigation.getParam('user');
     const { avatar, bio, age, username, nickname } = user;
 
-    const userAvatar = avatar
-      ? { uri: user.avatar }
-      : defaultAvatar;
-
     return (
       <ScrollView>
-        <View style={styles.avatarWrapper}>
-          <Image style={styles.avatar} source={userAvatar}/>
-        </View>
+        <CachedImageLoaded
+          imageUrl={avatar}
+          style={styles.avatar}
+          defaultImage={defaultAvatar}
+        />
 
         <Text style={styles.nickname}>
           Nickname: {nickname}

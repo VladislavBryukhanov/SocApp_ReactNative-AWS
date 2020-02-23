@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, Text, View, Image, TouchableNativeFeedback } from 'react-native';
+import { FlatList, Text, View, TouchableNativeFeedback } from 'react-native';
 import { NavigationSwitchScreenProps } from 'react-navigation';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -8,8 +8,9 @@ import { AppState } from '@store/index';
 import { fetchUsers } from '@store/users/users.actions';
 import defaultAvatar from '@assets/icons/user.png';
 import AppMenu from '@components/Menu/menu.component';
-import styles from './styles';
 import { Preloader } from '@components/atoms/Prloader/preloader.component';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import styles from './styles';
 
 interface UserListProps extends NavigationSwitchScreenProps {
   userList: User[];
@@ -35,19 +36,16 @@ class UserListScreen extends React.Component<UserListProps> {
   }
 
   userTemplate = ({ item }: { item: User }) => {
-    const avatar = item.avatar
-      ? { uri: item.avatar } 
-      : defaultAvatar;
-
     return (
       <TouchableNativeFeedback
         key={item.id!}
         onPress={() => this.onOpenProfile(item)}
       >
         <View style={styles.userContainer}>
-          <Image 
-            source={avatar}
+          <CachedImageLoaded
+            imageUrl={item.avatar}
             style={styles.avatar}
+            defaultImage={defaultAvatar}
           />
           <Text style={styles.username}>{item.username}</Text>
         </View>
@@ -58,6 +56,7 @@ class UserListScreen extends React.Component<UserListProps> {
   render() {
     return this.props.userList.length ? (
       <FlatList
+        extraData={this.state}
         data={this.props.userList}
         renderItem={this.userTemplate}
       />
