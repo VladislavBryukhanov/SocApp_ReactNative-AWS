@@ -10,6 +10,7 @@ export const RESEND_CONFIRMATION_CODE = 'resend_confirmation_code';
 export const FETCH_USERS = 'fetch_users';
 export const FETCH_PROFILE = 'fetch_profile';
 export const UPDATE_PROFILE = 'update_profile';
+export const UPDATE_AVATAR = 'update_avatar';
 export const CREATE_USER = 'create_user';
 // modals
 export const OPEN_MODAL = 'open_modal';

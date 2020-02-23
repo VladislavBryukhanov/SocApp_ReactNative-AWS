@@ -12,14 +12,14 @@ import { connect } from 'react-redux';
 import { AppState } from '@store/index';
 import { User } from '@models/user';
 import defaultAvatar from '@assets/icons/user.png';
-import { editProfile, fetchProfile } from '@store/users/users.actions';
-import s3 from '@api/s3/native-s3';
-import usersRepository from '@api/repositories/users.repository';
+import { editProfile, fetchProfile, updateProfileAvatar } from '@store/users/users.actions';
+import { FileBase64 } from '@models/file-base64';
 
 interface EditProfileProps {
   profile: User;
   editProfile: (changes: Partial<User>) => Promise<User>;
-  fetchProfile: () => Promise<User>
+  updateAvatar: (file: FileBase64) => Promise<string>;
+  fetchProfile: () => Promise<User>;
 }
 
 interface EditProfileState {
@@ -30,14 +30,8 @@ interface EditProfileState {
   loading: boolean;
 }
 
-interface AvatarPayload {
-  data: string;
-  type: string;
-  extension: string;
-}
-
 class EditProfileScreen extends React.Component<EditProfileProps, EditProfileState> {
-  newAvatar?: AvatarPayload;
+  newAvatar?: FileBase64;
 
   constructor(props: EditProfileProps) {
     super(props);
@@ -60,10 +54,7 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
     this.setState({ loading: true });
     
     if (this.newAvatar) {
-      const { data, type, extension } = this.newAvatar;
-
-      const promise = usersRepository.uploadProfileAvatar(data, type!, extension)
-        .then(({ s3Key }) => s3.read(s3Key))
+      const promise = this.props.updateAvatar(this.newAvatar)
         .then(url => this.setState({ avatar: url }));
 
       promises.push(promise)
@@ -166,6 +157,7 @@ const mapStateToProps = (store: AppState) => ({
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   editProfile: (changes: Partial<User>) => dispatch(editProfile(changes)),
+  updateAvatar: (file: FileBase64) => dispatch(updateProfileAvatar(file)),
   fetchProfile: () => dispatch(fetchProfile())
 })
 

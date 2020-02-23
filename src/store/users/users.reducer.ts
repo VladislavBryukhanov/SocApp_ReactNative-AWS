@@ -1,7 +1,12 @@
-import { UPDATE_PROFILE } from '@store/action-types';
 import { Action, Reducer } from 'redux';
 import { User } from '@models/user';
-import { FETCH_USERS, CREATE_USER, FETCH_PROFILE } from '@store/action-types';
+import { 
+  FETCH_USERS, 
+  CREATE_USER, 
+  FETCH_PROFILE,
+  UPDATE_PROFILE,
+  UPDATE_AVATAR
+} from '@store/action-types';
 import { handleActions } from 'redux-actions';
 
 interface UserState {
@@ -11,9 +16,10 @@ interface UserState {
 
 interface UserAction extends Action {
   payload: {
-    fetchedUsers?: User[],
-    newUser?: User,
-    profile? : User
+    fetchedUsers?: User[];
+    newUser?: User;
+    profile? : User;
+    avatarUrl?: string;
   }
 }
 
@@ -29,6 +35,10 @@ const profileHandler = (
 export const usersReducer: Reducer<UserState, UserAction> = handleActions({
   [FETCH_PROFILE]: profileHandler,
   [UPDATE_PROFILE]: profileHandler,
+  [UPDATE_AVATAR]: (
+    state: UserState,
+    { payload: { avatarUrl } }: UserAction
+  ) => ({ ...state, profile: { ...state.profile!, avatar: avatarUrl }}),
   [FETCH_USERS]: (
     state: UserState,
     { payload: { fetchedUsers } }: UserAction

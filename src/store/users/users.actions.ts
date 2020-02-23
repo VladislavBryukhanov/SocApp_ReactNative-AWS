@@ -1,4 +1,6 @@
-import { UPDATE_PROFILE } from './../action-types';
+import s3 from '@api/s3/native-s3';
+import { FileBase64 } from '@models/file-base64';
+import { UPDATE_PROFILE, UPDATE_AVATAR } from './../action-types';
 import { AppState } from './../index';
 import { Dispatch } from 'redux';
 import UsersRepository from "@api/repositories/users.repository";
@@ -28,6 +30,10 @@ export const fetchProfile = (): any => (
   async (dispatch: Dispatch) => {
     try {
       const profile = await UsersRepository.fetchProfile();
+      
+      if (profile.avatar) {
+        profile.avatar = await s3.read(profile.avatar);
+      }
       
       dispatch({
         type: FETCH_PROFILE,
@@ -59,3 +65,24 @@ export const editProfile = (changes: Partial<User>): any => (
     }
   }
 );
+
+export const updateProfileAvatar = (avatar: FileBase64): any => (
+  async (dispatch: Dispatch) => {
+    try {
+      const { data, type, extension } = avatar;
+
+      const avatarUrl = await UsersRepository.uploadProfileAvatar(
+        data, type, extension
+      ).then(({ s3Key }) => s3.read(s3Key))
+
+      dispatch({
+        type: UPDATE_AVATAR,
+        payload: { avatarUrl }
+      });
+
+      return avatarUrl;
+    } catch (err) {
+      errorHandler(err, 'updateProfileAvatar');
+    }
+  }
+)
