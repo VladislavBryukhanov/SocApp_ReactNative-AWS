@@ -7,17 +7,22 @@ import UsersRepository from "@api/repositories/users.repository";
 import { FETCH_USERS, FETCH_PROFILE } from "@store/action-types";
 import errorHandler from "@store/errorHandler";
 import { User } from '@models/user';
+import { joinAvatar } from '@helpers/join-avatar';
 
 export const fetchUsers = (): any => (
   async (dispatch: Dispatch, getState: () => AppState) => {
     try {
-      const users = await UsersRepository.list();
+      const userList = await UsersRepository.list();
       const me = getState().usersModule.profile!;
+    
+      const users = await Promise.all(
+        userList.filter(({ id }) => id !== me.id).map(joinAvatar)
+      );
 
       dispatch({
         type: FETCH_USERS,
         payload: { 
-          fetchedUsers: users.filter(({ id }) => id !== me.id)
+          fetchedUsers: users
         }
       });
     } catch (err) {
@@ -29,11 +34,9 @@ export const fetchUsers = (): any => (
 export const fetchProfile = (): any => (
   async (dispatch: Dispatch) => {
     try {
-      const profile = await UsersRepository.fetchProfile();
-      
-      if (profile.avatar) {
-        profile.avatar = await s3.read(profile.avatar);
-      }
+      const profile = await UsersRepository
+        .fetchProfile()
+        .then(joinAvatar);
       
       dispatch({
         type: FETCH_PROFILE,
