@@ -84,7 +84,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-test-225156-deployment",
-					"S3Key": "amplify-builds/uploadAvatar-6b687246664c5567577a-build.zip"
+					"S3Key": "amplify-builds/uploadAvatar-36765956373566515371-build.zip"
 				}
 			}
 		},
@@ -188,12 +188,29 @@
 						{
 							"Effect": "Allow",
 							"Action": [
+								"dynamodb:Get*",
+								"dynamodb:BatchGetItem",
+								"dynamodb:List*",
+								"dynamodb:Describe*",
+								"dynamodb:Scan",
+								"dynamodb:Query",
 								"dynamodb:Update*",
 								"dynamodb:RestoreTable*"
 							],
 							"Resource": [
 								{
 									"Ref": "storageuserListArn"
+								},
+								{
+									"Fn::Join": [
+										"/",
+										[
+											{
+												"Ref": "storageuserListArn"
+											},
+											"index/*"
+										]
+									]
 								}
 							]
 						},

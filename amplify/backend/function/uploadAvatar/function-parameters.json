@@ -2,6 +2,7 @@
     "permissions": {
         "storage": {
             "userList": [
+                "read",
                 "update"
             ],
             "mediaResources": [

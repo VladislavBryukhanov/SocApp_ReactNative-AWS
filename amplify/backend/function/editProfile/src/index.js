@@ -7,7 +7,7 @@ var storageUserListArn = process.env.STORAGE_USERLIST_ARN
 var authSocAppMobileUserPoolId = process.env.AUTH_SOCAPPMOBILE_USERPOOLID
 
 Amplify Params - DO NOT EDIT */
-const updateDb = require('/opt/nodejs/db-utils');
+const UsersDB = require('/opt/nodejs/db-utils');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
@@ -40,13 +40,21 @@ const updateUserPool = async (UserAttributes, body) => {
 }
 
 exports.handler = async (event) => {
+  const db = new UsersDB(dynamoDb, TableName, event);
   const UserAttributes = event.requestContext.authorizer.claims;
   const body = JSON.parse(event.body);
 
-  await Promise.all([
-    updateUserPool(UserAttributes, body),
-    updateDb(event, dynamoDb, TableName),
-  ]);
-
+  try {
+    await Promise.all([
+      updateUserPool(UserAttributes, body),
+      db.updateDynamodbTable(body)
+    ]);
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: err })
+    };
+  }
+  
   return { statusCode: 200 };
 };

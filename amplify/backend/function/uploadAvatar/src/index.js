@@ -8,7 +8,7 @@ var storageMediaResourcesBucketName = process.env.STORAGE_MEDIARESOURCES_BUCKETN
 
 Amplify Params - DO NOT EDIT */
 
-const updateDb = require('/opt/nodejs/db-utils');
+const UsersDB = require('/opt/nodejs/db-utils');
 const uuidv4 = require('uuid/v4');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
@@ -16,6 +16,8 @@ AWS.config.update({ region: process.env.REGION });
 const bucketName = process.env.STORAGE_MEDIARESOURCES_BUCKETNAME;
 const TableName = process.env.STORAGE_USERLIST_NAME;
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+const AVATAR_DB_KEY = 'avatar'
 
 const storage = new AWS.S3({
   signatureVersion: 'v4',
@@ -43,17 +45,29 @@ exports.handler = async (event) => {
 
   const buff = Buffer.from(base64File, 'base64');
   const objectKey = `${uuidv4()}.${extension}`;
-  const body = JSON.stringify({ avatar: objectKey });
 
   const options = {
-    Bucket: bucketName,
     Key: objectKey,
     Body: buff,
     ContentType: fileType
   };
 
-  await storage.putObject(options).promise();
-  await updateDb({ ...event, body }, dynamoDb, TableName);
+  const db = new UsersDB(dynamoDb, TableName, event);
+  
+  try {
+    const { avatar } = await db.fetchUserProfile();
+
+    await Promise.all([
+      storage.deleteObject({ Key: avatar }).promise(),
+      storage.putObject(options).promise(),
+      db.updateDynamodbTable({ [AVATAR_DB_KEY]: objectKey })
+    ]);
+  } catch (err) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: err })
+    };
+  }
   
   return {
     statusCode: 200,

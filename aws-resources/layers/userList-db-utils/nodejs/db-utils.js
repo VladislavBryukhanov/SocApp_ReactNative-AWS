@@ -3,40 +3,32 @@ class Validation {
     return ['nickname', 'bio', 'avatar', 'username'];
   };
 
-  static validateRequestBody(body) {
-    return !(Object.keys(body)).some(
-      key => !this.mutableUserEntityProperties.includes(key)
-    );
+  static get validatorErrors() {
+    return {
+      event: 'Api gateway proxy and auth required',
+      body: 'Request body contain unexpected property.'
+    };
   }
 
-  static validateRequest(event) {
-    const body = JSON.parse(event.body);
-    const validators = [
-      {
-        rule: this.validateRequestBody(body),
-        statusCode: 400,
-        errorMessage: 'Api gateway proxy and auth required'
-      },
-      {
-        rule: event.requestContext,
-        statusCode: 400,
-        errorMessage: 'Request body contain unexpected property.'
-      }
-    ];
-  
-    validators.forEach((validator) => {
-      if (!validator.rule) {
-        const { statusCode, errorMessage: message } = validator;
-        const body = JSON.stringify({ message });
+  static validateBody(body) {
+    const bodyValidator = (body) => !(Object.keys(body)).some(
+      key => !this.mutableUserEntityProperties.includes(key)
+    );
 
-        throw Error({ statusCode, body });
-      }
-    });
+    if (!bodyValidator(body)) {
+      throw Error(this.validatorErrors.body);
+    }
+  }
+
+  static validateEvent(event) {
+    if (!event.requestContext) {
+      throw Error(this.validatorErrors.event);
+    }
   }
 }
 
 
-class Database {
+class UsersDB {
   // cognito user 'sub' is unique id of it
   get primaryKeys() {
     return [
@@ -45,17 +37,25 @@ class Database {
     ];
   }
 
-  constructor(dynamoDb, tableName) {
-    this.dynamoDb = dynamoDb;
-    this.tableName = tableName;
+  get queryKeys() {
+    return this.primaryKeys.reduce((res, { userPoolAttribute, dynamodbField }) => ({
+        ...res, [dynamodbField]: this.userAttributes[userPoolAttribute]
+      }), {}
+    );
   }
 
-  async updateDynamodbTable(UserAttributes, body) {
-    const Key = {};
-    this.primaryKeys.forEach(({ userPoolAttribute, dynamodbField }) => {
-      Key[dynamodbField] = UserAttributes[userPoolAttribute];
-    });
-    
+  constructor(dynamoDb, tableName, event) {
+    Validation.validateEvent(event);
+    const userAttributes = event.requestContext.authorizer.claims;
+
+    this.dynamoDb = dynamoDb;
+    this.tableName = tableName;
+    this.userAttributes = userAttributes;
+  }
+
+  async updateDynamodbTable(body) {
+    Validation.validateBody(body);
+
     const AttributeUpdates = (Object.keys(body)).reduce((acc, prop) => ({
       ...acc,
       [prop]: {
@@ -66,19 +66,19 @@ class Database {
     
     return this.dynamoDb.update({
       TableName: this.tableName,
-      Key,
+      Key: this.queryKeys,
       AttributeUpdates
     }).promise();
   }
+
+  async fetchUserProfile() {
+    const { Item: profile } = await this.dynamoDb.get({ 
+      TableName: this.tableName,
+      Key: this.queryKeys
+    }).promise();
+
+    return profile;
+  }
 }
 
-module.exports = async (event, dynamoDb, tableName) => {
-  Validation.validateRequest(event);
-
-  const UserAttributes = event.requestContext.authorizer.claims;
-  const body = JSON.parse(event.body);
-  
-  const db = new Database(dynamoDb, tableName);
-  
-  return db.updateDynamodbTable(UserAttributes, body);
-}
+module.exports = UsersDB;

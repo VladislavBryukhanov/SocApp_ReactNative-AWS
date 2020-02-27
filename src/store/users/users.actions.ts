@@ -1,10 +1,14 @@
 import s3 from '@api/s3/native-s3';
 import { FileBase64 } from '@models/file-base64';
-import { UPDATE_PROFILE, UPDATE_AVATAR } from './../action-types';
 import { AppState } from './../index';
 import { Dispatch } from 'redux';
 import UsersRepository from "@api/repositories/users.repository";
-import { FETCH_USERS, FETCH_PROFILE } from "@store/action-types";
+import { 
+  FETCH_USERS,
+  FETCH_PROFILE,
+  UPDATE_PROFILE,
+  UPDATE_AVATAR
+} from "@store/action-types";
 import errorHandler from "@store/errorHandler";
 import { User } from '@models/user';
 import { joinAvatar } from '@helpers/join-avatar';
