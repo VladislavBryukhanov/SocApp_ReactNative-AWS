@@ -65,6 +65,7 @@
       "@store/*": ["store/*"],
       "@models/*": ["models/*"],
       "@utils/*": ["utils/*"],
+      "@helpers/*": ["helpers/*"],
       "@wrappers/*": ["wrappers/*"]
     },
   },

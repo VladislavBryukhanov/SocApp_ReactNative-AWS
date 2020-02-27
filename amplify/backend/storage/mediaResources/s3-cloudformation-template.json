@@ -18,51 +18,63 @@
 			"Type": "String"
 		},
 		"s3PublicPolicy": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "NONE"
 		},
 		"s3PrivatePolicy": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "NONE"
 		},
 		"s3ProtectedPolicy": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "NONE"
 		},
 		"s3UploadsPolicy": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "NONE"
 		},
 		"s3ReadPolicy": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "NONE"
 		},
 		"s3PermissionsAuthenticatedPublic": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "DISALLOW"
 		},
 		"s3PermissionsAuthenticatedProtected": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "DISALLOW"
 		},
 		"s3PermissionsAuthenticatedPrivate": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "DISALLOW"
 		},
 		"s3PermissionsAuthenticatedUploads": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "DISALLOW"
 		},
 		"s3PermissionsGuestPublic": {
 			"Type": "String",
 			"Default" : "DISALLOW"
-		},	
+		},
 		"s3PermissionsGuestUploads": {
 			"Type": "String",
 			"Default" : "DISALLOW"		},
 		"AuthenticatedAllowList": {
-			"Type": "String"
+			"Type": "String",
+			"Default" : "DISALLOW"
 		},
 		"GuestAllowList": {
 			"Type": "String",
 			"Default" : "DISALLOW"
 		},
 		"selectedGuestPermissions": {
-			"Type": "CommaDelimitedList"
+			"Type": "CommaDelimitedList",
+			"Default" : "NONE"
 		},
 		"selectedAuthenticatedPermissions": {
-			"Type": "CommaDelimitedList"
+			"Type": "CommaDelimitedList",
+			"Default" : "NONE"
 		},
 		"env": {
 			"Type": "String"
@@ -70,7 +82,7 @@
 		"triggerFunction": {
 			"Type": "String"
 		}
-	
+
 
 	},
 	"Conditions": {
@@ -150,7 +162,7 @@
 	"Resources": {
 		"S3Bucket": {
 			"Type": "AWS::S3::Bucket",
-		    
+
 			"DeletionPolicy" : "Retain",
 			"Properties": {
 				"BucketName": {
@@ -166,6 +178,19 @@
                                     {
                                         "Ref": "bucketName"
                                     },
+                                    {
+                                      "Fn::Select": [
+                                          3,
+                                          {
+                                              "Fn::Split": [
+                                                  "-",
+                                                  {
+                                                      "Ref": "AWS::StackName"
+                                                  }
+                                              ]
+                                          }
+                                      ]
+                                    },
                                     "-",
                                     {
                                         "Ref": "env"
@@ -175,7 +200,7 @@
                         }
                     ]
                 },
-                
+
 				"CorsConfiguration": {
 					"CorsRules": [
 						{
@@ -205,7 +230,8 @@
 				}
 			}
 		},
-	    
+
+
 		"S3AuthPublicPolicy": {
 			"DependsOn": [
 				"S3Bucket"
@@ -229,7 +255,7 @@
 							"Action": {
 								"Fn::Split" : [ "," , {
 									"Ref": "s3PermissionsAuthenticatedPublic"
-								} ] 
+								} ]
 							},
 							"Resource": [
 								{
@@ -273,7 +299,7 @@
 							"Action": {
 								"Fn::Split" : [ "," , {
 									"Ref": "s3PermissionsAuthenticatedProtected"
-								} ] 
+								} ]
 							},
 							"Resource": [
 								{
@@ -317,7 +343,7 @@
 							"Action": {
 								"Fn::Split" : [ "," , {
 									"Ref": "s3PermissionsAuthenticatedPrivate"
-								} ] 
+								} ]
 							},
 							"Resource": [
 								{
@@ -361,7 +387,7 @@
 							"Action": {
 								"Fn::Split" : [ "," , {
 									"Ref": "s3PermissionsAuthenticatedUploads"
-								} ] 
+								} ]
 							},
 							"Resource": [
 								{
@@ -478,7 +504,7 @@
 							"Action": {
 								"Fn::Split" : [ "," , {
 									"Ref": "s3PermissionsGuestPublic"
-								} ] 
+								} ]
 							},
 							"Resource": [
 								{
@@ -522,7 +548,7 @@
 							"Action": {
 								"Fn::Split" : [ "," , {
 									"Ref": "s3PermissionsGuestUploads"
-								} ] 
+								} ]
 							},
 							"Resource": [
 								{

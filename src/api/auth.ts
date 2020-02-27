@@ -50,6 +50,15 @@ export class CognitoAuth {
       IdentityPoolId: aws_cognito_identity_pool_id
     };
 
+    const token = await this.retreiveSessionToken();
+    if (token) {
+      credentials.Logins = { [awsIdentityLogin]: token };
+    }
+    
+    return credentials;
+  }
+
+  static async retreiveSessionToken(): Promise<string | undefined> {
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
       const getSession = promisify(
@@ -58,12 +67,9 @@ export class CognitoAuth {
       const session = await getSession();
 
       if (session instanceof CognitoUserSession) {
-        credentials.Logins = {
-          [awsIdentityLogin]: session.getIdToken().getJwtToken()
-        }
+        return session.getIdToken().getJwtToken();
       }
     }
-    return credentials;
   }
 
   static async updateAWSConfig() {

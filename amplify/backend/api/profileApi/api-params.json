@@ -1,0 +1,81 @@
+{
+    "paths": [
+        {
+            "name": "/fetch",
+            "lambdaFunction": "fetchProfile",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            }
+        },
+        {
+            "name": "/update",
+            "lambdaFunction": "editProfile",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/PUT",
+                    "/PATCH"
+                ]
+            }
+        },
+        {
+            "name": "/uploadAvatar",
+            "lambdaFunction": "uploadAvatar",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST"
+                ]
+            }
+        }
+    ],
+    "resourceName": "profileApi",
+    "apiName": "profileApi",
+    "functionArns": [
+        {
+            "lambdaFunction": "fetchProfile"
+        },
+        {
+            "lambdaFunction": "editProfile"
+        },
+        {
+            "lambdaFunction": "uploadAvatar"
+        }
+    ],
+    "privacy": {
+        "auth": 3,
+        "unauth": 0,
+        "authRoleName": "amplify-soc-app-test-225156-authRole",
+        "unAuthRoleName": "amplify-soc-app-test-225156-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "fetchProfile",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "editProfile",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "uploadAvatar",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ],
+    "uuid": "6443dc03"
+}
