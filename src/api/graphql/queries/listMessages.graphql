@@ -1,0 +1,12 @@
+query listMessages {
+  listMessages {
+    items {
+      id
+      chatId
+      senderId
+      content
+      timestamp
+      isRead
+    }
+  }
+}

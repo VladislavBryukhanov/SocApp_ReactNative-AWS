@@ -1,0 +1,10 @@
+subscription onCreateMessage {
+  onCreateMessage {
+    id
+    chatId
+    senderId
+    content
+    timestamp
+    isRead
+  }
+}

@@ -5,6 +5,8 @@ import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
 import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { Button } from 'react-native-paper';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 interface ProfileScreeProps extends NavigationSwitchScreenProps {}
 
@@ -24,6 +26,10 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
   static navigationOptions = ({ navigation }: { navigation: NavigationProps }) => ({
     title: navigation.getParam('screenName')
   });
+
+  onOpenChat = () => {
+    this.props.navigation.navigate('Chat');
+  };
 
   render() {
     const user = this.props.navigation.getParam('user');
@@ -49,6 +55,13 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
         <Text>
           Bio: {bio}
         </Text>
+        <Button
+          mode="outlined"
+          color={Colors.primary}
+          onPress={this.onOpenChat}
+        >
+          Send Mesasge
+        </Button>
       </ScrollView>
     )
   }
