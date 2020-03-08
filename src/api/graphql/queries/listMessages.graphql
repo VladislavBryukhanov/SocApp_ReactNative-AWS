@@ -1,5 +1,9 @@
-query listMessages {
-  listMessages {
+query ListMessages(
+  $filter: TableMessageFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listMessages(filter: $filter, limit: $limit, nextToken: $nextToken) {
     items {
       id
       chatId
@@ -8,5 +12,6 @@ query listMessages {
       timestamp
       isRead
     }
+    nextToken
   }
 }

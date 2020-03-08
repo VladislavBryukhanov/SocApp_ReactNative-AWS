@@ -1,66 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { graphql } from 'react-apollo'
-import { CognitoAuth } from '@api/auth';
-import AWSAppSyncClient from "aws-appsync";
+import React, { useEffect, useState } from 'react';
+// import { graphql, useQuery } from 'react-apollo'
+import { useQuery } from '@apollo/react-hooks';
 import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
-import { Text, View } from 'react-native';
+import { Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { Message } from '@models/message';
 import styles from './styles';
 import listMessagesQuery from '../../api/graphql/queries/listMessages.graphql';
-import createMessageMutation from '../../api/graphql/mutations/createMessage.graphql';
 import onCreateMessageSubscription from '../../api/graphql/subscriptions/onCreateMessage.graphql';
-import { ApolloQueryResult } from 'apollo-client';
+import { Preloader } from '@components/atoms/Prloader/preloader.component';
+import { ChatInput } from '@components/ChatInput/chat-input.component';
+import { FAB } from 'react-native-paper';
+
+interface ListMessages {
+  listMessages: {
+    items: Message[]
+  }
+}
 
 interface ChatScreenProps  extends NavigationSwitchScreenProps {};
 
 export const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) => {
-  const [ messages, setMessages ] = useState(new Array<Message>());
+  let mesageListRef: FlatList<Message> | undefined;
 
-  useEffect(() => {
-    const client = new AWSAppSyncClient({
-      url: 'https://s3g43sr47vbmpdlgzqejb6xn3m.appsync-api.us-east-1.amazonaws.com/graphql',
-      region: 'us-east-1',
-      disableOffline: true,
-      auth: {
-        type: 'AMAZON_COGNITO_USER_POOLS',
-        jwtToken: CognitoAuth.retreiveSessionToken().then(token => token || '')
-      }
-    });
+  const [ isScrollBottomAvailable, setIsScrollBottomAvailable ] = useState(true);
+  const { loading, data, subscribeToMore } = useQuery<ListMessages>(listMessagesQuery);
 
-    setInterval(() => client.mutate({ mutation: createMessageMutation,
-        variables: {
-          "createmessageinput": {
-            "chatId": "bkQEBvvDCv7xU9oia1PsWTNHyi6QMVYq",
-            "senderId": "vx4mWfNBkvXwbhCZbGiUquqz4EkWdQFa",
-            "content": "Hello, world!",
-            "timestamp": 1583051052,
-            "isRead": false
-          }
-        }
-      }).then(res => console.log('MUT_RES', res))
-        .catch(e => console.log('MT_ER', e))
-    , 7000);
-
-    client.hydrated().then((client) => {
-      console.log('HYD')
-
-      const observable = client.subscribe({ query: onCreateMessageSubscription });
-  
-      observable.subscribe({
-        next: (data) => console.log('>>>>>>>>>>>>>>>>>>>>>>>LIVE', data),
-        complete: (ctd) => console.log('>>>>>>>>>>>>>>>>>>>>>>>COM', ctd),
-        error: err => console.log('>>>>>>>>>>>>>>>>ERR', err),
-      });
-    });
-
-    client.query<Message>({ query: listMessagesQuery }).then((
-      result: ApolloQueryResult<{ listMessages: { items: Message[]} }>) => 
-        setMessages(result.data.listMessages.items)
-    );
+  useEffect(() => subscribeToMore<{ onCreateMessage: Message }>({
+    document: onCreateMessageSubscription,
+    updateQuery: (prev, { subscriptionData }) => {
+      if (!subscriptionData.data) return prev;
       
-  }, []);
+      return {
+        ...prev,
+        listMessages: {
+          ...prev.listMessages,
+          items: [
+            ...prev.listMessages.items,
+            subscriptionData.data.onCreateMessage
+          ]
+        }
+      };
+    }
+  }), []);
 
-  console.log(messages);
+  if (loading || !data) {
+    return <Preloader/>;
+  }
 
   const messageTemplate = ({ item }: { item: Message }) => (
     <View style={styles.message}>
@@ -71,10 +56,48 @@ export const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) =>
     </View>
   )
 
+  const onListScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { nativeEvent: { contentSize, layoutMeasurement, contentOffset } } = event;
+    const endPosition = contentSize.height - layoutMeasurement.height;
+    
+    if (contentOffset.y === endPosition) {
+      setIsScrollBottomAvailable(false);
+    } else if (!isScrollBottomAvailable) {
+      setIsScrollBottomAvailable(true);
+    }
+  };
+
+  const onScrollBottom = () => {
+    if (mesageListRef) {
+      mesageListRef.scrollToEnd({ animated: true});
+    }
+  }
+
+  const onMesageCountChanged = () => {
+    if (!isScrollBottomAvailable) {
+      onScrollBottom();
+    }
+  }
+
   return (
-    <FlatList
-      data={messages}
-      renderItem={messageTemplate}
-    />
+    <View style={styles.chat}>
+      <FlatList
+        style={styles.messageList}
+        data={data.listMessages.items}
+        renderItem={messageTemplate}
+        ref={(ref:  FlatList<Message>) => mesageListRef = ref}
+        // onLayout={onScrollBottom}
+        onContentSizeChange={onMesageCountChanged}
+        onScroll={onListScroll}
+      />
+      { isScrollBottomAvailable && (
+        <FAB 
+          style={styles.srollBottomFab}
+          icon='chevron-down'
+          onPress={onScrollBottom}
+          small/>
+      )}
+      <ChatInput/>
+    </View>
   )
 };

@@ -18,7 +18,12 @@ export const Screens = {
       title: 'My profile'
     }
   },
-  Chat: ChatScreen
+  Chat: {
+    screen: ChatScreen,
+    navigationOptions: {
+      title: 'Chat'
+    }
+  }
 };
 
 export const AppStack = createStackNavigator(Screens);

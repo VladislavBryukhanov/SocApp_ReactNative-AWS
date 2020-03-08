@@ -1,7 +1,29 @@
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { StyleSheet } from "react-native";
 
+const border = {
+  borderColor: '#1A567B',
+  borderWidth: 1,
+};
+
 export default StyleSheet.create({
+  chat: {
+    display: 'flex',
+    flex: 1
+  },
+  messageList: {
+    display: 'flex',
+    flex: 1,
+  },
+  srollBottomFab: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    margin: 16,
+    marginBottom: 64,
+    ...border,
+    backgroundColor: Colors.primary,
+  },
   message: {
     flexDirection:'row',
     flexWrap:'wrap',
@@ -13,16 +35,10 @@ export default StyleSheet.create({
 
     padding: 10,
     margin: 10,
-    borderColor: '#1A567B',
     borderRadius: 8,
-    borderWidth: 2,
+    ...border,
 
-    elevation: 6,
-
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.8,
-    // shadowRadius: 1, 
+    elevation: 4,
   },
   content: {
     color: 'white',
