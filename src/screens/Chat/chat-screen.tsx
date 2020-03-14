@@ -1,25 +1,35 @@
 import React, { useEffect, useState } from 'react';
 // import { graphql, useQuery } from 'react-apollo'
-import { useQuery } from '@apollo/react-hooks';
-import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
 import { Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
-import { Message } from '@models/message';
-import styles from './styles';
-import listMessagesQuery from '../../api/graphql/queries/listMessages.graphql';
-import onCreateMessageSubscription from '../../api/graphql/subscriptions/onCreateMessage.graphql';
-import { Preloader } from '@components/atoms/Prloader/preloader.component';
-import { ChatInput } from '@components/ChatInput/chat-input.component';
+import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
+import { connect } from 'react-redux';
 import { FAB } from 'react-native-paper';
-
+import { useQuery } from '@apollo/react-hooks';
+import { Message } from '@models/message';
+import { User } from '@models/user';
+import { AppState } from '@store/index';
+import onCreateMessageSubscription from '../../api/graphql/subscriptions/onCreateMessage.graphql';
+import listMessagesQuery from '../../api/graphql/queries/listMessages.graphql';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { Preloader } from '@components/atoms/Prloader/preloader.component';
+import ChatInput from '@components/ChatInput/chat-input.component';
+import defaultAvatar from '@assets/icons/user.png';
+import styles from './styles';
+import { debounce } from 'lodash';
+import moment from 'moment-mini';
+// fixme replace to models
 interface ListMessages {
   listMessages: {
     items: Message[]
   }
 }
 
-interface ChatScreenProps  extends NavigationSwitchScreenProps {};
+interface ChatScreenProps  extends NavigationSwitchScreenProps {
+  userList: User[],
+  profile: User
+};
 
-export const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) => {
+const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) => {
   let mesageListRef: FlatList<Message> | undefined;
 
   const [ isScrollBottomAvailable, setIsScrollBottomAvailable ] = useState(true);
@@ -47,23 +57,57 @@ export const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) =>
     return <Preloader/>;
   }
 
-  const messageTemplate = ({ item }: { item: Message }) => (
-    <View style={styles.message}>
-      {/* <Text>{item.chatId}</Text>
-      <Text>{item.senderId}</Text> */}
-      <Text style={styles.content}>{item.content}</Text>
-      <Text>{item.timestamp}</Text>
-    </View>
-  )
+  const messageTemplate = ({ item }: { item: Message }) => {
+    const sentByMe = item.senderId === props.profile.id;
+    const messageStyle = sentByMe 
+      ? styles.outcomingMessage
+      : styles.incomingMessage;
+
+    let sender;
+
+    if (item.senderId === props.profile.id) {
+      sender = props.profile;
+    } else {
+      // TODO all interlocutors will be replaced into Message table interlocutorIds: string[]
+      sender = props.userList.find(({ id }) => id === item.senderId)!;
+    }
+
+    return (
+      <View style={[styles.messageView, sentByMe && styles.reversed]}>
+        <View style={styles.sender}>
+          <CachedImageLoaded
+            imageUrl={sender.avatar}
+            style={styles.avatar}
+            defaultImage={defaultAvatar}
+          />
+        </View>
+        <View style={[ styles.message, messageStyle]}>
+          <Text style={styles.content}>{item.content}</Text>
+        </View>
+        <View style={styles.dateTimeView}>
+          <Text style={styles.dateTime}>
+            {moment(item.createdAt).format('DD MMM')}
+          </Text>
+          <Text style={styles.dateTime}>
+            {moment(item.createdAt).format('HH:MM:ss')}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  // prevent displaying of button on new message event (button appears on few miliseconds before autoscroll scrolling 
+  // down the same problem with keyboard appearing)
+  const setScrollableState = debounce((val) => setIsScrollBottomAvailable(val), 300);
 
   const onListScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { nativeEvent: { contentSize, layoutMeasurement, contentOffset } } = event;
     const endPosition = contentSize.height - layoutMeasurement.height;
-    
-    if (contentOffset.y === endPosition) {
-      setIsScrollBottomAvailable(false);
+
+    if (contentOffset.y === endPosition || endPosition < 0) {
+      setScrollableState(false);
     } else if (!isScrollBottomAvailable) {
-      setIsScrollBottomAvailable(true);
+      setScrollableState(true);
     }
   };
 
@@ -101,3 +145,10 @@ export const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) =>
     </View>
   )
 };
+
+const mapStateToProps = (store: AppState) => ({
+  userList: store.usersModule.users,
+  profile: store.usersModule.profile!
+})
+
+export default connect(mapStateToProps)(ChatScreen);

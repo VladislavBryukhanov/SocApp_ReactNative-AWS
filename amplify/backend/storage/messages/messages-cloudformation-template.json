@@ -45,7 +45,7 @@
                   }  , 
                   
                   {
-                      "AttributeName": "chatId",
+                      "AttributeName": "createdAt",
                       "AttributeType": "S"
                   } 
                   
@@ -58,7 +58,7 @@
                   }  , 
                   
                   {
-                    "AttributeName": "chatId",
+                    "AttributeName": "createdAt",
                     "KeyType": "RANGE"
                   } 
                   

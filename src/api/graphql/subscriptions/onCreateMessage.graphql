@@ -4,7 +4,7 @@ subscription onCreateMessage {
     chatId
     senderId
     content
-    timestamp
+    createdAt
     isRead
   }
 }

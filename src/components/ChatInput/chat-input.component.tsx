@@ -5,17 +5,23 @@ import { IconButton } from 'react-native-paper';
 import { useMutation } from 'react-apollo';
 import createMessageMutation from '../../api/graphql/mutations/createMessage.graphql';
 import styles from './styles';
+import { connect } from 'react-redux';
+import { AppState } from '@store/index';
+import { User } from '@models/user';
 
-export const ChatInput: React.FC = () => {
+interface ChatInputProps {
+  profile: User
+}
+
+const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
   const [message, setMessage] = useState('');
   const [addMessage, { loading }] = useMutation(createMessageMutation, {
     variables: {
-      "createmessageinput": {
-        "chatId": "bkQEBvvDCv7xU9oia1PsWTNHyi6QMVYq",
-        "senderId": "vx4mWfNBkvXwbhCZbGiUquqz4EkWdQFa",
-        "content": message,
-        "timestamp": 1583051052,
-        "isRead": false
+      'createmessageinput': {
+        'chatId': 'bkQEBvvDCv7xU9oia1PsWTNHyi6QMVYq',
+        'senderId': props.profile.id,
+        'content': message,
+        'isRead': false, // backend autoset
       }
     },
     onCompleted: () => setMessage('')
@@ -38,3 +44,9 @@ export const ChatInput: React.FC = () => {
     </View>
   );
 }
+
+const mapStateToProps = (store: AppState) => ({
+  profile: store.usersModule.profile!
+});
+
+export default connect(mapStateToProps)(ChatInput);

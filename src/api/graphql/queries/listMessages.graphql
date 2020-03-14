@@ -9,7 +9,7 @@ query ListMessages(
       chatId
       senderId
       content
-      timestamp
+	    createdAt
       isRead
     }
     nextToken

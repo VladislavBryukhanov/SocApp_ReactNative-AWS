@@ -2,6 +2,6 @@
     "tableName": "messages",
     "partitionKeyName": "id",
     "partitionKeyType": "S",
-    "sortKeyName": "chatId",
+    "sortKeyName": "createdAt",
     "sortKeyType": "S"
 }
