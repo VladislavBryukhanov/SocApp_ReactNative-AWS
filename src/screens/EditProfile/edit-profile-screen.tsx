@@ -14,6 +14,7 @@ import { User } from '@models/user';
 import defaultAvatar from '@assets/icons/user.png';
 import { editProfile, fetchProfile, updateProfileAvatar } from '@store/users/users.actions';
 import { FileBase64 } from '@models/file-base64';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 
 interface EditProfileProps {
   profile: User;
@@ -89,9 +90,6 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
 
   render() {
     const { username, avatar , nickname, bio, loading } = this.state;
-    const userAvatar = avatar
-      ? { uri: avatar }
-      : defaultAvatar;
 
     return (
       <ScrollView 
@@ -101,12 +99,13 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
         <View>
           <TouchableNativeFeedback
             onPress={() => this.onChangeAvatar()}
-            background={TouchableNativeFeedback.Ripple('#AAF', true)}
+            background={TouchableNativeFeedback.Ripple(Colors.light, true)}
           >
             <View style={styles.avatarWrapper}>
-              <Avatar.Image
-                size={148}
-                source={userAvatar}
+              <CachedImageLoaded
+                style={styles.avatar}
+                imageUrl={avatar}
+                defaultImage={defaultAvatar}
               />
             </View>
           </TouchableNativeFeedback>

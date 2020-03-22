@@ -1,11 +1,11 @@
 import React from 'react';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { NavigationScreenProp, NavigationSwitchScreenProps } from 'react-navigation';
 import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
 import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
-import { Button } from 'react-native-paper';
+import { Button, FAB } from 'react-native-paper';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 interface ProfileScreeProps extends NavigationSwitchScreenProps {}
@@ -36,32 +36,38 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
     const { avatar, bio, age, username, nickname } = user;
 
     return (
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.profileView}>
         <CachedImageLoaded
           imageUrl={avatar}
           style={styles.avatar}
           defaultImage={defaultAvatar}
         />
 
-        <Text style={styles.nickname}>
-          Nickname: {nickname}
+        <View style={styles.infoView}>
+          <Text style={styles.nickname}>Nickname:</Text>
+          <Text style={styles.nickname}>{nickname}</Text>
+        </View>
+
+        <View style={styles.infoView}>
+          <Text style={styles.username}>Username:</Text>
+          <Text style={styles.username}>@{username}</Text>
+        </View>
+
+        <View style={styles.infoView}>
+          <Text>
+            Age: {age} *TODO
+          </Text>
+        </View>
+
+        <Text style={styles.infoView}>
+          Bio: {bio} *TODO
         </Text>
-        <Text  style={styles.username}>
-        Username: @{username}
-        </Text>
-        <Text>
-          Age: {age}
-        </Text>
-        <Text>
-          Bio: {bio}
-        </Text>
-        <Button
-          mode="outlined"
-          color={Colors.primary}
+
+        <FAB
+          style={styles.chatBtn}
+          icon="message-text"
           onPress={this.onOpenChat}
-        >
-          Send Mesasge
-        </Button>
+        />
       </ScrollView>
     )
   }

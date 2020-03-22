@@ -7,11 +7,12 @@ import { Provider } from 'react-redux';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { store } from '@store/index';
 import { apolloClient } from '@api/graphql';
+import { theme } from '@constants/theme';
 
 const AppWithRedux: React.FC = () => (
   <ApolloProvider client={apolloClient}>
     <Provider store={store}>
-      <PaperProvider>
+      <PaperProvider theme={theme}>
         <App/>
       </PaperProvider>
     </Provider>

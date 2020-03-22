@@ -1,7 +1,5 @@
 {
     "tableName": "messages",
     "partitionKeyName": "id",
-    "partitionKeyType": "S",
-    "sortKeyName": "createdAt",
-    "sortKeyType": "S"
+    "partitionKeyType": "S"
 }

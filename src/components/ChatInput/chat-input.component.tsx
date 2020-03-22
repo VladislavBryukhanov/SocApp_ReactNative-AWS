@@ -21,7 +21,6 @@ const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
         'chatId': 'bkQEBvvDCv7xU9oia1PsWTNHyi6QMVYq',
         'senderId': props.profile.id,
         'content': message,
-        'isRead': false, // backend autoset
       }
     },
     onCompleted: () => setMessage('')

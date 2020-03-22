@@ -12,13 +12,6 @@
             "Type": "String"
         },
         
-        "sortKeyName": {
-            "Type": "String"
-        },
-        "sortKeyType": {
-            "Type": "String"
-        },
-        
         "tableName": {
             "Type": "String"
         }
@@ -45,6 +38,11 @@
                   }  , 
                   
                   {
+                      "AttributeName": "chatId",
+                      "AttributeType": "S"
+                  }  , 
+                  
+                  {
                       "AttributeName": "createdAt",
                       "AttributeType": "S"
                   } 
@@ -55,11 +53,6 @@
                   {
                     "AttributeName": "id",
                     "KeyType": "HASH"
-                  }  , 
-                  
-                  {
-                    "AttributeName": "createdAt",
-                    "KeyType": "RANGE"
                   } 
                   
                 ],
@@ -94,6 +87,34 @@
                     ]
                 }
                 
+                ,"GlobalSecondaryIndexes": [
+                  
+                    {
+                        "IndexName": "messages-chatId-createdAt-index",
+                        "KeySchema": [
+                            
+                            {
+                                "AttributeName": "chatId",
+                                "KeyType": "HASH"
+                            }  , 
+                            
+                            {
+                                "AttributeName": "createdAt",
+                                "KeyType": "RANGE"
+                            } 
+                            
+                        ],
+                        "Projection": {
+                            "ProjectionType": "ALL"
+                        },
+                        "ProvisionedThroughput": {
+                            "ReadCapacityUnits": "5",
+                            "WriteCapacityUnits": "5"
+                        }
+                    } 
+                  
+                ]
+                
             }
         }
     },
@@ -127,17 +148,6 @@
         "PartitionKeyType": {
             "Value": {
                 "Ref": "partitionKeyType"
-            }
-        },
-        
-        "SortKeyName": {
-            "Value": {
-                "Ref": "sortKeyName"
-            }
-        },
-        "SortKeyType": {
-            "Value": {
-                "Ref": "sortKeyType"
             }
         },
         

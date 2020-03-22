@@ -15,3 +15,7 @@ _____________________
 
 soc-app-appSync role should grand acces to chatDb
 this role should be used to appSync chat interactions
+
+appsync resolvers kept by path aws/rescources/resolvers they should be updated manually
+as well as schema.graphql
+
