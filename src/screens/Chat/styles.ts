@@ -1,5 +1,6 @@
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { StyleSheet, Dimensions } from "react-native";
+import { customColors } from '@constants/theme';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -10,7 +11,7 @@ const elementsMargin = 10;
 const maxMessageWidth = screenWidth - (avatarWidth + elementsMargin * 2) - (dateTimeWidth + elementsMargin * 2);
 
 const border = {
-  borderColor: '#1A567B',
+  borderColor: customColors.primary,
   borderWidth: 1,
 };
 
@@ -59,10 +60,10 @@ export default StyleSheet.create({
     elevation: 3,
   },
   incomingMessage: {
-    backgroundColor: '#243443'
+    backgroundColor: customColors.secondary,
   },
   outcomingMessage: {
-    backgroundColor: '#1A567B',
+    backgroundColor: customColors.primary,
   },
   content: {
     color: 'white',
