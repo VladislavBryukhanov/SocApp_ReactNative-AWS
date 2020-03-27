@@ -5,15 +5,11 @@ import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
 import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
-import { Button, FAB } from 'react-native-paper';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { FAB } from 'react-native-paper';
 
 interface ProfileScreeProps extends NavigationSwitchScreenProps {}
 
-type NavigationProps = NavigationScreenProp<ScreenParams>;
-type ScreenParams = {
-  screenName: string;
-}
+type NavigationProps = NavigationScreenProp<{ screenName: string }>;
 
 class ProfileScreen extends React.Component<ProfileScreeProps> {
   componentDidMount() {

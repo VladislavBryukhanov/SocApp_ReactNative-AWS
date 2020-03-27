@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Button, Text } from 'react-native';
+import { ScrollView, View, Text } from 'react-native';
 import { NavigationSwitchScreenProps } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
@@ -12,25 +12,33 @@ import { signIn } from '@store/auth/auth.actions';
 import { openModal } from '@store/modal/modal.actions';
 import styles from './styles';
 import { EMAIL_NOT_CONFIRMED } from '@constants/text-auth';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { Button } from 'react-native-paper';
 
 interface SignInProps extends NavigationSwitchScreenProps, AuthComponentProps {
   signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
   openModal: (element: React.ReactNode) => void;
+  isAuthenticated?: boolean;
 }
 
 const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  if (props.isAuthenticated) {
+    props.navigation.navigate('App');
+  }
 
   const onSignIn = async () => {
-    const res = await props.signIn(
+    setLoading(true);
+
+    await props.signIn(
       { email: email.toLowerCase(), password },
       onUserIsNotConfirmedHandler
     );
-    
-    if (res) {
-      props.navigation.navigate('App');
-    }
+
+    setLoading(false);
   }
 
   const onUserIsNotConfirmedHandler = async () => {
@@ -67,7 +75,16 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
         />
       </View>
       
-      <Button title="Sign in" onPress={onSignIn}/>
+      <Button
+        mode="outlined"
+        loading={loading}
+        disabled={loading}
+        style={styles.signInBtn}
+        color={Colors.primary}
+        onPress={onSignIn}
+      >
+        Sign in
+      </Button>
       
       <Text onPress={onForgotPassword} style={baseStyles.linkButton}>
         Forgot password
@@ -84,6 +101,10 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   )
 }
 
+const mapStateToProps = (store: AppState) => ({
+  isAuthenticated: store.authModule.isAuthenticated
+});
+
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   signIn: (credentials: Credentials, confirmationExceptionHandler?: Function) => 
     dispatch(signIn(credentials, confirmationExceptionHandler)),
@@ -91,6 +112,6 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 });
 
 export default compose<SignInProps>(
-  connect(null, mapDispatchToProps),
+  connect(mapStateToProps, mapDispatchToProps),
   withEmailConfirmation
 )(SignInScreen);

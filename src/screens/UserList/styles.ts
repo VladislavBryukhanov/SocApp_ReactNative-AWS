@@ -1,3 +1,4 @@
+import { customColors } from '@constants/theme';
 import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
@@ -8,8 +9,7 @@ export default StyleSheet.create({
     flex: 1, 
     alignItems: 'center',
 
-    paddingVertical: 10,
-    marginHorizontal: 10,
+    padding: 10,
     borderBottomColor: Colors.light,
     borderBottomWidth: 1,
   },
@@ -20,8 +20,13 @@ export default StyleSheet.create({
     borderColor: Colors.dark,
     marginRight: 12
   },
-  username: {
+  nickname: {
     fontSize: 18,
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+    color: customColors.darkText
+  },
+  username: {
+    fontSize: 15,
+    color: customColors.darkText
+  },
 })

@@ -22,6 +22,9 @@ export const retrieveAuthenticatedUser = (): any => (
   async (dispatch: Dispatch) => {
     try {
       const user = await CognitoAuth.retrieveAuthenticatedUser();
+
+      if (!user) return;
+
       const cognitoUsername = user && user.getUsername();
       await CognitoAuth.updateAWSConfig();
       

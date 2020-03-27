@@ -46,7 +46,10 @@ class UserListScreen extends React.Component<UserListProps> {
           style={styles.avatar}
           defaultImage={defaultAvatar}
         />
-        <Text style={styles.username}>{item.username}</Text>
+        <View>
+          <Text style={styles.nickname}>{item.nickname}</Text>
+          <Text style={styles.username}>@{item.username}</Text>
+        </View>
       </View>
     </TouchableNativeFeedback>
   )

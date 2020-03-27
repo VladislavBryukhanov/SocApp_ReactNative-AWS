@@ -1,21 +1,23 @@
 import React from 'react';
-import { View, ActivityIndicator, StatusBar } from 'react-native';
+import { View } from 'react-native';
 import { NavigationSwitchScreenProps } from 'react-navigation';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { retrieveAuthenticatedUser } from '@store/auth/auth.actions';
 import styles from './styles';
 import { Preloader } from '@components/atoms/Prloader/preloader.component';
+import { AppState } from '@store/index';
 
 interface AuthLoadingScreenProps extends NavigationSwitchScreenProps {
   retrieveAuthenticatedUser: () => any
+  isAuthenticated?: boolean;
 }
 
 class AuthLoadingScreen extends React.Component<AuthLoadingScreenProps> {
   async componentDidMount() {
-    const user = await this.props.retrieveAuthenticatedUser();
-    if (user) {
+    await this.props.retrieveAuthenticatedUser();
+
+    if (this.props.isAuthenticated) {
       return this.props.navigation.navigate('App');
     }
     this.props.navigation.navigate('Auth');
@@ -30,11 +32,15 @@ class AuthLoadingScreen extends React.Component<AuthLoadingScreenProps> {
   }
 }
 
+const mapStateToProps = (store: AppState) => ({
+  isAuthenticated: store.authModule.isAuthenticated
+});
+
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   retrieveAuthenticatedUser: () => dispatch(retrieveAuthenticatedUser())
 });
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(AuthLoadingScreen);

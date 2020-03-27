@@ -3,6 +3,7 @@ import { DefaultTheme } from 'react-native-paper';
 export const customColors = {
   primary: '#1A567B',
   secondary: '#243443',
+  darkText: '#2B3856',
 }
 
 export const theme = {
