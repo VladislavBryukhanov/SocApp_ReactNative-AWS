@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-// import { graphql, useQuery } from 'react-apollo'
-import { Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import React from 'react';
+import { Text, View, NativeSyntheticEvent, NativeScrollEvent, ViewToken } from 'react-native';
 import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
 import { connect } from 'react-redux';
+import { compose } from 'redux';
 import { FAB } from 'react-native-paper';
-import { useQuery } from '@apollo/react-hooks';
 import { Message } from '@models/message';
 import { User } from '@models/user';
 import { AppState } from '@store/index';
@@ -17,6 +16,8 @@ import defaultAvatar from '@assets/icons/user.png';
 import styles from './styles';
 import { debounce } from 'lodash';
 import moment from 'moment-mini';
+import { graphql } from 'react-apollo';
+
 // fixme replace to models
 interface ListMessages {
   listMessages: {
@@ -24,52 +25,51 @@ interface ListMessages {
   }
 }
 
-interface ChatScreenProps  extends NavigationSwitchScreenProps {
-  userList: User[],
-  profile: User
+interface ChatScreenProps extends NavigationSwitchScreenProps {
+  userList: User[];
+  profile: User;
+  messages?: Message[];
+  loading?: boolean;
+  subscribeToNewMessages: () => () => void;
 };
 
-const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) => {
-  let mesageListRef: FlatList<Message> | undefined;
+interface ChatScreenState {
+  isScrollBottomAvailable: boolean;
+}
 
-  const [ isScrollBottomAvailable, setIsScrollBottomAvailable ] = useState(true);
-  const { loading, data, subscribeToMore } = useQuery<ListMessages>(listMessagesQuery);
-
-  useEffect(() => subscribeToMore<{ onCreateMessage: Message }>({
-    document: onCreateMessageSubscription,
-    updateQuery: (prev, { subscriptionData }) => {
-      if (!subscriptionData.data) return prev;
-      
-      return {
-        ...prev,
-        listMessages: {
-          ...prev.listMessages,
-          items: [
-            ...prev.listMessages.items,
-            subscriptionData.data.onCreateMessage
-          ]
-        }
-      };
-    }
-  }), []);
-
-  if (loading || !data) {
-    return <Preloader/>;
+class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
+  state: ChatScreenState = {
+    isScrollBottomAvailable: false
   }
 
-  const messageTemplate = ({ item }: { item: Message }) => {
-    const sentByMe = item.senderId === props.profile.id;
+  lastVisibleItem?: Message;
+
+  mesageListRef?: FlatList<Message>;
+  unsubscribe?: () => void;
+
+  componentDidMount() {
+    this.unsubscribe = this.props.subscribeToNewMessages();
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
+  messageTemplate = ({ item }: { item: Message }) => {
+    const sentByMe = item.senderId === this.props.profile.id;
     const messageStyle = sentByMe 
       ? styles.outcomingMessage
       : styles.incomingMessage;
 
     let sender;
 
-    if (item.senderId === props.profile.id) {
-      sender = props.profile;
+    if (item.senderId === this.props.profile.id) {
+      sender = this.props.profile;
     } else {
       // TODO all interlocutors will be replaced into Message table interlocutorIds: string[]
-      sender = props.userList.find(({ id }) => id === item.senderId)!;
+      sender = this.props.userList.find(({ id }) => id === item.senderId)!;
     }
 
     return (
@@ -89,7 +89,7 @@ const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) => {
             {moment(item.createdAt).format('DD MMM')}
           </Text>
           <Text style={styles.dateTime}>
-            {moment(item.createdAt).format('HH:MM:ss')}
+            {moment(item.createdAt).format('HH:mm:ss')}
           </Text>
         </View>
       </View>
@@ -98,57 +98,84 @@ const ChatScreen: React.FC<ChatScreenProps> = (props: ChatScreenProps) => {
 
   // prevent displaying of button on new message event (button appears on few miliseconds before autoscroll scrolling 
   // down the same problem with keyboard appearing)
-  const setScrollableState = debounce((val) => setIsScrollBottomAvailable(val), 300);
+  setScrollableState = debounce((val) => this.setState({
+    isScrollBottomAvailable: val
+  }), 300);
 
-  const onListScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { nativeEvent: { contentSize, layoutMeasurement, contentOffset } } = event;
-    const endPosition = contentSize.height - layoutMeasurement.height;
+  onListScroll = (
+    event: NativeSyntheticEvent<NativeScrollEvent>
+  ) => this.setScrollableState(event.nativeEvent.contentOffset.y > 0);
 
-    if (contentOffset.y === endPosition || endPosition < 0) {
-      setScrollableState(false);
-    } else if (!isScrollBottomAvailable) {
-      setScrollableState(true);
-    }
-  };
-
-  const onScrollBottom = () => {
-    if (mesageListRef) {
-      mesageListRef.scrollToEnd({ animated: true});
+  onScrollBottom = () => {
+    if (this.mesageListRef) {
+      this.mesageListRef.scrollToIndex({ animated: true, index: 0 });
     }
   }
 
-  const onMesageCountChanged = () => {
-    if (!isScrollBottomAvailable) {
-      onScrollBottom();
-    }
-  }
+  render() {
+    const { loading, messages } = this.props;
 
-  return (
-    <View style={styles.chat}>
-      <FlatList
-        style={styles.messageList}
-        data={data.listMessages.items}
-        renderItem={messageTemplate}
-        ref={(ref:  FlatList<Message>) => mesageListRef = ref}
-        // onLayout={onScrollBottom}
-        onContentSizeChange={onMesageCountChanged}
-        onScroll={onListScroll}
-      />
-      { isScrollBottomAvailable && (
-        <FAB 
-          style={styles.srollBottomFab}
-          icon='chevron-down'
-          onPress={onScrollBottom}
-          small/>
-      )}
-      <ChatInput/>
-    </View>
-  )
+    if (loading || !messages) {
+      return <Preloader/>;
+    }
+
+    const sortedMessages = [...messages].reverse();
+
+    return (
+      <View style={styles.chat}>
+        <FlatList
+          style={styles.messageList}
+          keyExtractor={({ id }) => id}
+          inverted
+          data={sortedMessages}
+          renderItem={this.messageTemplate}
+          ref={(ref: FlatList<Message>) => this.mesageListRef = ref}
+          onScroll={this.onListScroll}
+        />
+        { this.state.isScrollBottomAvailable && (
+          <FAB 
+            style={styles.srollBottomFab}
+            icon='chevron-down'
+            onPress={this.onScrollBottom}
+            small/>
+        )}
+        <ChatInput/>
+      </View>
+    );
+  }
 };
+
+const mapApolloToProps = graphql<{}, ListMessages, {}, {}>(listMessagesQuery, {
+    props: ({ data }) => ({
+      loading: data!.loading,
+      messages: data!.listMessages ? data!.listMessages.items : [],
+      subscribeToNewMessages: () => data!.subscribeToMore({
+        document: onCreateMessageSubscription,
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData.data) return prev;
+          
+          return {
+            ...prev,
+            listMessages: {
+              ...prev.listMessages,
+              items: [
+                ...prev.listMessages.items,
+                subscriptionData.data.onCreateMessage
+              ]
+            }
+          };
+        }
+      })
+    })
+  }
+)
 
 const mapStateToProps = (store: AppState) => ({
   userList: store.usersModule.users,
   profile: store.usersModule.profile!
 })
 
-export default connect(mapStateToProps)(ChatScreen);
+export default compose(
+  mapApolloToProps,
+  connect(mapStateToProps)
+)(ChatScreen);
