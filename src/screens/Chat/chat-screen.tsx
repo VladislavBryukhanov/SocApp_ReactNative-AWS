@@ -1,9 +1,12 @@
 import React from 'react';
-import { Text, View, NativeSyntheticEvent, NativeScrollEvent, ViewToken } from 'react-native';
+import { Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
+import { graphql } from 'react-apollo';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { FAB } from 'react-native-paper';
+import moment from 'moment-mini';
+import { debounce } from 'lodash';
 import { Message } from '@models/message';
 import { User } from '@models/user';
 import { AppState } from '@store/index';
@@ -14,9 +17,6 @@ import { Preloader } from '@components/atoms/Prloader/preloader.component';
 import ChatInput from '@components/ChatInput/chat-input.component';
 import defaultAvatar from '@assets/icons/user.png';
 import styles from './styles';
-import { debounce } from 'lodash';
-import moment from 'moment-mini';
-import { graphql } from 'react-apollo';
 
 // fixme replace to models
 interface ListMessages {

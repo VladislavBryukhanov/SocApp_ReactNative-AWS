@@ -1,4 +1,4 @@
-import { uuidv4 } from 'uuid/v4';
+import uuidv4 from 'uuid/v4';
 import AWS from 'aws-sdk';
 import { mediaResources } from './s3-configs';
 import { Buffer } from 'buffer';
@@ -12,7 +12,7 @@ class s3 {
       this._storage = new AWS.S3({
         signatureVersion: 'v4',
         correctClockSkew: true,
-        params: { Bucket: 'media-resources-satest-test' }
+        params: { Bucket: mediaResources.bucket }
       });
     }
 
@@ -31,7 +31,7 @@ class s3 {
     const objectKey = uuidv4();
 
     const options = {
-      Bucket: 'media-resources-satest-test',
+      Bucket: mediaResources.bucket,
       Key: `${objectKey}.${extension}`,
       Body: buff,
       ContentType: `image/${fileType}`
