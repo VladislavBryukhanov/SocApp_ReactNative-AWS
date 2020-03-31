@@ -7,7 +7,8 @@ import {
   FETCH_USERS,
   FETCH_PROFILE,
   UPDATE_PROFILE,
-  UPDATE_AVATAR
+  UPDATE_AVATAR,
+  UPDATE_NOTIFICATION_TOKEN,
 } from "@store/action-types";
 import errorHandler from "@store/errorHandler";
 import { User } from '@models/user';
@@ -55,9 +56,16 @@ export const fetchProfile = (): any => (
 );
 
 export const updateNotificationToken = (token: string): any => (
-  async () => {
+  async (dispatch: Dispatch) => {
     try {
-      return UsersRepository.updateNotificationToken(token);
+      const snsCreds = await UsersRepository.updateNotificationToken(token);
+
+      dispatch({
+        type: UPDATE_NOTIFICATION_TOKEN,
+        payload: { snsCreds }
+      });
+
+      return snsCreds;
     } catch (err) {
       errorHandler(err, 'updateNotificationToken');
     }

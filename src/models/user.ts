@@ -3,6 +3,7 @@ export interface User extends Credentials, UserAttributes {
   avatar?: string;
   bio?: string;
   age? :number;
+  snsCreds?: SNSCredentials;
 };
 
 export type Credentials = {
@@ -14,3 +15,9 @@ export type UserAttributes = {
   username: string;
   nickname: string;
 };
+
+export type SNSCredentials = {
+  notificationToken: string;
+  EndpointArn: string;
+  SubscriptionArn: string;
+}
