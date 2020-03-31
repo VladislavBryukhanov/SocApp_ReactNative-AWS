@@ -29,19 +29,9 @@ class Validation {
 
 
 class UsersDB {
-  // cognito user 'sub' is unique id of it
-  get primaryKeys() {
-    return [
-      { dynamodbField: 'id', userPoolAttribute: 'sub' },
-      { dynamodbField: 'username', userPoolAttribute: 'preferred_username' },
-    ];
-  }
-
   get queryKeys() {
-    return this.primaryKeys.reduce((res, { userPoolAttribute, dynamodbField }) => ({
-        ...res, [dynamodbField]: this.userAttributes[userPoolAttribute]
-      }), {}
-    );
+    const { sub: id, prefered_name: username } = this.userAttributes;
+    return { id, username };
   }
 
   constructor(dynamoDb, tableName, event) {

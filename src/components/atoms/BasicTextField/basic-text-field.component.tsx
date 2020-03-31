@@ -4,7 +4,7 @@ import { Text, TextInput, TextInputProps } from 'react-native';
 import styles from './styles';
 
 interface BasicTextFieldProps extends TextInputProps {
-  label: string;
+  label?: string;
   description?: string;
 }
 

@@ -35,23 +35,24 @@ class UserListScreen extends React.Component<UserListProps> {
     );
   }
 
-  userTemplate = ({ item }: { item: User }) => {
-    return (
-      <TouchableNativeFeedback
-        key={item.id!}
-        onPress={() => this.onOpenProfile(item)}
-      >
-        <View style={styles.userContainer}>
-          <CachedImageLoaded
-            imageUrl={item.avatar}
-            style={styles.avatar}
-            defaultImage={defaultAvatar}
-          />
-          <Text style={styles.username}>{item.username}</Text>
+  userTemplate = ({ item }: { item: User }) => (
+    <TouchableNativeFeedback
+      key={item.id!}
+      onPress={() => this.onOpenProfile(item)}
+    >
+      <View style={styles.userContainer}>
+        <CachedImageLoaded
+          imageUrl={item.avatar}
+          style={styles.avatar}
+          defaultImage={defaultAvatar}
+        />
+        <View>
+          <Text style={styles.nickname}>{item.nickname}</Text>
+          <Text style={styles.username}>@{item.username}</Text>
         </View>
-      </TouchableNativeFeedback>
-    )
-  }
+      </View>
+    </TouchableNativeFeedback>
+  )
 
   render() {
     return this.props.userList.length ? (

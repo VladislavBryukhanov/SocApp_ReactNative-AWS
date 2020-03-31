@@ -1,0 +1,17 @@
+query ListMessages(
+  $filter: TableMessageFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listMessages(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      chatId
+      senderId
+      content
+	    createdAt
+      isRead
+    }
+    nextToken
+  }
+}

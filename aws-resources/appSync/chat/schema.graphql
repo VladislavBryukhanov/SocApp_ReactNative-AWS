@@ -1,0 +1,121 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+type Message {
+  chatId: ID!
+  content: String
+  id: ID!
+  isRead: Boolean
+  senderId: ID!
+  timestamp: AWSTimestamp
+}
+
+type MessageConnection {
+  items: [Message]
+  nextToken: String
+}
+
+type Mutation {
+  createMessage(input: CreateMessageInput!): Message
+  deleteMessage(input: DeleteMessageInput!): Message
+  updateMessage(input: UpdateMessageInput!): Message
+}
+
+type Query {
+  getMessage(id: ID!): Message
+  listMessages(filter: TableMessageFilterInput, limit: Int, nextToken: String): MessageConnection
+}
+
+type Subscription {
+  onCreateMessage(chatId: ID, content: String, id: ID, senderId: ID, timestamp: AWSTimestamp): Message @aws_subscribe(mutations : ["createMessage"])
+  onDeleteMessage(chatId: ID, content: String, id: ID, senderId: ID, timestamp: AWSTimestamp): Message @aws_subscribe(mutations : ["deleteMessage"])
+  onUpdateMessage(chatId: ID, content: String, id: ID, senderId: ID, timestamp: AWSTimestamp): Message @aws_subscribe(mutations : ["updateMessage"])
+}
+
+input CreateMessageInput {
+  chatId: ID!
+  content: String
+  isRead: Boolean
+  senderId: ID!
+  timestamp: AWSTimestamp
+}
+
+input DeleteMessageInput {
+  id: ID!
+}
+
+input TableBooleanFilterInput {
+  eq: Boolean
+  ne: Boolean
+}
+
+input TableFloatFilterInput {
+  between: [Float]
+  contains: Float
+  eq: Float
+  ge: Float
+  gt: Float
+  le: Float
+  lt: Float
+  ne: Float
+  notContains: Float
+}
+
+input TableIDFilterInput {
+  beginsWith: ID
+  between: [ID]
+  contains: ID
+  eq: ID
+  ge: ID
+  gt: ID
+  le: ID
+  lt: ID
+  ne: ID
+  notContains: ID
+}
+
+input TableIntFilterInput {
+  between: [Int]
+  contains: Int
+  eq: Int
+  ge: Int
+  gt: Int
+  le: Int
+  lt: Int
+  ne: Int
+  notContains: Int
+}
+
+input TableMessageFilterInput {
+  chatId: TableIDFilterInput
+  content: TableStringFilterInput
+  id: TableIDFilterInput
+  isRead: TableBooleanFilterInput
+  senderId: TableIDFilterInput
+  timestamp: TableIntFilterInput
+}
+
+input TableStringFilterInput {
+  beginsWith: String
+  between: [String]
+  contains: String
+  eq: String
+  ge: String
+  gt: String
+  le: String
+  lt: String
+  ne: String
+  notContains: String
+}
+
+input UpdateMessageInput {
+  chatId: ID
+  content: String
+  id: ID!
+  isRead: Boolean
+  senderId: ID
+  timestamp: AWSTimestamp
+}

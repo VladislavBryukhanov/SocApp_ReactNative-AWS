@@ -1,0 +1,24 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "scanIndexForward": true,
+    "index": "messages-chatId-createdAt-index",
+    "query" : {
+      "expression": "chatId = :id",
+      "expressionValues" : {
+        ":id": {
+          "S": "bkQEBvvDCv7xU9oia1PsWTNHyi6QMVYq"
+        }
+      }
+        
+        ## "expression": "id = :id AND begins_with(createdAt, :createdAt)",
+        ## "expressionValues" : {
+        ##     ":id": {
+        ##     	"S": "1"
+        ##     },
+        ##      ":createdAt": {
+        ##      	"S": "2020-03-1"
+        ##      }
+        ## }
+    }
+}

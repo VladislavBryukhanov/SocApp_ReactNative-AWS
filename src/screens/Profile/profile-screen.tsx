@@ -1,17 +1,15 @@
 import React from 'react';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { NavigationScreenProp, NavigationSwitchScreenProps } from 'react-navigation';
 import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
 import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { FAB } from 'react-native-paper';
 
 interface ProfileScreeProps extends NavigationSwitchScreenProps {}
 
-type NavigationProps = NavigationScreenProp<ScreenParams>;
-type ScreenParams = {
-  screenName: string;
-}
+type NavigationProps = NavigationScreenProp<{ screenName: string }>;
 
 class ProfileScreen extends React.Component<ProfileScreeProps> {
   componentDidMount() {
@@ -25,30 +23,47 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
     title: navigation.getParam('screenName')
   });
 
+  onOpenChat = () => {
+    this.props.navigation.navigate('Chat');
+  };
+
   render() {
     const user = this.props.navigation.getParam('user');
     const { avatar, bio, age, username, nickname } = user;
 
     return (
-      <ScrollView>
+      <ScrollView contentContainerStyle={styles.profileView}>
         <CachedImageLoaded
           imageUrl={avatar}
           style={styles.avatar}
           defaultImage={defaultAvatar}
         />
 
-        <Text style={styles.nickname}>
-          Nickname: {nickname}
+        <View style={styles.infoView}>
+          <Text style={styles.nickname}>Nickname:</Text>
+          <Text style={styles.nickname}>{nickname}</Text>
+        </View>
+
+        <View style={styles.infoView}>
+          <Text style={styles.username}>Username:</Text>
+          <Text style={styles.username}>@{username}</Text>
+        </View>
+
+        <View style={styles.infoView}>
+          <Text>
+            Age: {age} *TODO
+          </Text>
+        </View>
+
+        <Text style={styles.infoView}>
+          Bio: {bio} *TODO
         </Text>
-        <Text  style={styles.username}>
-        Username: @{username}
-        </Text>
-        <Text>
-          Age: {age}
-        </Text>
-        <Text>
-          Bio: {bio}
-        </Text>
+
+        <FAB
+          style={styles.chatBtn}
+          icon="message-text"
+          onPress={this.onOpenChat}
+        />
       </ScrollView>
     )
   }

@@ -3,7 +3,7 @@ import { User } from '@models/user';
 
 export const joinAvatar = (user: User) => new Promise((resolve, reject) => {
   if (!user.avatar) {
-    return user;
+    return resolve(user);
   }
 
   s3.read(user.avatar)

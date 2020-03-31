@@ -14,11 +14,17 @@ export default StyleSheet.create({
     borderWidth: 1,
     marginTop: 10,
     marginBottom: 16,
-    color: Colors.dark
+    color: Colors.dark,
   },
   avatarWrapper: {
-    borderRadius: 45,
+    alignSelf: 'flex-start',
     marginBottom: 16,
-    alignSelf: 'flex-start'
+  },
+  avatar: {
+    borderColor: '#1A567B',
+    borderWidth: 2,
+    borderRadius: 90,
+    width: 148,
+    height: 148
   }
 });

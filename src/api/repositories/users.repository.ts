@@ -43,6 +43,17 @@ class UsersRepository {
     return profile;
   }
 
+  async updateNotificationToken(notificationToken: string) {
+    const { apiName } = profileApiConf;
+    const token = await CognitoAuth.retreiveSessionToken();
+    const requestParams = { 
+      headers: { Authorization: token },
+      body: { notificationToken }
+    };
+
+    return API.put(apiName, '/notificationToken', requestParams)
+  }
+
   async editProfile(changes: Partial<User>): Promise<User> {
     const { apiName } = profileApiConf;
     const token = await CognitoAuth.retreiveSessionToken();

@@ -1,11 +1,12 @@
 import { Action, Reducer } from 'redux';
-import { User } from '@models/user';
+import { User, SNSCredentials } from '@models/user';
 import { 
   FETCH_USERS, 
   CREATE_USER, 
   FETCH_PROFILE,
   UPDATE_PROFILE,
-  UPDATE_AVATAR
+  UPDATE_AVATAR,
+  UPDATE_NOTIFICATION_TOKEN,
 } from '@store/action-types';
 import { handleActions } from 'redux-actions';
 
@@ -20,6 +21,7 @@ interface UserAction extends Action {
     newUser?: User;
     profile? : User;
     avatarUrl?: string;
+    snsCreds?: SNSCredentials;
   }
 }
 
@@ -35,6 +37,10 @@ const profileHandler = (
 export const usersReducer: Reducer<UserState, UserAction> = handleActions({
   [FETCH_PROFILE]: profileHandler,
   [UPDATE_PROFILE]: profileHandler,
+  [UPDATE_NOTIFICATION_TOKEN]: (
+    state: UserState,
+    { payload: { snsCreds } }: UserAction,
+  ) => ({ ...state, profile: { ...state.profile!, snsCreds }}),
   [UPDATE_AVATAR]: (
     state: UserState,
     { payload: { avatarUrl } }: UserAction

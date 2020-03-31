@@ -11,6 +11,10 @@
         "mediaResources": {
             "service": "S3",
             "providerPlugin": "awscloudformation"
+        },
+        "messages": {
+            "service": "DynamoDB",
+            "providerPlugin": "awscloudformation"
         }
     },
     "function": {
@@ -152,6 +156,36 @@
                     ]
                 }
             ]
+        },
+        "messagesNotifier": {
+            "service": "Lambda",
+            "providerPlugin": "awscloudformation",
+            "build": true,
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "messages",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ]
+        },
+        "deviceTokenUpdater": {
+            "service": "Lambda",
+            "providerPlugin": "awscloudformation",
+            "build": true,
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "userList",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ]
         }
     },
     "api": {
@@ -192,6 +226,14 @@
                 {
                     "category": "function",
                     "resourceName": "uploadAvatar",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "function",
+                    "resourceName": "deviceTokenUpdater",
                     "attributes": [
                         "Name",
                         "Arn"
