@@ -30,6 +30,17 @@
                     "/POST"
                 ]
             }
+        },
+        {
+            "name": "/notificationToken",
+            "lambdaFunction": "deviceTokenUpdater",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/PUT",
+                    "/PATCH"
+                ]
+            }
         }
     ],
     "resourceName": "profileApi",
@@ -43,10 +54,13 @@
         },
         {
             "lambdaFunction": "uploadAvatar"
+        },
+        {
+            "lambdaFunction": "deviceTokenUpdater"
         }
     ],
     "privacy": {
-        "auth": 3,
+        "auth": 4,
         "unauth": 0,
         "authRoleName": "amplify-soc-app-test-225156-authRole",
         "unAuthRoleName": "amplify-soc-app-test-225156-unauthRole"
@@ -75,7 +89,15 @@
                 "Name",
                 "Arn"
             ]
+        },
+        {
+            "category": "function",
+            "resourceName": "deviceTokenUpdater",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
         }
     ],
-    "uuid": "6443dc03"
+    "uuid": "170fa578"
 }

@@ -54,6 +54,16 @@ export const fetchProfile = (): any => (
   }
 );
 
+export const updateNotificationToken = (token: string): any => (
+  async () => {
+    try {
+      return UsersRepository.updateNotificationToken(token);
+    } catch (err) {
+      errorHandler(err, 'updateNotificationToken');
+    }
+  }
+)
+
 export const editProfile = (changes: Partial<User>): any => (
   async (dispatch: Dispatch, getState: () => AppState) => {
     try {
