@@ -18,6 +18,10 @@ import ChatInput from '@components/ChatInput/chat-input.component';
 import defaultAvatar from '@assets/icons/user.png';
 import styles from './styles';
 
+// ignore timer warnings which displayed due apollo subscription
+import { YellowBox } from 'react-native';
+YellowBox.ignoreWarnings(['Setting a timer']);
+
 // fixme replace to models
 interface ListMessages {
   listMessages: {
@@ -58,18 +62,18 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   }
 
   messageTemplate = ({ item }: { item: Message }) => {
-    const sentByMe = item.senderId === this.props.profile.id;
+    const sentByMe = item.senderKey.id === this.props.profile.id;
     const messageStyle = sentByMe 
       ? styles.outcomingMessage
       : styles.incomingMessage;
 
     let sender;
 
-    if (item.senderId === this.props.profile.id) {
+    if (item.senderKey.id === this.props.profile.id) {
       sender = this.props.profile;
     } else {
       // TODO all interlocutors will be replaced into Message table interlocutorIds: string[]
-      sender = this.props.userList.find(({ id }) => id === item.senderId)!;
+      sender = this.props.userList.find(({ id }) => id === item.senderKey.id)!;
     }
 
     return (

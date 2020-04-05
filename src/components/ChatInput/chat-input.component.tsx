@@ -14,12 +14,13 @@ interface ChatInputProps {
 }
 
 const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
+  const { id, username } = props.profile;
   const [message, setMessage] = useState('');
   const [addMessage, { loading }] = useMutation(createMessageMutation, {
     variables: {
       'createmessageinput': {
-        'chatId': 'bkQEBvvDCv7xU9oia1PsWTNHyi6QMVYq',
-        'senderId': props.profile.id,
+        'chatId': '9xNZWKEix0LrYvTl2IuIKZLWWsHzDMIJ',
+        'senderKey': { id, username },
         'content': message,
       }
     },

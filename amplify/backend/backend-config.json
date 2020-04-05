@@ -169,6 +169,14 @@
                         "Name",
                         "Arn"
                     ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "userList",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
                 }
             ]
         },

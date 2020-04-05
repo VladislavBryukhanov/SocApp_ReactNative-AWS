@@ -13,12 +13,21 @@ cognito Pre sign-up trigger invokes validateNewUser
 cognito Post confirmation trigger invokes validateNewUser createUser
 _____________________
 
-soc-app-appSync role should grand acces to chatDb
-this role should be used to appSync chat interactions
+soc-app-appSync role should grant access to chatDb and messagedDb
+these roles should be used to appSync chat interactions
 
 appsync resolvers kept by path aws/rescources/resolvers they should be updated manually
 as well as schema.graphql
 
+role for auth user required to grant access to appsync
+{
+  "Effect": "Allow",
+  "Action": "appsync:GraphQL",
+  "Resource": "arn:aws:appsync:*:606853744219:apis/APPSYNC_API_ID/types/*/fields/*"
+}
+_____________________
+
+messagesNotifier lambda should to listen dynamodb mesages table stream
 _____________________
 
 create new firebase application and bind it's FCM senderID to AWS SNS
