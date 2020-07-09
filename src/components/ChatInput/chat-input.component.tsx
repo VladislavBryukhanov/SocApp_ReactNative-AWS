@@ -5,6 +5,7 @@ import { IconButton } from 'react-native-paper';
 import { useMutation } from 'react-apollo';
 import createMessageMutation from '../../api/graphql/mutations/createMessage.graphql';
 import styles from './styles';
+
 const ChatInput: React.FC = () => {
   const [message, setMessage] = useState('');
   const [addMessage, { loading }] = useMutation(createMessageMutation, {
@@ -21,7 +22,7 @@ const ChatInput: React.FC = () => {
     <View style={styles.chatInput}>
       <BasicTextField
         style={styles.messageInput}
-        placeholder="Enter message"
+        placeholder='Enter message'
         value={message}
         onChangeText={setMessage}/>
         

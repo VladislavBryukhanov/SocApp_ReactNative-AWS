@@ -44,6 +44,6 @@ export class HttpApi {
   }
 
   async delete<T>(specificEndpoint: string): Promise<T> {
-    return this.basicRequest('GET', specificEndpoint);
+    return this.basicRequest('DELETE', specificEndpoint);
   }
 }

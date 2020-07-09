@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "384905943442",
+    "firebase_url": "https://aunea-chat-v2.firebaseio.com",
+    "project_id": "aunea-chat-v2",
+    "storage_bucket": "aunea-chat-v2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384905943442:android:30bb0f86babc078133c94b",
+        "android_client_info": {
+          "package_name": "com.chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "384905943442-srpnr7gm8orfsjso8mhdm2elifjdaj9i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFFgna4ANrrZrjHM1vBpK92pJ0O5fI_n0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "384905943442-srpnr7gm8orfsjso8mhdm2elifjdaj9i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

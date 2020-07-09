@@ -26,8 +26,8 @@ class AuthLoadingScreen extends React.Component<AuthLoadingScreenProps> {
       return this.props.navigation.navigate('Auth');
     }
 
-    this.registerPushNotifications();
     this.props.navigation.navigate('App');
+    this.registerPushNotifications();
   }
 
   registerPushNotifications() {
