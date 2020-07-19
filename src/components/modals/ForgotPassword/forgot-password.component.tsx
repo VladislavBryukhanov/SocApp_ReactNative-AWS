@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dispatch } from 'redux';
-import { Text, View, Button, Alert } from 'react-native';
+import { Button } from 'react-native-paper';
+import { Text, Alert } from 'react-native';
 import styles from '../modal.styles';
 import { BasicTextField } from '@components/atoms/BasicTextField/basic-text-field.component';
 import { forgotPassword } from '@store/auth/auth.actions';
@@ -8,6 +9,7 @@ import { connect } from 'react-redux';
 import { ForgotPasswordResult } from '@models/auth';
 import { openModal } from '@store/modal/modal.actions';
 import ConfirmNewPassword from '../ConfirmNewPassword/confirm-new-password.component';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 interface ForgotPasswordProps {
   forgotPassword: (email: string) => Promise<ForgotPasswordResult | undefined>;
@@ -16,7 +18,11 @@ interface ForgotPasswordProps {
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = (props: ForgotPasswordProps) => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const onForgotPassword = async () => {
+    setLoading(true);
+
     const response = await props.forgotPassword(email);
 
     if (response) {
@@ -34,6 +40,8 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = (props: ForgotPasswordProp
         { cancelable: false }
       );
     }
+
+    setLoading(false);
   };
 
   return (
@@ -50,12 +58,16 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = (props: ForgotPasswordProp
         onChangeText={setEmail}
       />
 
-      <View style={styles.confirmButton}>
-        <Button
-          title="Send code"
-          onPress={onForgotPassword}
-        />
-      </View>
+      <Button
+        mode="outlined"
+        loading={loading}
+        disabled={loading}
+        style={styles.confirmButton}
+        color={Colors.primary}
+        onPress={onForgotPassword}
+      >
+        Send code
+      </Button>
     </>
   );
 }

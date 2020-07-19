@@ -1,5 +1,6 @@
 import React from 'react';
-import { ToastAndroid, ScrollView, View, Button } from 'react-native';
+import { Button } from 'react-native-paper';
+import { ToastAndroid, ScrollView, View } from 'react-native';
 import { NavigationSwitchScreenProps } from 'react-navigation';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
@@ -10,6 +11,7 @@ import { AuthComponentProps, withEmailConfirmation } from '@wrappers/auth/withEm
 import { CONFIRM_REGISTRATION, USER_EXISTS, PASSWORDS_DO_NOT_MATCH } from '@constants/text-auth';
 import startCase from 'lodash/startCase';
 import styles from './styles';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 type StateKeys = 'email' | 'password' | 'confirmPassword' | 'nickname' | 'username';
 
@@ -26,12 +28,13 @@ interface SignUpProps extends NavigationSwitchScreenProps, AuthComponentProps {
 }
 
 interface SignUpState {
-  email: string,
+  loading: boolean;
+  email: string;
   password: string;
   confirmPassword: string;
   nickname: string;
   username: string;
-  [key: string]: string;
+  [key: string]: string | boolean;
 }
 
 class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
@@ -41,9 +44,12 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
     nickname: '',
     password: '',
     confirmPassword: '',
+    loading: false,
   }
 
   onSignUp = async () => {
+    this.setState({ loading: true });
+
     const { email, password, username, nickname, confirmPassword } = this.state;
 
     if (password !== confirmPassword) {
@@ -64,6 +70,8 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
       await this.props.signIn({ email, password });
       this.props.onRegestrationComplete();
     }
+
+    this.setState({ loading: false });
   }
 
   onUserExistsHandler = () => {
@@ -80,7 +88,6 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
   });
 
   render() {
-
     return (
       <ScrollView
         keyboardShouldPersistTaps='handled'
@@ -111,10 +118,16 @@ class SignUpScreen extends React.Component<SignUpProps, SignUpState> {
           />
         </View>
 
-        <View style={styles.signUpBtn}>
-          <Button title="Sign up" onPress={this.onSignUp}/>
-        </View>
-
+        <Button
+          mode="outlined"
+          loading={this.state.loading}
+          disabled={this.state.loading}
+          style={styles.signUpBtn}
+          color={Colors.primary}
+          onPress={this.onSignUp}
+        >
+          Sign up
+        </Button>
       </ScrollView>
     )
   }

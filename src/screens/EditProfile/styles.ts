@@ -6,6 +6,7 @@ export default StyleSheet.create({
     padding: 20
   },
   saveButton: {
+    marginBottom: 42,
     marginTop: 20,
   },
   textInput: {

@@ -158,7 +158,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   editProfile: (changes: Partial<User>) => dispatch(editProfile(changes)),
   updateAvatar: (file: FileBase64) => dispatch(updateProfileAvatar(file)),
   fetchProfile: () => dispatch(fetchProfile())
-})
+});
 
 export default connect(
   mapStateToProps,

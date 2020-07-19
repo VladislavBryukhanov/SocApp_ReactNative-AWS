@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
+import { customColors } from "@constants/theme";
 
 export default StyleSheet.create({
   scrollView: {
@@ -23,6 +24,8 @@ export default StyleSheet.create({
     marginBottom: 22
   },
   signUpBtn: {
-    marginBottom: 42
+    marginBottom: 42,
+    borderColor: customColors.primary,
+    backgroundColor: 'rgba(255, 255, 255, 08)'
   }
 });

@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { customColors } from '@constants/theme';
 
 export default StyleSheet.create({
   title: {
@@ -15,6 +16,8 @@ export default StyleSheet.create({
     marginBottom: 20
   },
   confirmButton: {
-    marginTop: 8
+    marginTop: 8,
+    borderColor: customColors.primary,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)'
   }
 });
