@@ -13,6 +13,7 @@ import { name as appName } from './app.json';
 import messaging from '@react-native-firebase/messaging';
 import { displayDataNotification } from '@helpers/displayDataNotification';
 import firebaseConfig from './firebaseConfig.json';
+import { CognitoAuth } from '@api/auth';
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -28,8 +29,10 @@ const AppWithRedux: React.FC = () => (
   </ApolloProvider>
 );
 
-messaging().setBackgroundMessageHandler(async message =>
-  displayDataNotification(message.data!)
-);
+messaging().setBackgroundMessageHandler(async message => {
+  await CognitoAuth.retrieveAuthenticatedUser();
+  await CognitoAuth.updateAWSConfig();
+  displayDataNotification(message.data!);
+});
 
 AppRegistry.registerComponent(appName, () => AppWithRedux);
