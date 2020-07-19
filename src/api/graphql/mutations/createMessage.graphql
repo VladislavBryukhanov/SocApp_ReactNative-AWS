@@ -2,7 +2,10 @@ mutation createMessage($createmessageinput: CreateMessageInput!) {
   createMessage(input: $createmessageinput) {
     id
     chatId
-    senderId
+    senderKey {
+      id
+      username
+    }
     content
     createdAt
     isRead

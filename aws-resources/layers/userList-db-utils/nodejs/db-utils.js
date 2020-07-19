@@ -30,7 +30,7 @@ class Validation {
 
 class UsersDB {
   get queryKeys() {
-    const { sub: id, prefered_name: username } = this.userAttributes;
+    const { sub: id, preferred_username: username } = this.userAttributes;
     return { id, username };
   }
 

@@ -12,6 +12,14 @@
 		"storagemessagesArn": {
 			"Type": "String",
 			"Default": "storagemessagesArn"
+		},
+		"storageuserListName": {
+			"Type": "String",
+			"Default": "storageuserListName"
+		},
+		"storageuserListArn": {
+			"Type": "String",
+			"Default": "storageuserListArn"
 		}
 	},
 	"Conditions": {
@@ -64,6 +72,12 @@
 						},
 						"STORAGE_MESSAGES_ARN": {
 							"Ref": "storagemessagesArn"
+						},
+						"STORAGE_USERLIST_NAME": {
+							"Ref": "storageuserListName"
+						},
+						"STORAGE_USERLIST_ARN": {
+							"Ref": "storageuserListArn"
 						}
 					}
 				},
@@ -77,7 +91,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-test-225156-deployment",
-					"S3Key": "amplify-builds/messagesNotifier-634d7975413259394932-build.zip"
+					"S3Key": "amplify-builds/messagesNotifier-517238307971746a6468-build.zip"
 				}
 			}
 		},
@@ -181,14 +195,42 @@
 						{
 							"Effect": "Allow",
 							"Action": [
-								"dynamodb:ListStreams",
-								"dynamodb:DescribeStream",
 								"dynamodb:Get*",
 								"dynamodb:BatchGetItem",
 								"dynamodb:List*",
 								"dynamodb:Describe*",
 								"dynamodb:Scan",
 								"dynamodb:Query"
+							],
+							"Resource": [
+								{
+									"Ref": "storageuserListArn"
+								},
+								{
+									"Fn::Join": [
+										"/",
+										[
+											{
+												"Ref": "storageuserListArn"
+											},
+											"index/*"
+										]
+									]
+								}
+							]
+						},
+						{
+							"Effect": "Allow",
+							"Action": [
+								"dynamodb:Get*",
+								"dynamodb:BatchGetItem",
+								"dynamodb:List*",
+								"dynamodb:Describe*",
+								"dynamodb:Scan",
+								"dynamodb:Query",
+								"dynamodb:GetRecords",
+								"dynamodb:GetShardIterator",
+								"dynamodb:DescribeStream"
 							],
 							"Resource": [
 								{

@@ -1,12 +1,11 @@
 import s3 from '@api/s3/native-s3';
 import { User } from '@models/user';
 
-export const joinAvatar = (user: User) => new Promise((resolve, reject) => {
+export const joinAvatar = async (user: User) => {
   if (!user.avatar) {
-    return resolve(user);
+    return user;
   }
 
-  s3.read(user.avatar)
-    .then((avatar) => resolve({ ...user, avatar}))
-    .catch(reject);
-});
+  const avatar = await s3.read(user.avatar);
+  return { ...user, avatar};
+};

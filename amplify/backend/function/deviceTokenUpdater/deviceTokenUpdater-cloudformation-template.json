@@ -77,7 +77,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-test-225156-deployment",
-					"S3Key": "amplify-builds/deviceTokenUpdater-50494a7254627055694a-build.zip"
+					"S3Key": "amplify-builds/deviceTokenUpdater-6369672f74313570312f-build.zip"
 				}
 			}
 		},

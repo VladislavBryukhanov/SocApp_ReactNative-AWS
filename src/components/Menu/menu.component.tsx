@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Paragraph, Menu, Divider, Provider } from 'react-native-paper';
+import { Menu } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Fontisto';
-import { View } from 'react-native';
 import styles from './styles';
 import { NavigationSwitchScreenProps, withNavigation } from 'react-navigation';
 import { signOut } from '@store/auth/auth.actions';

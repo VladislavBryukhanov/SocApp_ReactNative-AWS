@@ -14,10 +14,14 @@ import styles from './styles';
 import { EMAIL_NOT_CONFIRMED } from '@constants/text-auth';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { Button } from 'react-native-paper';
+import messaging from '@react-native-firebase/messaging';
+import { updateNotificationToken } from '@store/users/users.actions';
+import { AppState } from '@store/index';
 
 interface SignInProps extends NavigationSwitchScreenProps, AuthComponentProps {
   signIn: (user: Credentials, confirmationExceptionHandler?: Function) => Promise<boolean>;
   openModal: (element: React.ReactNode) => void;
+  updateNotificationToken: (token: string) => Promise<void>;
   isAuthenticated?: boolean;
 }
 
@@ -27,16 +31,16 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
   const [loading, setLoading] = useState(false);
 
   if (props.isAuthenticated) {
-    props.navigation.navigate('App');
+    props.navigation.navigate('AuthLoading');
   }
 
   const onSignIn = async () => {
     setLoading(true);
 
-    await props.signIn(
-      { email: email.toLowerCase(), password },
-      onUserIsNotConfirmedHandler
-    );
+    await props.signIn({ email, password }, onUserIsNotConfirmedHandler);
+
+    const token = await messaging().getToken();
+    await props.updateNotificationToken(token);
 
     setLoading(false);
   }
@@ -64,7 +68,7 @@ const SignInScreen: React.FC<SignInProps> = (props: SignInProps) => {
         <BasicTextField
           label='Email'
           value={email}
-          onChangeText={(text: string) => setEmail(text)}
+          onChangeText={(text: string) => setEmail(text.toLowerCase())}
         />
 
         <BasicTextField
@@ -109,6 +113,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   signIn: (credentials: Credentials, confirmationExceptionHandler?: Function) => 
     dispatch(signIn(credentials, confirmationExceptionHandler)),
   openModal: (element: React.ReactNode) => dispatch(openModal(element)),
+  updateNotificationToken: (token: string) => dispatch(updateNotificationToken(token)),
 });
 
 export default compose<SignInProps>(

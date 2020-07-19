@@ -25,8 +25,8 @@ exports.handler = async (event) => {
         Key: { id, username },
     }).promise();
 
-    if ((user.snsCreds && user.snsCreds.notificationToken === notificationToken)) {
-        return { statusCode: 304 };
+    if (user.snsCreds && user.snsCreds.notificationToken === notificationToken) {
+        return { statusCode: 204 };
     }
 
     const promises = [];
@@ -34,26 +34,26 @@ exports.handler = async (event) => {
     const { EndpointArn } = await SNS.createPlatformEndpoint({
         Token: notificationToken,
         PlatformApplicationArn,
-    }).promise()
+    }).promise();
 
     promises.push(
         SNS.subscribe({
             Protocol: 'application',
             TopicArn,
             Endpoint: EndpointArn
-        })
-        .promise()
-        .then(({ ResponseMetadata: { SubscriptionArn } }) => SubscriptionArn)
+        }).promise()
     );
 
     if (user.snsCreds) {
         const { EndpointArn, SubscriptionArn } = user.snsCreds;
 
-        promises.push(SNS.deleteEndpoint({ EndpointArn }).promise());
-        promises.push(SNS.unsubscribe({ SubscriptionArn }).promise());
+        promises.push(
+            SNS.unsubscribe({ SubscriptionArn }).promise(),
+            SNS.deleteEndpoint({ EndpointArn }).promise(),
+        );
     }
 
-    const [SubscriptionArn] = await Promise.all(promises);
+    const [{ ResponseMetadata: { SubscriptionArn } }] = await Promise.all(promises);
     
     await dynamodb.update({
         TableName,
