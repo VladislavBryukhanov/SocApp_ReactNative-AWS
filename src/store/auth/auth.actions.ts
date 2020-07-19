@@ -9,6 +9,7 @@ import {
 } from "@api/auth";
 import { Credentials, UserAttributes } from "@models/user";
 import { ForgotPasswordResult } from '@models/auth';
+import messaging from '@react-native-firebase/messaging';
 import errorHandler from '@store/errorHandler';
 import { 
   SIGN_IN,
@@ -120,9 +121,12 @@ export const signUp = (
 )
 
 export const signOut = (): any => (
-  (dispatch: Dispatch) => {
+  async (dispatch: Dispatch) => {
     try {
+      await messaging().deleteToken();
+
       CognitoAuth.signOut();
+
       dispatch({ type: SIGN_OUT });
     } catch (err) {
       errorHandler(err, 'signOut');

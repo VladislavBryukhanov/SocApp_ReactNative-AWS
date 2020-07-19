@@ -32,17 +32,11 @@ exports.handler = (event, context, callback) => {
             const notificationPayload = {
                 data: {
                     tag: MESSAGE_RECEIVED_TAG,
-                    bigText: content,
-                    message: content, 
-                    title: sender.nickname,
+                    message: content,
+                    createdAt,
+                    sender
                 },
-
-                // notification: {
-                //     image: 'https://images-na.ssl-images-amazon.com/images/I/61-k3sb1UiL._SL1158_.jpg',
-                //     tag: MESSAGE_RECEIVED_TAG,
-                //     body: content,
-                //     title: sender.nickname,                   
-                // }
+                priority: "high"
             };
             
             const message = JSON.stringify({ 
