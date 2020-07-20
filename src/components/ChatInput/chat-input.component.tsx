@@ -6,12 +6,16 @@ import { useMutation } from 'react-apollo';
 import createMessageMutation from '../../api/graphql/mutations/createMessage.graphql';
 import styles from './styles';
 
-const ChatInput: React.FC = () => {
+interface ChatInputProps {
+  chatId: string;
+}
+
+const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
   const [message, setMessage] = useState('');
   const [addMessage, { loading }] = useMutation(createMessageMutation, {
     variables: {
       createmessageinput: {
-        chatId: '9xNZWKEix0LrYvTl2IuIKZLWWsHzDMIJ',
+        chatId: props.chatId,
         content: message,
       }
     },

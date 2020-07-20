@@ -24,9 +24,10 @@ exports.handler = async function (event) {
   };
 
   const data = await cisp.listUsers(params).promise();
-  if (data.Users.length > 0) {
+
+  if (data.Users.length) {
     throw Error('Such username already exists');
-  } else {
-    return event;
   }
+
+  return event;
 };

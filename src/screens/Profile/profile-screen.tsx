@@ -24,7 +24,11 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
   });
 
   onOpenChat = () => {
-    this.props.navigation.navigate('Chat');
+    this.props.navigation.navigate('Chat', { 
+      // chatId: 'test' 
+      // TODO replace with ids
+      chatId: this.props.navigation.getParam('user').username
+    });
   };
 
   render() {

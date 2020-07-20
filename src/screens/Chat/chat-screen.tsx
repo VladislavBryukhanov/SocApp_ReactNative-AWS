@@ -29,12 +29,20 @@ interface ListMessages {
   }
 }
 
-interface ChatScreenProps extends NavigationSwitchScreenProps {
+interface QueryListMessages {
+  filter: {
+    chatId: {
+      eq: string;
+    }
+  }
+}
+
+interface ChatScreenProps extends NavigationSwitchScreenProps<{chatId: string}> {
   userList: User[];
   profile: User;
   messages?: Message[];
   loading?: boolean;
-  subscribeToNewMessages: () => () => void;
+  subscribeToNewMessages: (chatId: string) => () => void;
 };
 
 interface ChatScreenState {
@@ -52,7 +60,10 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   unsubscribe?: () => void;
 
   componentDidMount() {
-    this.unsubscribe = this.props.subscribeToNewMessages();
+    // TODO implement AWS subscription separate filters
+    this.unsubscribe = this.props.subscribeToNewMessages(
+      this.props.navigation.getParam('chatId')
+    );
   }
 
   componentWillUnmount() {
@@ -113,7 +124,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   }
 
   render() {
-    const { loading, messages } = this.props;
+    const { loading, messages, navigation } = this.props;
 
     if (loading || !messages) {
       return <Preloader/>;
@@ -139,17 +150,32 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
             onPress={this.onScrollBottom}
             small/>
         )}
-        <ChatInput/>
+        <ChatInput chatId={navigation.getParam('chatId')}/>
       </View>
     );
   }
 };
 
-const mapApolloToProps = graphql<{}, ListMessages, {}, {}>(listMessagesQuery, {
+const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessages, {}>(listMessagesQuery, {
+    options: (props: ChatScreenProps) => ({
+      variables: {
+        filter: {
+          chatId: {
+            eq: props.navigation.getParam('chatId')
+          }
+        }
+      },
+      fetchPolicy: 'cache-and-network'
+    }),
     props: ({ data }) => ({
       loading: data!.loading,
       messages: data!.listMessages ? data!.listMessages.items : [],
-      subscribeToNewMessages: () => data!.subscribeToMore({
+      subscribeToNewMessages: (chatId: string) => data!.subscribeToMore({
+        variables: { 
+          filter: {
+            chatId: { eq: chatId }
+          }
+        },
         document: onCreateMessageSubscription,
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;
@@ -173,7 +199,7 @@ const mapApolloToProps = graphql<{}, ListMessages, {}, {}>(listMessagesQuery, {
 const mapStateToProps = (store: AppState) => ({
   userList: store.usersModule.users,
   profile: store.usersModule.profile!
-})
+});
 
 export default compose(
   mapApolloToProps,

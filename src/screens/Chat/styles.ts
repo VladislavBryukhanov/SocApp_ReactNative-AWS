@@ -30,7 +30,7 @@ export default StyleSheet.create({
     bottom: 0,
     margin: 16,
     marginBottom: 64,
-    backgroundColor: Colors.primary,
+    backgroundColor: customColors.primary,
   },
   messageView: {
     flex: 1,
