@@ -171,11 +171,7 @@ const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessage
       loading: data!.loading,
       messages: data!.listMessages ? data!.listMessages.items : [],
       subscribeToNewMessages: (chatId: string) => data!.subscribeToMore({
-        variables: { 
-          filter: {
-            chatId: { eq: chatId }
-          }
-        },
+        variables: { chatId },
         document: onCreateMessageSubscription,
         updateQuery: (prev, { subscriptionData }) => {
           if (!subscriptionData.data) return prev;

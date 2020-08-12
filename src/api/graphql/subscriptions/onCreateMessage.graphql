@@ -1,5 +1,38 @@
-subscription onCreateMessage {
-  onCreateMessage {
+# AppSync respond onCreateMessage: null when optional arguments omitted
+# https://github.com/awslabs/aws-mobile-appsync-sdk-js/issues/241
+
+# subscription onCreateMessage(
+#     $id: ID
+# 		$chatId: ID
+# 		$senderKey: SenderKeyInput
+# 		$createdAt: AWSDateTime
+# 		$content: String
+# ) {
+#   onCreateMessage(
+#     id: $id,
+# 		chatId: $chatId,
+# 		senderKey: $senderKey,
+# 		createdAt: $createdAt,
+# 		content: $content
+#   ) {
+#     id
+#     chatId
+#     senderKey {
+#       id
+#       username
+#     }
+#     content
+#     createdAt
+#     isRead
+#   }
+# }
+
+subscription onCreateMessage(
+		$chatId: ID
+) {
+  onCreateMessage(
+		chatId: $chatId
+  ) {
     id
     chatId
     senderKey {

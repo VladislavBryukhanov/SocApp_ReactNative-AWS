@@ -29,10 +29,7 @@ class UserListScreen extends React.Component<UserListProps> {
   };
 
   onOpenProfile = (user: User) => {
-    this.props.navigation.navigate(
-      'Profile',
-      { user }
-    );
+    this.props.navigation.navigate('Profile', { user });
   }
 
   userTemplate = ({ item }: { item: User }) => (
