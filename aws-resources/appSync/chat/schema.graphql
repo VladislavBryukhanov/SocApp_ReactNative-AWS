@@ -46,7 +46,7 @@ input SenderKeyInput {
 type Subscription {
 	onCreateMessage(
 		id: ID,
-		chatId: ID,
+		chatId: ID!,
 		senderKey: SenderKeyInput,
 		createdAt: AWSDateTime,
 		content: String

@@ -3,7 +3,7 @@
 
 # subscription onCreateMessage(
 #     $id: ID
-# 		$chatId: ID
+# 		$chatId: ID!
 # 		$senderKey: SenderKeyInput
 # 		$createdAt: AWSDateTime
 # 		$content: String
@@ -28,7 +28,7 @@
 # }
 
 subscription onCreateMessage(
-		$chatId: ID
+  $chatId: ID!
 ) {
   onCreateMessage(
 		chatId: $chatId
