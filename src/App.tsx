@@ -1,37 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ModalDialog from '@components/ModalDialog/modal-dialog.component';
 import { AppContainer } from './navigation';
 import { connect } from 'react-redux';
 import { AppState } from './store';
 
-import messaging from '@react-native-firebase/messaging';
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { displayDataNotification } from '@helpers/displayDataNotification';
+import { User } from '@models/user';
 
-interface AppProps {
+interface AppProps  {
   isAuthenticated?: boolean;
+  cognitoUsername?: string;
+  openedChat: string | null;
 }
 
-const App: React.FC<AppProps> = (props: AppProps) => {
-  const [unsubscribe, setUnsubscribe] = useState<() => void>();
+const App: React.FC<AppProps> = ({ isAuthenticated, openedChat, cognitoUsername }: AppProps) => {
+  const notificationHandler = (message: FirebaseMessagingTypes.RemoteMessage) => {
+    const sender: User = JSON.parse(message.data!.sender);
+    const isCurrentChat = openedChat === message.data!.chatId;
+    const isSentByMe = sender.id === cognitoUsername;
 
-  const registerPushNotifications = () => {
-    const unsub = messaging().onMessage(async message =>
-        displayDataNotification(message.data!)
-    );
-
-    setUnsubscribe(() => unsub);
-  };
-
-  const unregisterPushNotifications = () => {
-    unsubscribe && unsubscribe();
+    if (!isCurrentChat && !isSentByMe) {
+      displayDataNotification(message.data!);
+    }
   }
 
   useEffect(() => {
-    if (!props.isAuthenticated) {
-      return unregisterPushNotifications();
+    if (isAuthenticated) {
+      return messaging().onMessage(notificationHandler);
     }
-    registerPushNotifications();
-  }, [props.isAuthenticated]);
+  }, [isAuthenticated, notificationHandler]);
 
   return (
     <>
@@ -42,7 +40,9 @@ const App: React.FC<AppProps> = (props: AppProps) => {
 };
 
 const mapStateToProps = (store: AppState) => ({
-  isAuthenticated: store.authModule.isAuthenticated
+  isAuthenticated: store.authModule.isAuthenticated,
+  cognitoUsername: store.authModule.cognitoUsername,
+  openedChat: store.appSharedModule.openedChat,
 });
 
 export default connect(mapStateToProps)(App);

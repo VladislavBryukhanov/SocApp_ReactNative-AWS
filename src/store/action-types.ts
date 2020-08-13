@@ -17,3 +17,5 @@ export const CREATE_USER = 'create_user';
 export const OPEN_MODAL = 'open_modal';
 export const CLOSE_MODAL = 'close_modal';
 export const OPEN_SUBMODAL = 'open_submodal';
+// chat-state
+export const UPDATE_OPENED_CHAT = 'update_opened_chat';

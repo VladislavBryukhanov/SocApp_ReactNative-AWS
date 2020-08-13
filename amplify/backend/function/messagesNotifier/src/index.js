@@ -22,7 +22,7 @@ exports.handler = (event, context, callback) => {
 
     event.Records.forEach(async record => {
         if (record.eventName == 'INSERT') {
-            const { createdAt, senderKey, content } = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+            const { createdAt, senderKey, content, chatId } = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
             
             const { Item: sender } = await dynamodb.get({
                 TableName,
@@ -33,10 +33,11 @@ exports.handler = (event, context, callback) => {
                 data: {
                     tag: MESSAGE_RECEIVED_TAG,
                     message: content,
+                    chatId,
                     createdAt,
                     sender
                 },
-                priority: "high"
+                priority: 'high'
             };
             
             const message = JSON.stringify({ 

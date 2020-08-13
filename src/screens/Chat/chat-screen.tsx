@@ -1,4 +1,5 @@
 import React from 'react';
+import { Dispatch } from 'redux';
 import { Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
 import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
 import { graphql } from 'react-apollo';
@@ -20,6 +21,7 @@ import styles from './styles';
 
 // ignore timer warnings which displayed due apollo subscription
 import { YellowBox } from 'react-native';
+import { updateOpenedChat } from '@store/app-shared/app-shared.actions';
 YellowBox.ignoreWarnings(['Setting a timer']);
 
 // fixme replace to models
@@ -43,6 +45,7 @@ interface ChatScreenProps extends NavigationSwitchScreenProps<{chatId: string}> 
   messages?: Message[];
   loading?: boolean;
   subscribeToNewMessages: (chatId: string) => () => void;
+  updateOpenedChat: (chatId: string | null) => void;
 };
 
 interface ChatScreenState {
@@ -60,15 +63,16 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   unsubscribe?: () => void;
 
   componentDidMount() {
-    // TODO implement AWS subscription separate filters
-    this.unsubscribe = this.props.subscribeToNewMessages(
-      this.props.navigation.getParam('chatId')
-    );
+    const chatId = this.props.navigation.getParam('chatId');
+
+    this.props.updateOpenedChat(chatId);
+    this.unsubscribe = this.props.subscribeToNewMessages(chatId);
   }
 
   componentWillUnmount() {
     if (this.unsubscribe) {
       this.unsubscribe();
+      this.props.updateOpenedChat(null);
     }
   }
 
@@ -197,7 +201,11 @@ const mapStateToProps = (store: AppState) => ({
   profile: store.usersModule.profile!
 });
 
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  updateOpenedChat: (chatId: string | null) => dispatch(updateOpenedChat(chatId))
+});
+
 export default compose(
   mapApolloToProps,
-  connect(mapStateToProps)
+  connect(mapStateToProps, mapDispatchToProps)
 )(ChatScreen);

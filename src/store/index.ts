@@ -4,11 +4,13 @@ import { createLogger } from 'redux-logger';
 import { authReducer } from './auth/auth.reducer';
 import { usersReducer } from './users/users.reducer';
 import { modalReducer } from './modal/modal.reducer';
+import { appSharedReducer } from './app-shared/app-shared.reducer';
 
 const rootReducer = combineReducers({
   authModule: authReducer,
   usersModule: usersReducer,
-  modalModule: modalReducer
+  modalModule: modalReducer,
+  appSharedModule: appSharedReducer,
 });
 
 export type AppState = ReturnType<typeof rootReducer>;
