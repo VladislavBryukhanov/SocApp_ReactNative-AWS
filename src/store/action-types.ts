@@ -19,3 +19,5 @@ export const CLOSE_MODAL = 'close_modal';
 export const OPEN_SUBMODAL = 'open_submodal';
 // chat-state
 export const UPDATE_OPENED_CHAT = 'update_opened_chat';
+// active-chats
+export const FETCH_ACTIVE_CHATS = 'fetch_active_chats';
