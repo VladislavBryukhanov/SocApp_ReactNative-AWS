@@ -1,3 +1,8 @@
+All ApiGateway's uses custom auth "cognito-auth" it is cognito token inside Authorization header of each request
+such auth must be set maually
+
+_____________________
+
 userPoolCleaner lambda should be used in cloudWatch every 24h
 _____________________
 
@@ -6,7 +11,7 @@ db-utils lambda layer required for that resources:
 2) editProfile lambda
 3) uploadAvatar lambda
 
-these lambdas requre auth and should be wrapped to API gateway
+these lambdas requre auth and should be wrapped by API gateway
 _____________________
 
 cognito Pre sign-up trigger invokes validateNewUser
@@ -14,7 +19,7 @@ cognito Post confirmation trigger invokes validateNewUser createUser
 _____________________
 
 soc-app-appSync role should grant access to chatDb and messagedDb
-these roles should be used to appSync chat interactions
+these roles should be used for appSync chat interactions
 
 appsync resolvers kept by path aws/rescources/resolvers they should be updated manually
 as well as schema.graphql
@@ -27,7 +32,7 @@ role for auth user required to grant access to appsync
 }
 _____________________
 
-messagesNotifier lambda should to listen dynamodb mesages table stream
+messagesNotifier lambda must listen dynamodb mesages table stream
 _____________________
 
 create new firebase application and bind it's FCM senderID to AWS SNS

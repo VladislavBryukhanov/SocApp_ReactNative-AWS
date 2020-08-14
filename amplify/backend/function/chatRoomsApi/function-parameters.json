@@ -1,0 +1,22 @@
+{
+  "mutableParametersState": {
+    "permissions": {
+      "storage": {
+        "userList": [
+          "read"
+        ],
+        "chatRooms": [
+          "create",
+          "read",
+          "delete"
+        ],
+        "chatMembers": [
+          "create",
+          "read",
+          "delete"
+        ]
+      }
+    }
+  },
+  "lambdaLayers": []
+}
