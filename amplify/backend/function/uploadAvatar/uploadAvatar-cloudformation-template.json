@@ -84,7 +84,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-dev-110127-deployment",
-					"S3Key": "amplify-builds/uploadAvatar-36765956373566515371-build.zip"
+					"S3Key": "amplify-builds/uploadAvatar-724b4d7142656c4d6178-build.zip"
 				}
 			}
 		},

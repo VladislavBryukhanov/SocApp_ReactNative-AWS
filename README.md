@@ -72,14 +72,27 @@ _____________________
 **AMPLIFY_ENV** variable must be equals to amplify environment name
 _____________________
 
+Update appropriate dataSource resource dynamodb table of AppSync API
+
+Update *Settings* -> *Default authorization mode* -> *Select a user pool*
+according to environment's user pool
+
+_____________________
+
 <!-- TODO replace with amplify implementation -->
 **db-utils** lambda layer required for that resources:
 1) **fetchProfile** lambda
 2) **editProfile** lambda
 3) **uploadAvatar** lambda
+4) **deviceTokenUpdater** lambda
 
 these lambdas require auth and should be wrapped by API gateway
 _____________________
+
+environment variables **SNS_APPLICATION_ARN** and **SNS_MSG_TOPIC_ARN**
+must be added to **deviceTokenUpdater** lambda
+
+*these env's expect SNS integration which described below*
 
 ### App initialization requirements
 
@@ -104,13 +117,13 @@ create new firebase application and bind it's FCM senderID to AWS SNS
 create platform application AuNea-chat_v2 using this senderID
 after that you should create new topic - Chat-msgs
 
-deviceTokenUpdater and messagesNotifier lambdas require appropriate SNS arns
+**deviceTokenUpdater** and **messagesNotifier** lambdas require appropriate SNS arns
 for platform application and topic
 
 "arn:aws:sns:*:*:Chat-msgs",
 "arn:aws:sns:*:*:app/GCM/AuNea-chat_v2"
 
-you need manually add this permission for deviceTokenUpdater lambda
+you need manually add this permission for **deviceTokenUpdater** lambda
 
 ```json
 {
@@ -132,7 +145,7 @@ and pass such env to lambda:
 process.env.SNS_APPLICATION_ARN
 process.env.SNS_MSG_TOPIC_ARN
 
-you need manually add this permission for messagesNotifier lambda
+you need manually add this permission for **messagesNotifier** lambda
 
 ```json
 {
