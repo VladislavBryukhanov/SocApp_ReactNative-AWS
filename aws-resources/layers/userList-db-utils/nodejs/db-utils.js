@@ -1,12 +1,12 @@
 class Validation {
   static get mutableUserEntityProperties() {
-    return ['nickname', 'bio', 'avatar', 'username'];
+    return ['nickname', 'bio', 'avatar', 'username', 'snsCreds'];
   };
 
   static get validatorErrors() {
     return {
       event: 'Api gateway proxy and auth required',
-      body: 'Request body contain unexpected property.'
+      body: 'Request body contain unexpected property'
     };
   }
 
@@ -30,8 +30,7 @@ class Validation {
 
 class UsersDB {
   get queryKeys() {
-    const { sub: id, preferred_username: username } = this.userAttributes;
-    return { id, username };
+    return { id: this.userAttributes.sub };
   }
 
   constructor(dynamoDb, tableName, event) {

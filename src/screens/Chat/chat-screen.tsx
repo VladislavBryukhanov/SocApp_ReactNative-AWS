@@ -77,7 +77,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   }
 
   messageTemplate = ({ item }: { item: Message }) => {
-    const sentByMe = item.senderKey.id === this.props.profile.id;
+    const sentByMe = item.senderId === this.props.profile.id;
     const messageStyle = sentByMe 
       ? styles.outcomingMessage
       : styles.incomingMessage;
@@ -85,7 +85,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     // TODO all interlocutors will be replaced into Message table interlocutorIds: string[]
     const sender = sentByMe
       ? this.props.profile
-      : this.props.userList.find(({ id }) => id === item.senderKey.id)!;
+      : this.props.userList.find(({ id }) => id === item.senderId)!;
 
     return (
       <View style={[styles.messageView, sentByMe && styles.reversed]}>

@@ -12,13 +12,6 @@
             "Type": "String"
         },
         
-        "sortKeyName": {
-            "Type": "String"
-        },
-        "sortKeyType": {
-            "Type": "String"
-        },
-        
         "tableName": {
             "Type": "String"
         }
@@ -42,26 +35,14 @@
                   {
                       "AttributeName": "id",
                       "AttributeType": "S"
-                  }  , 
-                  
-                  {
-                      "AttributeName": "username",
-                      "AttributeType": "S"
-                  } 
-                  
+                  }
                 ],
                 "KeySchema": [
                   
                   {
                     "AttributeName": "id",
                     "KeyType": "HASH"
-                  }  , 
-                  
-                  {
-                    "AttributeName": "username",
-                    "KeyType": "RANGE"
-                  } 
-                  
+                  }
                 ],
                 "ProvisionedThroughput": {
                     "ReadCapacityUnits": "5",
@@ -127,17 +108,6 @@
         "PartitionKeyType": {
             "Value": {
                 "Ref": "partitionKeyType"
-            }
-        },
-        
-        "SortKeyName": {
-            "Value": {
-                "Ref": "sortKeyName"
-            }
-        },
-        "SortKeyType": {
-            "Value": {
-                "Ref": "sortKeyType"
             }
         },
         

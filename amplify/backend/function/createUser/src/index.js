@@ -11,18 +11,9 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+const TableName = process.env.STORAGE_USERLIST_NAME;
 
 const targetTriggerSource = 'PostConfirmation_ConfirmSignUp';
-const targetAttributes = [
-  { userPoolKey: 'sub', dynamoDbKey: 'id' },
-  { userPoolKey: 'nickname', dynamoDbKey: 'nickname' },
-  { userPoolKey: 'preferred_username', dynamoDbKey: 'username' }
-];
-
-let TableName = 'userList';
-if(process.env.ENV && process.env.ENV !== "NONE") {
-  TableName = `${TableName}-${process.env.ENV}`;
-}
 
 exports.handler = function (event, context, callback) {
   context.callbackWaitsForEmptyEventLoop = false;
@@ -33,11 +24,11 @@ exports.handler = function (event, context, callback) {
     return callback(null, event);
   }
 
-  const Item = targetAttributes.reduce((acc, { userPoolKey, dynamoDbKey  }) => ({
-    ...acc,
-    [dynamoDbKey]: userAttributes[userPoolKey]
-  }), {});
+  const Item = {
+    id: userAttributes.sub,
+    nickname: userAttributes.nickname,
+    username: userAttributes.preferred_username,
+  }
   
-  const queryParams = { TableName, Item };
-  dynamodb.put(queryParams, (err, data) => callback(err, event));
+  dynamodb.put({ TableName, Item }, (err, data) => callback(err, event));
 };

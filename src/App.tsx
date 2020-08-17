@@ -18,7 +18,7 @@ const App: React.FC<AppProps> = ({ isAuthenticated, openedChat, cognitoUsername 
   const notificationHandler = (message: FirebaseMessagingTypes.RemoteMessage) => {
     const sender: User = JSON.parse(message.data!.sender);
     const isCurrentChat = openedChat === message.data!.chatId;
-    const isSentByMe = sender.id === cognitoUsername;
+    const isSentByMe = sender.username === cognitoUsername;
 
     if (!isCurrentChat && !isSentByMe) {
       displayDataNotification(message.data!);
