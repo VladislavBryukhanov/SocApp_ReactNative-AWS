@@ -7,10 +7,7 @@ query ListMessages(
     items {
       id
       chatId
-      senderKey {
-        id
-        username
-      }
+      senderId
       content
 	    createdAt
       isRead

@@ -1,6 +1,6 @@
 ﻿input CreateMessageInput {
 	chatId: ID!
-	senderKey: SenderKeyInput!
+	senderId: ID,
 	content: String!
 }
 
@@ -11,7 +11,7 @@ input DeleteMessageInput {
 type Message {
 	id: ID!
 	chatId: ID!
-	senderKey: SenderKey!
+	senderId: ID!,
 	createdAt: AWSDateTime
 	content: String!
 	isRead: Boolean
@@ -33,21 +33,11 @@ type Query {
 	listMessages(filter: TableMessageFilterInput, limit: Int, nextToken: String): MessageConnection
 }
 
-type SenderKey {
-	id: ID!
-	username: String!
-}
-
-input SenderKeyInput {
-	id: ID!
-	username: String!
-}
-
 type Subscription {
 	onCreateMessage(
 		id: ID,
 		chatId: ID!,
-		senderKey: SenderKeyInput,
+		senderId: ID,
 		createdAt: AWSDateTime,
 		content: String
 	): Message
@@ -55,7 +45,7 @@ type Subscription {
 	onUpdateMessage(
 		id: ID,
 		chatId: ID,
-		senderKey: SenderKeyInput,
+		senderId: ID,
 		createdAt: AWSDateTime,
 		content: String
 	): Message
@@ -63,7 +53,7 @@ type Subscription {
 	onDeleteMessage(
 		id: ID,
 		chatId: ID,
-		senderKey: SenderKeyInput,
+		senderId: ID,
 		createdAt: AWSDateTime,
 		content: String
 	): Message
@@ -136,7 +126,7 @@ input TableStringFilterInput {
 input UpdateMessageInput {
 	id: ID!
 	chatId: ID
-	senderKey: SenderKeyInput
+	senderId: ID
 	content: String
 	isRead: Boolean
 }
