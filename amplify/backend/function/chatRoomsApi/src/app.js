@@ -29,13 +29,16 @@ router.route('/chatRooms')
   .get(ChatService.getActiveChats)
   .post(ChatService.createChat);
 
-router.route('/chatRooms:roomId')
+router.route('/chatRooms/:roomId')
   .get(ChatService.getDetailedChat)
   .delete(ChatService.deleteChat);
 
-app.use(router);
+router.route('/directRoom/:interlocutorId')
+  .get(ChatService.findDirectByInterlocutor);
+
 app.use(bodyParser.json());
 app.use(awsServerlessExpressMiddleware.eventContext());
+app.use(router);
 
 app.listen(3000, function() {
     console.log("App started")

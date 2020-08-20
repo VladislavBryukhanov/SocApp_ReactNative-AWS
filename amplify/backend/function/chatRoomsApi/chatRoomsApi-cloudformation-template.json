@@ -111,7 +111,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "amplify-soc-app-dev-110127-deployment",
-					"S3Key": "amplify-builds/chatRoomsApi-4f7978764f6271317568-build.zip"
+					"S3Key": "amplify-builds/chatRoomsApi-6263515970632b6d7345-build.zip"
 				}
 			}
 		},
