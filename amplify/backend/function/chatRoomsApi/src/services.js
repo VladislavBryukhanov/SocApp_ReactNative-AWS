@@ -88,7 +88,7 @@ exports.findDirectByInterlocutor = async (req, res) => {
   const chat = await findDirectByInterlocutor(myId, req.params.interlocutorId, errHandler);
 
   if (!chat) {
-    return errHandler(404, "No chat found with such id");
+    return res.sendStatus(204);
   }
 
   res.status(200).json(chat);
@@ -152,14 +152,14 @@ exports.getDetailedChat = async (req, res) => {
 exports.createChat = async (req, res) => {
   const errHandler = (code, msg, err) => errorHandler(res, "createChat", code, msg, err);
 
-  const { interlocurotId, chatName } = req.body;
+  const { interlocutorId, chatName, avatar } = req.body;
   const { sub: ownerId } = req.apiGateway.event.requestContext.authorizer.claims;
  
-  if (!interlocurotId) {
+  if (!interlocutorId) {
     return errHandler(400, "InterlocutorId is require parameter");
   }
 
-  const chat = await findDirectByInterlocutor(ownerId, interlocurotId, errHandler);
+  const chat = await findDirectByInterlocutor(ownerId, interlocutorId, errHandler);
 
   if (chat) {
     return errHandler(409, "Such direct already exists");
@@ -168,7 +168,8 @@ exports.createChat = async (req, res) => {
   const newChatRoomItem = {
     Item: {
       id: uuid(),
-      ownerId,
+      ownerId, 
+      avatar,
       name: chatName,
     }
   };
@@ -184,7 +185,7 @@ exports.createChat = async (req, res) => {
   const interlocutorMemberItem = {
     Item: {
       id: uuid(),
-      userId: interlocurotId,
+      userId: interlocutorId,
       chatId: newChatRoomItem.Item.id,
     }
   };
