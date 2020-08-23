@@ -16,5 +16,5 @@ const TableName = process.env.STORAGE_USERLIST_NAME;
 //TODO Paging
 exports.handler = function (event, context, callback) {
   context.callbackWaitsForEmptyEventLoop = false;
-  dynamodb.scan({ TableName }, callback);
+  dynamodb.scan({ TableName, ProjectionExpression: 'id, nickname, avatar, username, bio' }, callback);
 };

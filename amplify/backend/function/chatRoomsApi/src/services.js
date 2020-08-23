@@ -7,6 +7,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 const ROOMS_TABLE = process.env.STORAGE_CHATROOMS_NAME;
 const MEMBERS_TABLE = process.env.STORAGE_CHATMEMBERS_NAME;
+const USERS_TABLE = process.env.STORAGE_USERLIST_NAME;
 
 // TODO index const
 const MEMBERS_USER_ID_INDEX = 'chatMembers-userId';
@@ -69,12 +70,10 @@ exports.getActiveChats = async (req, res) => {
     }
   }).promise();
 
-  const { Responses: { [ROOMS_TABLE] : chatList } }= await dynamodb.batchGet({
+  const { Responses: { [ROOMS_TABLE]: chatList } } = await dynamodb.batchGet({
     RequestItems: {
       [ROOMS_TABLE]: {
-        Keys: chatRelations.map(({ chatId }) => ({
-          id: chatId
-        }))
+        Keys: chatRelations.map(({ chatId }) => ({ id: chatId }))
       }
     }
   }).promise();
@@ -96,16 +95,58 @@ exports.findDirectByInterlocutor = async (req, res) => {
 };
 
 exports.getDetailedChat = async (req, res) => {
-  try {
-    const { Item } = await dynamodb.get({
-      TableName: ROOMS_TABLE,
-      Key: { id: req.params.roomId }
-    }).promise();
+  const errHandler = (code, msg, err) => errorHandler(res, "getDetailedChat", code, msg, err);
+  const { roomId } = req.params;
 
-    res.json(Item);
+  let chatInfo, members;
+
+  try {
+    ({ Item: chatInfo } = await dynamodb.get({
+      TableName: ROOMS_TABLE,
+      Key: { id: roomId }
+    }).promise());
   } catch (err) {
-    return errorHandler(res, "getDetailedChat", 500, "Error searching chat by interlocutor's chatId", err);
+    return errHandler(500, "Error searching chat by interlocutor's chatId", err);
   }
+
+  if (!chatInfo) {
+    return errHandler(404, "No chats with such id found");
+  }
+
+  try {
+    ({ Items: members } = await dynamodb.query({
+      TableName: MEMBERS_TABLE,
+      IndexName: MEMBERS_CHAT_ID_INDEX,
+      KeyConditionExpression: "chatId=:roomId",
+      ExpressionAttributeValues: {
+        ":roomId": roomId
+      },
+      ProjectionExpression: 'userId'
+    }).promise());
+  } catch (err) {
+    return errHandler(500, "Error searching members attached to chat by provided id", err)
+  }
+
+  try {
+    ({ Responses: { [USERS_TABLE]: members } } = await dynamodb.batchGet({
+      RequestItems: {
+        [USERS_TABLE]: {
+          Keys: members.map(({ userId }) => ({ id: userId })),
+          ProjectionExpression: 'id, nickname, avatar, username, bio'
+        }
+      }
+    }).promise());
+  } catch (err) {
+    return errHandler(500, "Error searching users by members id", err)
+  }
+
+  res.send({
+    id: chatInfo.id,
+    name: chatInfo.name,
+    avatar: chatInfo.avatar,
+    chatOwner: members.find(({ id }) => id === chatInfo.ownerId),
+    members
+  });
 };
 
 exports.createChat = async (req, res) => {
@@ -165,7 +206,7 @@ exports.createChat = async (req, res) => {
       }
     }).promise();
   } catch (err) {
-    errHandler(500, "Error creating chat or members", err);
+    return errHandler(500, "Error creating chat or members", err);
   }
 
   res.status(201).json(newChatRoomItem.Item);
@@ -187,7 +228,7 @@ exports.deleteChat = async (req, res) => {
       ProjectionExpression: 'id'
     }).promise());
   } catch (err) {
-    errHandler(500, "Error searching members attached to chat by provided id", err)
+    return errHandler(500, "Error searching members attached to chat by provided id", err)
   }
 
   if (!members.length) {
@@ -197,7 +238,7 @@ exports.deleteChat = async (req, res) => {
         Key: { id: roomId },
       }).promise();
     } catch (err) {
-      errHandler(500, "Error deleting chat (without members)", err)
+      return errHandler(500, "Error deleting chat (without members)", err)
     }
 
     return res.sendStatus(204);
@@ -215,7 +256,7 @@ exports.deleteChat = async (req, res) => {
       }
     }).promise();
   } catch (err) {
-    errHandler(500, "Error deleting chat or members", err)
+    return errHandler(500, "Error deleting chat or members", err)
   }
 
   res.sendStatus(204);
