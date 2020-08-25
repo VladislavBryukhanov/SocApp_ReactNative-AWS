@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
-import { NavigationSwitchScreenProps, FlatList } from 'react-navigation';
+import { NavigationSwitchScreenProps, FlatList, withNavigation } from 'react-navigation';
 import { graphql } from 'react-apollo';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -18,10 +18,12 @@ import { Preloader } from '@components/atoms/Prloader/preloader.component';
 import ChatInput from '@components/ChatInput/chat-input.component';
 import defaultAvatar from '@assets/icons/user.png';
 import styles from './styles';
+import { getChatDetails, disposeChat } from '@store/chat-rooms/chat-rooms.actions';
+import { ChatRoom } from '@models/chat-room';
+import _ from 'lodash';
 
 // ignore timer warnings which displayed due apollo subscription
 import { YellowBox } from 'react-native';
-import { updateOpenedChat } from '@store/app-shared/app-shared.actions';
 YellowBox.ignoreWarnings(['Setting a timer']);
 
 // fixme replace to models
@@ -34,27 +36,38 @@ interface ListMessages {
 interface QueryListMessages {
   filter: {
     chatId: {
-      eq: string;
+      eq?: string;
     }
   }
 }
 
-interface ChatScreenProps extends NavigationSwitchScreenProps<{chatId: string}> {
+type NavigationParams = {
+  chatId?: string;
+  chatDetails?: ChatRoom;
+  interlocutorId?: string;
+}
+
+interface ChatScreenProps extends NavigationSwitchScreenProps<NavigationParams> {
   userList: User[];
   profile: User;
+  openedChatDetails: ChatRoom,
+  chatCreating?: boolean;
   messages?: Message[];
   loading?: boolean;
   subscribeToNewMessages: (chatId: string) => () => void;
-  updateOpenedChat: (chatId: string | null) => void;
-};
+  getChatDetails: (chatId: string) => void;
+  disposeChat: () => void;
+}
 
 interface ChatScreenState {
   isScrollBottomAvailable: boolean;
+  isSubscriptionsEstablished: boolean;
 }
 
 class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   state: ChatScreenState = {
-    isScrollBottomAvailable: false
+    isScrollBottomAvailable: false,
+    isSubscriptionsEstablished: false,
   }
 
   lastVisibleItem?: Message;
@@ -65,16 +78,47 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   componentDidMount() {
     const chatId = this.props.navigation.getParam('chatId');
 
-    this.props.updateOpenedChat(chatId);
+    if (!chatId) return;
+
     this.unsubscribe = this.props.subscribeToNewMessages(chatId);
+    this.setState({ isSubscriptionsEstablished: true });
+
+    if (!this.props.openedChatDetails || this.props.openedChatDetails.id !== chatId) {
+      this.props.getChatDetails(chatId);
+    }
   }
 
   componentWillUnmount() {
     if (this.unsubscribe) {
       this.unsubscribe();
-      this.props.updateOpenedChat(null);
+      this.props.disposeChat();
     }
   }
+
+  static getDerivedStateFromProps(props: ChatScreenProps, state: ChatScreenState) {
+    if (props.chatCreating) {
+      return { ...state, isSubscriptionsEstablished: false }
+    }
+
+    return null;
+  }
+
+  componentDidUpdate(prevProps: ChatScreenProps) {
+    const { openedChatDetails } = this.props;
+
+    if (openedChatDetails && !_.isEqual(openedChatDetails, prevProps.openedChatDetails)) {
+      this.unsubscribe && this.unsubscribe();
+      this.unsubscribe = this.props.subscribeToNewMessages(openedChatDetails.id);
+
+      this.props.navigation.setParams({ chatDetails: openedChatDetails });
+      // subscription has some delay until established
+      setTimeout(() => this.setState({ isSubscriptionsEstablished: true }), 1000);
+    }
+  }
+  
+  static navigationOptions = ({ navigation }: NavigationSwitchScreenProps<NavigationParams>) => ({
+    title: navigation.state.params!.chatDetails && navigation.state.params!.chatDetails.name
+  })
 
   messageTemplate = ({ item }: { item: Message }) => {
     const sentByMe = item.senderId === this.props.profile.id;
@@ -154,7 +198,10 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
             onPress={this.onScrollBottom}
             small/>
         )}
-        <ChatInput chatId={navigation.getParam('chatId')}/>
+        <ChatInput 
+          isSubscriptionsEstablished={this.state.isSubscriptionsEstablished}
+          interlocutorId={navigation.getParam('interlocutorId')} 
+          chatId={this.props.openedChatDetails && this.props.openedChatDetails.id}/>
       </View>
     );
   }
@@ -198,14 +245,18 @@ const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessage
 
 const mapStateToProps = (store: AppState) => ({
   userList: store.usersModule.users,
-  profile: store.usersModule.profile!
+  profile: store.usersModule.profile!,
+  openedChatDetails: store.chatRoomsModule.openedChatDetails,
+  chatCreating:  store.chatRoomsModule.chatLoading
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  updateOpenedChat: (chatId: string | null) => dispatch(updateOpenedChat(chatId))
+  getChatDetails: (chatId: string) => dispatch(getChatDetails(chatId)),
+  disposeChat: () => dispatch(disposeChat()),
 });
 
-export default compose(
+export default compose<ChatScreenProps>(
   mapApolloToProps,
-  connect(mapStateToProps, mapDispatchToProps)
+  connect(mapStateToProps, mapDispatchToProps),
+  withNavigation
 )(ChatScreen);

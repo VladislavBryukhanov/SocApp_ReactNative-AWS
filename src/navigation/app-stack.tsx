@@ -62,10 +62,5 @@ export const AppStack = createStackNavigator({
     }
   },
   Profile: ProfileScreen,
-  Chat: {
-    screen: ChatScreen,
-    navigationOptions: {
-      title: 'Chat',
-    }
-  },
+  Chat: ChatScreen,
 })

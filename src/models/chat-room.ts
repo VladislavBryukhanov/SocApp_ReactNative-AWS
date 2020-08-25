@@ -8,3 +8,10 @@ export interface ChatRoom {
     chatOwner?: User;
     members?: User[];
 }
+
+export interface CreateChatRoom {
+    interlocutorId: string;
+    // interlocutors: string;
+    name?: string;
+    avatar?: string;
+}

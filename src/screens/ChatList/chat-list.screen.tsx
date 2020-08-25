@@ -8,19 +8,17 @@ import { Preloader } from '@components/atoms/Prloader/preloader.component';
 import { TouchableNativeFeedback, View, Text } from 'react-native';
 import AppMenu from '@components/Menu/menu.component';
 
-const ChatListScreen: React.FC &{ navigationOptions: any }  = () => {
+const ChatListScreen: React.FC & { navigationOptions: any } = () => {
   const activeChats: ChatRoom[] | undefined = useSelector((store: AppState) => store.chatRoomsModule.activeChats);
   const dispatch = useDispatch();
 
   const chatRoomTemplate = ({ item }: { item: ChatRoom }) => (
-    <TouchableNativeFeedback
-      key={item.id}
-    >
+    <TouchableNativeFeedback key={item.id}>
       <View>
         <Text>{item.name}</Text>
       </View>
     </TouchableNativeFeedback>
-  )
+  );
 
   useEffect(() => {
     if (!activeChats) {

@@ -21,3 +21,9 @@ export const OPEN_SUBMODAL = 'open_submodal';
 export const UPDATE_OPENED_CHAT = 'update_opened_chat';
 // active-chats
 export const FETCH_ACTIVE_CHATS = 'fetch_active_chats';
+export const FIND_DIRECT_BY_INTERLOCUTOR = 'find_chat_by_interlocutor';
+export const DISPOSE_DIRECT_SEARCH_RESULT = 'dispose_direct_search_result';
+export const GET_CHAT_DETAILS = 'get_chat_details';
+export const CLOSE_CHAT = 'close_chat';
+export const CHAT_CREATING = 'chat_creating';
+export const CHAT_CREATED = 'chat_created';

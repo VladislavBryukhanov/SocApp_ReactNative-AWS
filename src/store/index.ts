@@ -4,14 +4,12 @@ import { createLogger } from 'redux-logger';
 import { authReducer } from './auth/auth.reducer';
 import { usersReducer } from './users/users.reducer';
 import { modalReducer } from './modal/modal.reducer';
-import { appSharedReducer } from './app-shared/app-shared.reducer';
 import { chatRoomsReducer } from './chat-rooms/chat-rooms.reducer';
 
 const rootReducer = combineReducers({
   authModule: authReducer,
   usersModule: usersReducer,
   modalModule: modalReducer,
-  appSharedModule: appSharedReducer,
   chatRoomsModule: chatRoomsReducer,
 });
 
