@@ -20,26 +20,12 @@ import defaultAvatar from '@assets/icons/user.png';
 import styles from './styles';
 import { getChatDetails, disposeChat } from '@store/chat-rooms/chat-rooms.actions';
 import { ChatRoom } from '@models/chat-room';
+import { ListMessages, QueryListMessages } from '@models/gql-results/list-messages-query';
 import _ from 'lodash';
 
 // ignore timer warnings which displayed due apollo subscription
 import { YellowBox } from 'react-native';
 YellowBox.ignoreWarnings(['Setting a timer']);
-
-// fixme replace to models
-interface ListMessages {
-  listMessages: {
-    items: Message[]
-  }
-}
-
-interface QueryListMessages {
-  filter: {
-    chatId: {
-      eq?: string;
-    }
-  }
-}
 
 type NavigationParams = {
   chatId?: string;
@@ -51,9 +37,9 @@ interface ChatScreenProps extends NavigationSwitchScreenProps<NavigationParams> 
   userList: User[];
   profile: User;
   openedChatDetails: ChatRoom,
-  chatCreating?: boolean;
   messages?: Message[];
   loading?: boolean;
+  refetch: (chatId: string) => Promise<void>;
   subscribeToNewMessages: (chatId: string) => () => void;
   getChatDetails: (chatId: string) => void;
   disposeChat: () => void;
@@ -61,13 +47,11 @@ interface ChatScreenProps extends NavigationSwitchScreenProps<NavigationParams> 
 
 interface ChatScreenState {
   isScrollBottomAvailable: boolean;
-  isSubscriptionsEstablished: boolean;
 }
 
 class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   state: ChatScreenState = {
     isScrollBottomAvailable: false,
-    isSubscriptionsEstablished: false,
   }
 
   lastVisibleItem?: Message;
@@ -81,7 +65,6 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     if (!chatId) return;
 
     this.unsubscribe = this.props.subscribeToNewMessages(chatId);
-    this.setState({ isSubscriptionsEstablished: true });
 
     if (!this.props.openedChatDetails || this.props.openedChatDetails.id !== chatId) {
       this.props.getChatDetails(chatId);
@@ -95,24 +78,13 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     }
   }
 
-  static getDerivedStateFromProps(props: ChatScreenProps, state: ChatScreenState) {
-    if (props.chatCreating) {
-      return { ...state, isSubscriptionsEstablished: false }
-    }
-
-    return null;
-  }
-
   componentDidUpdate(prevProps: ChatScreenProps) {
     const { openedChatDetails } = this.props;
 
     if (openedChatDetails && !_.isEqual(openedChatDetails, prevProps.openedChatDetails)) {
       this.unsubscribe && this.unsubscribe();
       this.unsubscribe = this.props.subscribeToNewMessages(openedChatDetails.id);
-
       this.props.navigation.setParams({ chatDetails: openedChatDetails });
-      // subscription has some delay until established
-      setTimeout(() => this.setState({ isSubscriptionsEstablished: true }), 1000);
     }
   }
   
@@ -179,6 +151,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     }
 
     const sortedMessages = [...messages].reverse();
+    const chatId = this.props.openedChatDetails && this.props.openedChatDetails.id;
 
     return (
       <View style={styles.chat}>
@@ -198,10 +171,10 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
             onPress={this.onScrollBottom}
             small/>
         )}
-        <ChatInput 
-          isSubscriptionsEstablished={this.state.isSubscriptionsEstablished}
+        <ChatInput
           interlocutorId={navigation.getParam('interlocutorId')} 
-          chatId={this.props.openedChatDetails && this.props.openedChatDetails.id}/>
+          refetchChat={() => this.props.refetch(chatId)}
+          chatId={chatId}/>
       </View>
     );
   }
@@ -219,6 +192,13 @@ const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessage
       fetchPolicy: 'cache-and-network'
     }),
     props: ({ data }) => ({
+      refetch: (chatId: string) => data!.refetch({
+        filter: {
+          chatId: {
+            eq: chatId
+          }
+        },
+      }),
       loading: data!.loading,
       messages: data!.listMessages ? data!.listMessages.items : [],
       subscribeToNewMessages: (chatId: string) => data!.subscribeToMore({
@@ -246,8 +226,7 @@ const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessage
 const mapStateToProps = (store: AppState) => ({
   userList: store.usersModule.users,
   profile: store.usersModule.profile!,
-  openedChatDetails: store.chatRoomsModule.openedChatDetails,
-  chatCreating:  store.chatRoomsModule.chatLoading
+  openedChatDetails: store.chatRoomsModule.openedChatDetails
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
