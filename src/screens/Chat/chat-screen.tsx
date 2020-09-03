@@ -39,6 +39,7 @@ interface ChatScreenProps extends NavigationSwitchScreenProps<NavigationParams> 
   openedChatDetails: ChatRoom,
   messages?: Message[];
   loading?: boolean;
+  chatCreating?: boolean;
   refetch: (chatId: string) => Promise<void>;
   subscribeToNewMessages: (chatId: string) => () => void;
   getChatDetails: (chatId: string) => void;
@@ -64,10 +65,8 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
 
     if (!chatId) return;
 
-    this.unsubscribe = this.props.subscribeToNewMessages(chatId);
-
     if (!this.props.openedChatDetails || this.props.openedChatDetails.id !== chatId) {
-      this.props.getChatDetails(chatId);
+      return this.props.getChatDetails(chatId);
     }
   }
 
@@ -82,7 +81,6 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     const { openedChatDetails } = this.props;
 
     if (openedChatDetails && !_.isEqual(openedChatDetails, prevProps.openedChatDetails)) {
-      this.unsubscribe && this.unsubscribe();
       this.unsubscribe = this.props.subscribeToNewMessages(openedChatDetails.id);
       this.props.navigation.setParams({ chatDetails: openedChatDetails });
     }
@@ -127,6 +125,32 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     );
   }
 
+  ChatList = () => {
+    const { loading, messages } = this.props;
+    if (loading || !messages) return <Preloader/>;
+
+    const sortedMessages = [...messages].reverse();
+
+    return <>
+      <FlatList
+          style={styles.messageList}
+          keyExtractor={({ id }) => id}
+          inverted
+          data={sortedMessages}
+          renderItem={this.messageTemplate}
+          ref={(ref: FlatList<Message>) => this.mesageListRef = ref}
+          onScroll={this.onListScroll}
+      />
+      { this.state.isScrollBottomAvailable && (
+        <FAB 
+          style={styles.srollBottomFab}
+          icon='chevron-down'
+          onPress={this.onScrollBottom}
+          small/>
+      )}
+    </>
+  }
+
   // prevent displaying of button on new message event (button appears on few miliseconds before autoscroll scrolling 
   // down the same problem with keyboard appearing)
   setScrollableState = debounce((val) => this.setState({
@@ -144,34 +168,14 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   }
 
   render() {
-    const { loading, messages, navigation } = this.props;
-
-    if (loading || !messages) {
-      return <Preloader/>;
-    }
-
-    const sortedMessages = [...messages].reverse();
-    const chatId = this.props.openedChatDetails && this.props.openedChatDetails.id;
+    const { loading, navigation, openedChatDetails } = this.props;
+    const chatId = openedChatDetails && openedChatDetails.id;
 
     return (
       <View style={styles.chat}>
-        <FlatList
-          style={styles.messageList}
-          keyExtractor={({ id }) => id}
-          inverted
-          data={sortedMessages}
-          renderItem={this.messageTemplate}
-          ref={(ref: FlatList<Message>) => this.mesageListRef = ref}
-          onScroll={this.onListScroll}
-        />
-        { this.state.isScrollBottomAvailable && (
-          <FAB 
-            style={styles.srollBottomFab}
-            icon='chevron-down'
-            onPress={this.onScrollBottom}
-            small/>
-        )}
+        <this.ChatList/>
         <ChatInput
+          chatLoading={loading || this.props.chatCreating}
           interlocutorId={navigation.getParam('interlocutorId')} 
           refetchChat={() => this.props.refetch(chatId)}
           chatId={chatId}/>
@@ -205,7 +209,7 @@ const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessage
         variables: { chatId },
         document: onCreateMessageSubscription,
         updateQuery: (prev, { subscriptionData }) => {
-          if (!subscriptionData.data) return prev;
+          if (!subscriptionData.data.onCreateMessage) return prev;
           
           return {
             ...prev,
@@ -226,7 +230,8 @@ const mapApolloToProps = graphql<ChatScreenProps, ListMessages, QueryListMessage
 const mapStateToProps = (store: AppState) => ({
   userList: store.usersModule.users,
   profile: store.usersModule.profile!,
-  openedChatDetails: store.chatRoomsModule.openedChatDetails
+  openedChatDetails: store.chatRoomsModule.openedChatDetails,
+  chatCreating: store.chatRoomsModule.chatCreating,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

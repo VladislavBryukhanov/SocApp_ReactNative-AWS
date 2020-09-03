@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Image } from 'react-native';
 import { useMutation } from 'react-apollo';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,12 +13,30 @@ import styles from './styles';
 interface ChatInputProps {
   chatId?: string;
   interlocutorId?: string;
+  chatLoading?: boolean;
   refetchChat: () => Promise<void>;
+}
+
+// FIXME WIP
+const usePrevious = (value: any) => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+
+  return ref.current;
 }
 
 const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
   const dispatch = useDispatch();
-  const chatCreating = useSelector((store: AppState) => store.chatRoomsModule.chatLoading);
+  const chatCreating = useSelector((store: AppState) => store.chatRoomsModule.chatCreating);
+  const prevChatCreatingProp = usePrevious(chatCreating);
+
+  // console.log("CUR CH CR", chatCreating)
+  // console.log("PREV CH CR", prevChatCreatingProp)
+
+  const [creationStage, updateCreationStage] = useState(prevChatCreatingProp && !chatCreating);
+  // console.log("CCS", creationStage)
 
   const [message, setMessage] = useState('');
   const [addMessage, { loading }] = useMutation(createMessageMutation, {
@@ -46,12 +64,12 @@ const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
     addMessage();
   };
 
-  if (chatCreating) {
+  if (props.chatLoading || creationStage) {
     return (
       <View style={styles.chatInput}>
         <BasicTextField
           style={styles.messageInput}
-          placeholder='Chat creating...'/>
+          placeholder='Chat loading...'/>
         <Image source={preloader2} style={styles.preloader}/> 
       </View>
     )

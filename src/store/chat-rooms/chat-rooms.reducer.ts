@@ -15,7 +15,7 @@ interface ChatRoomsState {
   lastFoundDirect?: ChatRoom;
   activeChats?: ChatRoom[];
   openedChatDetails?: ChatRoom;
-  chatLoading?: boolean;
+  chatCreating?: boolean;
 }
 
 interface ChatRoomAction extends Action {
@@ -30,8 +30,8 @@ const initState: ChatRoomsState = {}
 
 export const chatRoomsReducer: Reducer<ChatRoomsState, ChatRoomAction> = handleActions({
   [FETCH_ACTIVE_CHATS]: (state, { payload: { chatList } }: ChatRoomAction) => ({ ...state, activeChats: chatList }),
-  [CHAT_CREATING]: (state) => ({ ...state, chatLoading: true }),
-  [CHAT_CREATED]: (state) => ({ ...state, chatLoading: false }),
+  [CHAT_CREATING]: (state) => ({ ...state, chatCreating: true }),
+  [CHAT_CREATED]: (state) => ({ ...state, chatCreating: false }),
   [FIND_DIRECT_BY_INTERLOCUTOR]: (state, { payload: { chat } }: ChatRoomAction) => ({ ...state, lastFoundDirect: chat }),
   [DISPOSE_DIRECT_SEARCH_RESULT]: (state) => ({ ...state, lastFoundDirect: undefined }),
   [GET_CHAT_DETAILS]: (state, { payload: { detailedChat } }: ChatRoomAction) => ({ ...state, openedChatDetails: detailedChat }),
