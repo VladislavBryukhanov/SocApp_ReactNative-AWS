@@ -1,67 +1,33 @@
 {
-    "test": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-soc-app-test-225156-authRole",
-            "UnauthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-test-225156-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-test-225156-authRole",
-            "Region": "us-east-1",
-            "DeploymentBucketName": "amplify-soc-app-test-225156-deployment",
-            "UnauthRoleName": "amplify-soc-app-test-225156-unauthRole",
-            "StackName": "amplify-soc-app-test-225156",
-            "StackId": "arn:aws:cloudformation:us-east-1:606853744219:stack/amplify-soc-app-test-225156/b2b0ead0-407d-11ea-9d78-0acf59e535ed",
-            "AmplifyAppId": "d2c2gi5fnm2927"
-        },
-        "categories": {
-            "auth": {
-                "SocAppMobile": {},
-                "socAppMobile": {}
-            },
-            "function": {
-                "dbConnection": {},
-                "createUser": {},
-                "listUsers": {},
-                "validateNewUser": {},
-                "userPoolCleaner": {},
-                "fetchProfile": {},
-                "editProfile": {},
-                "userList": {},
-                "SocAppMobile": {},
-                "uploadAvatar": {},
-                "chatRoomsApi": {},
-                "messagesNotifier": {},
-                "deviceTokenUpdater": {}
-            }
-        }
-    },
-    "dev": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-soc-app-dev-110127-authRole",
-            "UnauthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-dev-110127-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-dev-110127-authRole",
-            "Region": "us-east-1",
-            "DeploymentBucketName": "amplify-soc-app-dev-110127-deployment",
-            "UnauthRoleName": "amplify-soc-app-dev-110127-unauthRole",
-            "StackName": "amplify-soc-app-dev-110127",
-            "StackId": "arn:aws:cloudformation:us-east-1:606853744219:stack/amplify-soc-app-dev-110127/b1306a10-df96-11ea-af54-0af6b1cd0899",
-            "AmplifyAppId": "d2c2gi5fnm2927"
-        },
-        "categories": {
-            "auth": {
-                "SocAppMobile": {}
-            },
-            "function": {
-                "dbConnection": {},
-                "createUser": {},
-                "listUsers": {},
-                "validateNewUser": {},
-                "userPoolCleaner": {},
-                "fetchProfile": {},
-                "editProfile": {},
-                "uploadAvatar": {},
-                "messagesNotifier": {},
-                "deviceTokenUpdater": {},
-                "chatRoomsApi": {}
-            }
-        }
-    }
+	"dev": {
+		"awscloudformation": {
+			"AuthRoleName": "amplify-soc-app-dev-110127-authRole",
+			"UnauthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-dev-110127-unauthRole",
+			"AuthRoleArn": "arn:aws:iam::606853744219:role/amplify-soc-app-dev-110127-authRole",
+			"Region": "us-east-1",
+			"DeploymentBucketName": "amplify-soc-app-dev-110127-deployment",
+			"UnauthRoleName": "amplify-soc-app-dev-110127-unauthRole",
+			"StackName": "amplify-soc-app-dev-110127",
+			"StackId": "arn:aws:cloudformation:us-east-1:606853744219:stack/amplify-soc-app-dev-110127/b1306a10-df96-11ea-af54-0af6b1cd0899",
+			"AmplifyAppId": "d2c2gi5fnm2927"
+		},
+		"categories": {
+			"auth": {
+				"SocAppMobile": {}
+			},
+			"function": {
+				"dbConnection": {},
+				"createUser": {},
+				"listUsers": {},
+				"validateNewUser": {},
+				"userPoolCleaner": {},
+				"fetchProfile": {},
+				"editProfile": {},
+				"uploadAvatar": {},
+				"messagesNotifier": {},
+				"deviceTokenUpdater": {},
+				"chatRoomsApi": {}
+			}
+		}
+	}
 }
