@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image } from 'react-native';
 import { useMutation } from 'react-apollo';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import { createChat } from '@store/chat-rooms/chat-rooms.actions';
 import { AppState } from '@store/index';
 import createMessageMutation from '../../api/graphql/mutations/createMessage.graphql';
 import preloader2 from '@assets/preloaders/preloader2.gif';
+import { usePrevious } from '@custom-hooks/usePrevious';
 import styles from './styles';
 
 interface ChatInputProps {
@@ -34,8 +35,8 @@ const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
 
   /* TODO Such logic looks pretty complex maybe it could be reworked */
 
-  const [prevChatCreatingProp, setPrevChatCreatingProp] = useState(chatCreating);
-  const [prevChatLoadingProp, setPrevChatLoadingProp] = useState(props.chatLoading);
+  const prevChatCreatingProp = usePrevious(chatCreating);
+  const prevChatLoadingProp = usePrevious(props.chatLoading);
 
   const [creationStage, updateCreationStage] = useState(false);
 
@@ -44,7 +45,6 @@ const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
     if (prevChatCreatingProp && !chatCreating) {
       updateCreationStage(true);
     }
-    setPrevChatCreatingProp(chatCreating);
   }, [chatCreating]);
 
   // send first messae after chat creating
@@ -59,7 +59,6 @@ const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
     if (prevChatLoadingProp && !props.chatLoading && creationStage) {
       updateCreationStage(false);
     }
-    setPrevChatLoadingProp(props.chatLoading);
   }, [props.chatLoading, creationStage]);
 
   const onSend = () => {
