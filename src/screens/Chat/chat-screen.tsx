@@ -39,7 +39,6 @@ interface ChatScreenProps extends NavigationSwitchScreenProps<NavigationParams> 
   openedChatDetails: ChatRoom,
   messages?: Message[];
   loading?: boolean;
-  chatCreating?: boolean;
   refetch: (chatId: string) => Promise<void>;
   subscribeToNewMessages: (chatId: string) => () => void;
   getChatDetails: (chatId: string) => void;
@@ -175,7 +174,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
       <View style={styles.chat}>
         <this.ChatList/>
         <ChatInput
-          chatLoading={loading || this.props.chatCreating}
+          chatLoading={loading}
           interlocutorId={navigation.getParam('interlocutorId')} 
           refetchChat={() => this.props.refetch(chatId)}
           chatId={chatId}/>
@@ -231,7 +230,6 @@ const mapStateToProps = (store: AppState) => ({
   userList: store.usersModule.users,
   profile: store.usersModule.profile!,
   openedChatDetails: store.chatRoomsModule.openedChatDetails,
-  chatCreating: store.chatRoomsModule.chatCreating,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

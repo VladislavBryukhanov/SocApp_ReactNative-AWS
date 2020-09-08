@@ -17,26 +17,9 @@ interface ChatInputProps {
   refetchChat: () => Promise<void>;
 }
 
-// FIXME WIP
-const usePrevious = (value: any) => {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  });
-
-  return ref.current;
-}
-
 const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
   const dispatch = useDispatch();
   const chatCreating = useSelector((store: AppState) => store.chatRoomsModule.chatCreating);
-  const prevChatCreatingProp = usePrevious(chatCreating);
-
-  // console.log("CUR CH CR", chatCreating)
-  // console.log("PREV CH CR", prevChatCreatingProp)
-
-  const [creationStage, updateCreationStage] = useState(prevChatCreatingProp && !chatCreating);
-  // console.log("CCS", creationStage)
 
   const [message, setMessage] = useState('');
   const [addMessage, { loading }] = useMutation(createMessageMutation, {
@@ -49,11 +32,35 @@ const ChatInput: React.FC<ChatInputProps> = (props: ChatInputProps) => {
     onCompleted: () => setMessage('')
   });
 
-   useEffect(() => {
-    if (message && props.chatId) {
+  /* TODO Such logic looks pretty complex maybe it could be reworked */
+
+  const [prevChatCreatingProp, setPrevChatCreatingProp] = useState(chatCreating);
+  const [prevChatLoadingProp, setPrevChatLoadingProp] = useState(props.chatLoading);
+
+  const [creationStage, updateCreationStage] = useState(false);
+
+  // detect chat creating stage and keep preloaders until first message sent
+  useEffect(() => {
+    if (prevChatCreatingProp && !chatCreating) {
+      updateCreationStage(true);
+    }
+    setPrevChatCreatingProp(chatCreating);
+  }, [chatCreating]);
+
+  // send first messae after chat creating
+  useEffect(() => {
+    if (creationStage && message && props.chatId) {
       addMessage().then(() => props.refetchChat());
     }
-  }, [props.chatId]);
+  }, [props.chatId, creationStage]);
+
+  // end creating stage after message sent - loading started again after chat creating
+  useEffect(() => {
+    if (prevChatLoadingProp && !props.chatLoading && creationStage) {
+      updateCreationStage(false);
+    }
+    setPrevChatLoadingProp(props.chatLoading);
+  }, [props.chatLoading, creationStage]);
 
   const onSend = () => {
       // "create chat if not exists"
