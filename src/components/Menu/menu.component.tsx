@@ -54,7 +54,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   signOut: () => dispatch(signOut())
 })
 
-export default compose<AppMenuProps>(
+export default compose<React.FC>(
   connect(null,  mapDispatchToProps),
   withNavigation
 )(AppMenu);

@@ -1,11 +1,11 @@
 import API from '@aws-amplify/api';
-import { profileApiConf } from '@api/api-gateway/api-configs';
-import { CognitoAuth } from '@api/auth';
+import { ApiConfigs } from '@api/api-gateway/api-configs';
 import { User } from '@models/user';
 import lambdaInvoker from '../lambdaInvoker';
-import { HttpApi } from '@api/api-gateway/native-api';
+import { BaseRepository } from './base.repository';
+// import { HttpApi } from '@api/api-gateway/native-api';
 
-class UsersRepository {
+class UsersRepository extends BaseRepository {
   // private http?: HttpApi;
   
   // get httpApi() {
@@ -32,37 +32,29 @@ class UsersRepository {
   }
 
   async fetchProfile(): Promise<User> {
-    const { apiName } = profileApiConf;
-    const token = await CognitoAuth.retreiveSessionToken();
-    const requestParams = { 
-      headers: { Authorization: token } 
-    };
-
-    const { profile } = await API.get(apiName, '/fetch', requestParams);
-
-    return profile;
+    const authHeader = await this.buildAuthHeader();
+    return API.get(this.apiName, '/fetch', { headers: authHeader })
+      .then(({ profile }) => profile);
   }
 
   async updateNotificationToken(notificationToken: string) {
-    const { apiName } = profileApiConf;
-    const token = await CognitoAuth.retreiveSessionToken();
+    const authHeader = await this.buildAuthHeader();
     const requestParams = { 
-      headers: { Authorization: token },
+      headers: authHeader,
       body: { notificationToken }
     };
 
-    return API.put(apiName, '/notificationToken', requestParams)
+    return API.put(this.apiName, '/notificationToken', requestParams);
   }
 
   async editProfile(changes: Partial<User>): Promise<User> {
-    const { apiName } = profileApiConf;
-    const token = await CognitoAuth.retreiveSessionToken();
+    const authHeader = await this.buildAuthHeader();
     const requestParams = { 
-      headers: { Authorization: token },
+      headers: authHeader,
       body: changes 
     };
 
-    return API.put(apiName, '/update', requestParams);
+    return API.put(this.apiName, '/update', requestParams);
   }
 
   async uploadProfileAvatar(
@@ -70,15 +62,14 @@ class UsersRepository {
     fileType: string,
     extension: string
   ): Promise<{ s3Key: string }> {
-    const { apiName } = profileApiConf;
-    const token = await CognitoAuth.retreiveSessionToken();
+    const authHeader = await this.buildAuthHeader();
     const requestParams = {
-      headers: { Authorization: token },
+      headers: authHeader,
       body: { base64File, fileType, extension }
     };
 
-    return API.post(apiName, '/uploadAvatar', requestParams);
+    return API.post(this.apiName, '/uploadAvatar', requestParams);
   }
 }
 
-export default new UsersRepository();
+export default new UsersRepository(ApiConfigs.profile.apiName);

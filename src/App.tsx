@@ -7,17 +7,18 @@ import { AppState } from './store';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import { displayDataNotification } from '@helpers/displayDataNotification';
 import { User } from '@models/user';
+import { ChatRoom } from '@models/chat-room';
 
 interface AppProps  {
   isAuthenticated?: boolean;
   cognitoUsername?: string;
-  openedChat: string | null;
+  openedChat?: ChatRoom;
 }
 
 const App: React.FC<AppProps> = ({ isAuthenticated, openedChat, cognitoUsername }: AppProps) => {
   const notificationHandler = (message: FirebaseMessagingTypes.RemoteMessage) => {
     const sender: User = JSON.parse(message.data!.sender);
-    const isCurrentChat = openedChat === message.data!.chatId;
+    const isCurrentChat = openedChat && openedChat.id === message.data!.chatId;
     const isSentByMe = sender.id === cognitoUsername;
 
     if (!isCurrentChat && !isSentByMe) {
@@ -42,7 +43,7 @@ const App: React.FC<AppProps> = ({ isAuthenticated, openedChat, cognitoUsername 
 const mapStateToProps = (store: AppState) => ({
   isAuthenticated: store.authModule.isAuthenticated,
   cognitoUsername: store.authModule.cognitoUsername,
-  openedChat: store.appSharedModule.openedChat,
+  openedChat: store.chatRoomsModule.openedChatDetails,
 });
 
 export default connect(mapStateToProps)(App);

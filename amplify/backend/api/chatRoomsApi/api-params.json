@@ -1,0 +1,41 @@
+{
+    "paths": [
+        {
+            "name": "/chat",
+            "lambdaFunction": "chatRoomsApi",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/POST",
+                    "/GET",
+                    "/PUT",
+                    "/PATCH",
+                    "/DELETE"
+                ]
+            }
+        }
+    ],
+    "resourceName": "chatRoomsApi",
+    "apiName": "chatRoomsApi",
+    "functionArns": [
+        {
+            "lambdaFunction": "chatRoomsApi"
+        }
+    ],
+    "privacy": {
+        "auth": 1,
+        "unauth": 0,
+        "authRoleName": "amplify-soc-app-test-225156-authRole",
+        "unAuthRoleName": "amplify-soc-app-test-225156-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "chatRoomsApi",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

@@ -2,7 +2,7 @@ import React from 'react';
 import { AppRegistry } from 'react-native';
 import firebase from '@react-native-firebase/app';
 import { Provider } from 'react-redux';
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider } from 'react-apollo';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { apolloClient } from '@api/graphql';
 import { store } from '@store/index';

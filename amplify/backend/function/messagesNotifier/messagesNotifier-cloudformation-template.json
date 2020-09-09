@@ -90,8 +90,8 @@
 				"Runtime": "nodejs10.x",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "amplify-soc-app-test-225156-deployment",
-					"S3Key": "amplify-builds/messagesNotifier-51503441562b49563568-build.zip"
+					"S3Bucket": "amplify-soc-app-dev-110127-deployment",
+					"S3Key": "amplify-builds/messagesNotifier-70474e74666f5a384e69-build.zip"
 				}
 			}
 		},

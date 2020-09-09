@@ -1,9 +1,4 @@
-#set ($senderKey = {
-	"id": $context.identity.claims.get("sub"),
-  "username": $context.identity.claims.get("preferred_username")
-})
-
-$util.qr($context.args.input.put("senderKey", $senderKey))
+$util.qr($context.args.input.put("senderId", $context.identity.claims.get("sub")))
 $util.qr($context.args.input.put("createdAt", $util.time.nowISO8601()))
 $util.qr($context.args.input.put("isRead", false))
 

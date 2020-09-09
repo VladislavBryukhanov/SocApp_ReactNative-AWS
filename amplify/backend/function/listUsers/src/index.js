@@ -11,17 +11,10 @@ const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+const TableName = process.env.STORAGE_USERLIST_NAME;
 
-let tableName = "userList";
-if(process.env.ENV && process.env.ENV !== "NONE") {
-  tableName = `${tableName}-${process.env.ENV}`;
-}
-
-const queryParams = {
-  TableName: tableName
-};
-
+//TODO Paging
 exports.handler = function (event, context, callback) {
   context.callbackWaitsForEmptyEventLoop = false;
-  dynamodb.scan(queryParams, callback);
+  dynamodb.scan({ TableName, ProjectionExpression: 'id, nickname, avatar, username, bio' }, callback);
 };

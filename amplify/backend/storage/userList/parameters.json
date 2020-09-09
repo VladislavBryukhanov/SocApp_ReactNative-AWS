@@ -1,7 +1,5 @@
 {
     "tableName": "userList",
     "partitionKeyName": "id",
-    "partitionKeyType": "S",
-    "sortKeyName": "username",
-    "sortKeyType": "S"
+    "partitionKeyType": "S"
 }

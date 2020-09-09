@@ -35,10 +35,7 @@ subscription onCreateMessage(
   ) {
     id
     chatId
-    senderKey {
-      id
-      username
-    }
+    senderId
     content
     createdAt
     isRead

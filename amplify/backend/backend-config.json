@@ -15,6 +15,18 @@
         "messages": {
             "service": "DynamoDB",
             "providerPlugin": "awscloudformation"
+        },
+        "chatRooms": {
+            "service": "DynamoDB",
+            "providerPlugin": "awscloudformation"
+        },
+        "chatMembers": {
+            "service": "DynamoDB",
+            "providerPlugin": "awscloudformation"
+        },
+        "users": {
+            "service": "DynamoDB",
+            "providerPlugin": "awscloudformation"
         }
     },
     "function": {
@@ -194,6 +206,37 @@
                     ]
                 }
             ]
+        },
+        "chatRoomsApi": {
+            "build": true,
+            "providerPlugin": "awscloudformation",
+            "service": "Lambda",
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "userList",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "chatRooms",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "storage",
+                    "resourceName": "chatMembers",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ]
         }
     },
     "api": {
@@ -242,6 +285,20 @@
                 {
                     "category": "function",
                     "resourceName": "deviceTokenUpdater",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ]
+        },
+        "chatRoomsApi": {
+            "service": "API Gateway",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [
+                {
+                    "category": "function",
+                    "resourceName": "chatRoomsApi",
                     "attributes": [
                         "Name",
                         "Arn"

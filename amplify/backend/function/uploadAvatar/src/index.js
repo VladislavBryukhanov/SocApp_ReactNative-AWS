@@ -58,13 +58,13 @@ exports.handler = async (event) => {
     const { avatar } = await db.fetchUserProfile();
 
     await Promise.all([
-      storage.deleteObject({ Key: avatar }).promise(),
+      avatar && storage.deleteObject({ Key: avatar }).promise(),
       storage.putObject(options).promise(),
       db.updateDynamodbTable({ [AVATAR_DB_KEY]: objectKey })
     ]);
   } catch (err) {
     return {
-      statusCode: 400,
+      statusCode: 500,
       body: JSON.stringify({ message: err })
     };
   }

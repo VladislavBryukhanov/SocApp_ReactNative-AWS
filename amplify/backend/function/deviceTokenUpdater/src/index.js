@@ -6,24 +6,21 @@ var storageUserListName = process.env.STORAGE_USERLIST_NAME
 var storageUserListArn = process.env.STORAGE_USERLIST_ARN
 
 Amplify Params - DO NOT EDIT */
+const UsersDB = require('/opt/nodejs/db-utils');
 const AWS = require('aws-sdk');
 AWS.config.update({ region: process.env.REGION });
 
 const SNS = new AWS.SNS();
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const PlatformApplicationArn = process.env.SNS_APPLICATION_ARN;
 const TableName = process.env.STORAGE_USERLIST_NAME;
 const TopicArn = process.env.SNS_MSG_TOPIC_ARN;
 
 exports.handler = async (event) => {
-    const { sub: id, preferred_username: username } = event.requestContext.authorizer.claims;
     const { notificationToken } = JSON.parse(event.body);
-
-    const user = await dynamodb.get({
-        TableName,
-        Key: { id, username },
-    }).promise();
+    const db = new UsersDB(dynamoDb, TableName, event);
+    const user = await db.fetchUserProfile();
 
     if (user.snsCreds && user.snsCreds.notificationToken === notificationToken) {
         return { statusCode: 204 };
@@ -53,18 +50,11 @@ exports.handler = async (event) => {
         );
     }
 
-    const [{ ResponseMetadata: { SubscriptionArn } }] = await Promise.all(promises);
-    
-    await dynamodb.update({
-        TableName,
-        Key: { id, username },
-        AttributeUpdates: { 
-            snsCreds: {
-                Action: 'PUT',
-                Value: { notificationToken, EndpointArn, SubscriptionArn },
-            }
-        }
-    }).promise();
+    const [{ SubscriptionArn }] = await Promise.all(promises);
+
+    await db.updateDynamodbTable({
+        snsCreds: { notificationToken, EndpointArn, SubscriptionArn }
+    });
 
     return { 
         statusCode: 200,

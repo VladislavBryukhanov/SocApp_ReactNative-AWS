@@ -1,6 +1,11 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
+  preloader: {
+    height: 35,
+    width: 35,
+    margin: 6,
+  },
   chatInput: {
     flexDirection:'row',
     flexWrap:'wrap',

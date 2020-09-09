@@ -1,13 +1,21 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { NavigationScreenProp, NavigationSwitchScreenProps } from 'react-navigation';
+import { NavigationScreenProp, NavigationSwitchScreenProps, withNavigation } from 'react-navigation';
 import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
 import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 import { FAB } from 'react-native-paper';
+import { AppState } from '@store/index';
+import { Dispatch, compose } from 'redux';
+import { findDirectByInterlocutor } from '@store/chat-rooms/chat-rooms.actions';
+import { connect } from 'react-redux';
+import { ChatRoom } from '@models/chat-room';
 
-interface ProfileScreeProps extends NavigationSwitchScreenProps {}
+interface ProfileScreeProps extends NavigationSwitchScreenProps {
+  lastFoundDirect: ChatRoom;
+  findDirectByInterlocutor: (interlocutorId: string) => Promise<void>;
+}
 
 type NavigationProps = NavigationScreenProp<{ screenName: string }>;
 
@@ -23,11 +31,16 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
     title: navigation.getParam('screenName')
   });
 
-  onOpenChat = () => {
-    this.props.navigation.navigate('Chat', { 
-      // chatId: 'test' 
-      // TODO replace with ids
-      chatId: this.props.navigation.getParam('user').username
+  onOpenChat = async () => {
+    const { id: interlocutorId } = this.props.navigation.getParam('user');
+    await this.props.findDirectByInterlocutor(interlocutorId);
+
+    if (!this.props.lastFoundDirect) {
+      return this.props.navigation.navigate('Chat', { interlocutorId });
+    };
+
+    this.props.navigation.navigate('Chat', {
+      chatId: this.props.lastFoundDirect.id
     });
   };
 
@@ -73,4 +86,15 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
   }
 }
 
-export default ProfileScreen;
+const mapStateToProps = (store: AppState) => ({
+  lastFoundDirect: store.chatRoomsModule.lastFoundDirect
+});
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  findDirectByInterlocutor: (interlocutorId: string) => dispatch(findDirectByInterlocutor(interlocutorId))
+});
+
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  withNavigation
+)(ProfileScreen);
