@@ -28,9 +28,9 @@ class ProfileScreen extends React.Component<ProfileScreeProps, ProfieScreenState
 
   static navigationOptions = ({ navigation }: { navigation: NavigationProps }) => {
     const user = navigation.getParam('user');
-    return {
-      title: startCase(user.nickname)
-    }
+    const title = startCase(user.nickname);
+
+    return { title };
   };
 
   onOpenChat = async () => {

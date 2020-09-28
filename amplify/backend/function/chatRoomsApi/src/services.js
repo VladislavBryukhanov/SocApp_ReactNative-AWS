@@ -8,34 +8,37 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 const ROOMS_TABLE = process.env.STORAGE_CHATROOMS_NAME;
 const MEMBERS_TABLE = process.env.STORAGE_CHATMEMBERS_NAME;
 const USERS_TABLE = process.env.STORAGE_USERLIST_NAME;
+const MESSAGES_TABLE = process.env.STORAGE_MESSAGES_NAME;
 
-// TODO index const
 const MEMBERS_USER_ID_INDEX = 'chatMembers-userId';
 const MEMBERS_CHAT_ID_INDEX = 'chatMembers-chatId';
+const MESSAGES_CHAT_ID_CREATED_AT_INDEX = 'messages-chatId-createdAt-index';
 
 const findDirectByInterlocutor = async (myId, interlocutorId, errHandler) => {
-  let interlocutorChatMembership, myChatMembership, chat;
+  let interlocutorChatMembership, myChatMembership;
 
-  const fetchMembersByUserId = async (userId) => {
-    try {
-      return await dynamodb.query({
-        TableName: MEMBERS_TABLE,
-        IndexName: MEMBERS_USER_ID_INDEX,
-        KeyConditionExpression: "userId=:userId",
-        ExpressionAttributeValues: {
-          ":userId": userId
-        },
-        ProjectionExpression: 'chatId'
-      }).promise();
-    } catch (err) {
-      return errHandler(500, "Error searching user in ChatMember table", err);
-    }
-  };
-
-  ([{ Items: interlocutorChatMembership }, { Items: myChatMembership }] = await Promise.all([
-    fetchMembersByUserId(interlocutorId),
-    fetchMembersByUserId(myId)
-  ]));
+  const fetchMembersByUserId = userId =>
+    dynamodb.query({
+      TableName: MEMBERS_TABLE,
+      IndexName: MEMBERS_USER_ID_INDEX,
+      KeyConditionExpression: "userId=:userId",
+      ExpressionAttributeValues: {
+        ":userId": userId
+      },
+      ProjectionExpression: "chatId"
+    }).promise();
+  
+  try {
+    ([
+      { Items: interlocutorChatMembership },
+      { Items: myChatMembership }
+    ] = await Promise.all([
+      fetchMembersByUserId(interlocutorId),
+      fetchMembersByUserId(myId)
+    ]));
+  } catch (err) {
+    return errHandler(500, "Error searching users in ChatMember table", err);
+  }
 
   const targetRelation = interlocutorChatMembership.reduce((res, item) => {
     return myChatMembership.find(({ chatId }) => chatId === item.chatId);
@@ -46,15 +49,15 @@ const findDirectByInterlocutor = async (myId, interlocutorId, errHandler) => {
   }
 
   try {
-    ({ Item: chat } = await dynamodb.get({
+    const { Item: chat } = await dynamodb.get({
       TableName: ROOMS_TABLE,
       Key: { id: targetRelation.chatId }
-    }).promise());
+    }).promise();
+
+    return chat;
   } catch (err) {
     return errHandler(500, "Error searching chat by interlocutor's chatId", err);
   }
-
-  return chat;
 };
 
 // TODO implement paging
@@ -62,26 +65,32 @@ exports.getActiveChats = async (req, res) => {
   const errHandler = (code, msg, err) => errorHandler(res, "getActiveChats", code, msg, err);
   const { sub: userId } = req.apiGateway.event.requestContext.authorizer.claims;
 
-  let chatRelations, chatList;
+  let chatIds, chatList;
 
+  // Fetch chats mentioned by authorized user
   try {
-    ({ Items: chatRelations } = await dynamodb.query({
+    const { Items: chatRelations } = await dynamodb.query({
       TableName: MEMBERS_TABLE,
       IndexName: MEMBERS_USER_ID_INDEX,
       KeyConditionExpression: "userId=:interlocutorId",
       ExpressionAttributeValues: {
         ":interlocutorId": userId
-      }
-    }).promise());
+      },
+      ProjectionExpression: "chatId"
+    }).promise();
+
+    chatIds = chatRelations.map(({ chatId }) => chatId);
   } catch (err) {
     return errHandler(500, "Error fetching members object by personal userId", err);
   }
 
   try {
-    ({ Responses: { [ROOMS_TABLE]: chatList } } = await dynamodb.batchGet({
+    ({ Responses: { 
+      [ROOMS_TABLE]: chatList
+    }} = await dynamodb.batchGet({
       RequestItems: {
         [ROOMS_TABLE]: {
-          Keys: chatRelations.map(({ chatId }) => ({ id: chatId }))
+          Keys: chatIds.map(id => ({ id }))
         }
       }
     }).promise());
@@ -89,33 +98,60 @@ exports.getActiveChats = async (req, res) => {
     return errHandler(500, "Error fetching chat rooms by personal member objects", err);
   }
 
-  try {
-    const chatsWithoutName = chatList.filter(({ name }) => !name);
-    const associatedUserIds = chatsWithoutName.map(({ id, membersMetaIds }) => ({ 
-      chatId: id,
-      interlocutorId: membersMetaIds.find(({ id }) => id !== userId)
-    }));
+  // Fetch last message that wrote in each chat
+  const messsagesQueries = chatIds.map(chatId =>
+    dynamodb.query({
+      TableName: MESSAGES_TABLE,
+      IndexName: MESSAGES_CHAT_ID_CREATED_AT_INDEX,
+      ScanIndexForward: false,
+      Limit: 1,
+      KeyConditionExpression: "chatId=:chatId",
+      ExpressionAttributeValues: {
+        ":chatId": chatId,
+      },
+    })
+    .promise()
+    .then(({ Items: [user] }) => user)
+  );
+  const queryMessagesPromise = Promise.all(messsagesQueries);
 
-    const { Responses: { [USERS_TABLE]: userList } } = await dynamodb.batchGet({
-      RequestItems: {
-        [USERS_TABLE]: {
-          Keys: associatedUserIds.map(({ interlocutorId }) => ({ id: interlocutorId }))
-        }
+  // Find chats without name and set name and avatar of single interlocutor, as such chats are directs
+  const chatsWithoutName = chatList.filter(({ name }) => !name);
+  const associatedUserIds = chatsWithoutName.map(({ id, membersMetaIds }) => ({ 
+    chatId: id,
+    interlocutorId: membersMetaIds.find(({ id }) => id !== userId)
+  }));
+
+  const usersQueryPromise = dynamodb.batchGet({
+    RequestItems: {
+      [USERS_TABLE]: {
+        Keys: associatedUserIds.map(({ interlocutorId }) => ({ id: interlocutorId }))
       }
-    }).promise();
+    }
+  })
+  .promise()
+  .then(({ Responses }) => Responses[USERS_TABLE]);
 
-    associatedUserIds.forEach(association => {
+  try {
+    const [ userList, messages ] = await Promise.all([ usersQueryPromise, queryMessagesPromise ]);
+
+    const resultChatList = associatedUserIds.map(association => {
       const targetChat = chatList.find(({ id }) => id === association.chatId);
       const interlocutor = userList.find(({ id }) => id === association.interlocutorId);
+      const lastMessage = messages.find(({ chatId }) => chatId === association.chatId);
 
-      targetChat.name = interlocutor.nickname;
-      targetChat.avatar = interlocutor.avatar;
-    })    
+      return {
+        ...targetChat,
+        name: interlocutor.nickname,
+        avatar: interlocutor.avatar,
+        lastMessage
+      }
+    });
+    
+    res.json(resultChatList);
   } catch (err) {
-    return errHandler(500, "Error fetching users by memebersMetaIds", err);
+    return errHandler(500, "Error fetching users by memebersMetaIds OR last messages fetching", err);
   }
-
-  res.json(chatList);
 };
 
 exports.findDirectByInterlocutor = async (req, res) => {

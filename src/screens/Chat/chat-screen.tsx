@@ -87,7 +87,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
   
   static navigationOptions = ({ navigation }: NavigationSwitchScreenProps<NavigationParams>) => {
     const { chatDetails, interlocutor } = navigation.state.params!;
-    const chatName = (chatDetails && chatDetails.name) || (interlocutor && interlocutor.nickname)
+    const chatName = (chatDetails && chatDetails.name) || (interlocutor && interlocutor.nickname);
 
     return { title: chatName };
   }

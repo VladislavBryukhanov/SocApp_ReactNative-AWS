@@ -11,15 +11,19 @@ import {
   CHAT_CREATED,
 } from '@store/action-types';
 import { CreateChatRoom } from '@models/chat-room';
+import { joinAvatar } from '@helpers/join-avatar';
 
 export const fetchActiveChats = (): any => (
   async (dispatch: Dispatch) => {
     try {
       const chatList = await ChatRoomsRepository.list();
+      const chatRooms = await Promise.all(
+        chatList.map(joinAvatar)
+      );
 
       dispatch({
         type: FETCH_ACTIVE_CHATS,
-        payload: { chatList }
+        payload: { chatList: chatRooms }
       });
     } catch (err) {
       errorHandler(err, 'fetchActiveChats');

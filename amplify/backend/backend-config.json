@@ -222,6 +222,14 @@
                 },
                 {
                     "category": "storage",
+                    "resourceName": "messages",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "storage",
                     "resourceName": "chatRooms",
                     "attributes": [
                         "Name",
