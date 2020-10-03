@@ -9,8 +9,10 @@ import {
   CLOSE_CHAT,
   CHAT_CREATING,
   CHAT_CREATED,
+  UPDATE_LAST_MESSAGE,
 } from '@store/action-types';
 import { CreateChatRoom } from '@models/chat-room';
+import { Message } from '@models/message';
 import { joinAvatar } from '@helpers/join-avatar';
 
 export const fetchActiveChats = (): any => (
@@ -72,5 +74,10 @@ export const getChatDetails = (chatId: string): any =>
       errorHandler(err, 'getCahtDetails');
     }
   }
+
+export const updateChatLastMessage = (lastMessage: Message) => ({
+  type: UPDATE_LAST_MESSAGE,
+  payload: { lastMessage },
+});
 
 export const disposeChat = () => ({ type: CLOSE_CHAT, payload: {} });

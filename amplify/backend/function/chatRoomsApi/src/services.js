@@ -119,7 +119,7 @@ exports.getActiveChats = async (req, res) => {
   const chatsWithoutName = chatList.filter(({ name }) => !name);
   const associatedUserIds = chatsWithoutName.map(({ id, membersMetaIds }) => ({ 
     chatId: id,
-    interlocutorId: membersMetaIds.find(({ id }) => id !== userId)
+    interlocutorId: membersMetaIds.find(id => id !== userId)
   }));
 
   const usersQueryPromise = dynamodb.batchGet({
