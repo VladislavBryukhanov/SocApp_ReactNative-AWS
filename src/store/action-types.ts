@@ -27,3 +27,4 @@ export const GET_CHAT_DETAILS = 'get_chat_details';
 export const CLOSE_CHAT = 'close_chat';
 export const CHAT_CREATING = 'chat_creating';
 export const CHAT_CREATED = 'chat_created';
+export const UPDATE_LAST_MESSAGE = 'update_last_message';

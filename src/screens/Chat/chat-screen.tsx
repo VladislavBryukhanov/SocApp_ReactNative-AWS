@@ -30,7 +30,7 @@ YellowBox.ignoreWarnings(['Setting a timer']);
 type NavigationParams = {
   chatId?: string;
   chatDetails?: ChatRoom;
-  interlocutorId?: string;
+  interlocutor?: User;
 }
 
 interface ChatScreenProps extends NavigationSwitchScreenProps<NavigationParams> {
@@ -85,9 +85,12 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
     }
   }
   
-  static navigationOptions = ({ navigation }: NavigationSwitchScreenProps<NavigationParams>) => ({
-    title: navigation.state.params!.chatDetails && navigation.state.params!.chatDetails.name
-  })
+  static navigationOptions = ({ navigation }: NavigationSwitchScreenProps<NavigationParams>) => {
+    const { chatDetails, interlocutor } = navigation.state.params!;
+    const chatName = (chatDetails && chatDetails.name) || (interlocutor && interlocutor.nickname);
+
+    return { title: chatName };
+  }
 
   messageTemplate = ({ item }: { item: Message }) => {
     const sentByMe = item.senderId === this.props.profile.id;
@@ -168,6 +171,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
 
   render() {
     const { loading, navigation, openedChatDetails } = this.props;
+    const interlocutor = navigation.getParam('interlocutor');
     const chatId = openedChatDetails && openedChatDetails.id;
 
     return (
@@ -175,9 +179,10 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
         <this.ChatList/>
         <ChatInput
           chatLoading={loading}
-          interlocutorId={navigation.getParam('interlocutorId')} 
+          chatId={chatId}
+          interlocutorId={interlocutor && interlocutor.id} 
           refetchChat={() => this.props.refetch(chatId)}
-          chatId={chatId}/>
+        />
       </View>
     );
   }

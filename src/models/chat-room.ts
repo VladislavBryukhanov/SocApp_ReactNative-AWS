@@ -1,4 +1,5 @@
 import { User } from "./user";
+import { Message } from "./message";
 
 export interface ChatRoom {
     id: string;
@@ -7,6 +8,7 @@ export interface ChatRoom {
     avatar?: string;
     chatOwner?: User;
     members?: User[];
+    lastMessage: Message;
 }
 
 export interface CreateChatRoom {

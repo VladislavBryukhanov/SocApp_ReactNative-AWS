@@ -17,12 +17,12 @@ const MESSAGE_RECEIVED_TAG = 'message-received';
 const TopicArn = process.env.SNS_MSG_TOPIC_ARN;
 const TableName = process.env.STORAGE_USERLIST_NAME;
 
-exports.handler = async (event, context, callback) => {
+exports.handler = async event => {
     const record = event.Records.find(({ eventName }) => eventName === 'INSERT');
 
     if (!record) return;
 
-    const { createdAt, senderId, content, chatId } = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+    const { createdAt, senderId, content, chatId, id } = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
     
     const { Item: sender } = await dynamodb.get({
         TableName,
@@ -32,6 +32,7 @@ exports.handler = async (event, context, callback) => {
     const notificationPayload = {
         data: {
             tag: MESSAGE_RECEIVED_TAG,
+            messageId: id,
             message: content,
             chatId,
             createdAt,
@@ -51,5 +52,5 @@ exports.handler = async (event, context, callback) => {
         TopicArn,
     };
     
-    SNS.publish(params, callback);   
+    return SNS.publish(params).promise();
 };

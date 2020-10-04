@@ -17,31 +17,34 @@ interface ProfileScreeProps extends NavigationSwitchScreenProps {
   findDirectByInterlocutor: (interlocutorId: string) => Promise<void>;
 }
 
+interface ProfieScreenState {
+  chatOpening: boolean;
+}
+
 type NavigationProps = NavigationScreenProp<{ screenName: string }>;
 
-class ProfileScreen extends React.Component<ProfileScreeProps> {
-  componentDidMount() {
-    const user = this.props.navigation.getParam('user');
-    const screenName = startCase(user.nickname);
+class ProfileScreen extends React.Component<ProfileScreeProps, ProfieScreenState> {
+  state = { chatOpening: false }
 
-    this.props.navigation.setParams({ screenName });
-  }
+  static navigationOptions = ({ navigation }: { navigation: NavigationProps }) => {
+    const user = navigation.getParam('user');
+    const title = startCase(user.nickname);
 
-  static navigationOptions = ({ navigation }: { navigation: NavigationProps }) => ({
-    title: navigation.getParam('screenName')
-  });
+    return { title };
+  };
 
   onOpenChat = async () => {
-    const { id: interlocutorId } = this.props.navigation.getParam('user');
-    await this.props.findDirectByInterlocutor(interlocutorId);
+    this.setState({ chatOpening: true });
 
-    if (!this.props.lastFoundDirect) {
-      return this.props.navigation.navigate('Chat', { interlocutorId });
-    };
+    const interlocutor = this.props.navigation.getParam('user');
+    await this.props.findDirectByInterlocutor(interlocutor.id);
 
-    this.props.navigation.navigate('Chat', {
-      chatId: this.props.lastFoundDirect.id
+    this.props.navigation.navigate('Chat', { 
+      interlocutor,
+      chatId: this.props.lastFoundDirect && this.props.lastFoundDirect.id
     });
+
+    this.setState({ chatOpening: false });
   };
 
   render() {
@@ -80,6 +83,7 @@ class ProfileScreen extends React.Component<ProfileScreeProps> {
           style={styles.chatBtn}
           icon="message-text"
           onPress={this.onOpenChat}
+          disabled={this.state.chatOpening}
         />
       </ScrollView>
     )
