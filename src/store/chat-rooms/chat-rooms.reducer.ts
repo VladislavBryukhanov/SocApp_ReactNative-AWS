@@ -46,7 +46,18 @@ export const chatRoomsReducer: Reducer<ChatRoomsState, ChatRoomAction> = handleA
   },
   [FETCH_ACTIVE_CHATS]: (state, { payload: { chatList } }: ChatRoomAction) => ({ ...state, activeChats: chatList }),
   [CHAT_CREATING]: (state) => ({ ...state, chatCreating: true }),
-  [CHAT_CREATED]: (state) => ({ ...state, chatCreating: false }),
+  [CHAT_CREATED]: (state, { payload: { chat } }: ChatRoomAction) => {
+    const activeChats = state.activeChats || [];
+    
+    if (chat) {
+      activeChats.push(chat);
+    }
+
+    return { ...state,
+      chatCreating: false,
+      activeChats
+    };
+  },
   [FIND_DIRECT_BY_INTERLOCUTOR]: (state, { payload: { chat } }: ChatRoomAction) => ({ ...state, lastFoundDirect: chat }),
   [DISPOSE_DIRECT_SEARCH_RESULT]: (state) => ({ ...state, lastFoundDirect: undefined }),
   [GET_CHAT_DETAILS]: (state, { payload: { detailedChat } }: ChatRoomAction) => ({ ...state, openedChatDetails: detailedChat }),

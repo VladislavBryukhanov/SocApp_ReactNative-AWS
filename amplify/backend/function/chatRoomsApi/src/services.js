@@ -84,6 +84,10 @@ exports.getActiveChats = async (req, res) => {
     return errHandler(500, "Error fetching members object by personal userId", err);
   }
 
+  if (!chatIds.length) {
+    return res.send([]);
+  }
+  
   try {
     ({ Responses: { 
       [ROOMS_TABLE]: chatList
@@ -98,7 +102,7 @@ exports.getActiveChats = async (req, res) => {
     return errHandler(500, "Error fetching chat rooms by personal member objects", err);
   }
 
-  // Fetch last message that wrote in each chat
+  // Fetch last message from each chat
   const messsagesQueries = chatIds.map(chatId =>
     dynamodb.query({
       TableName: MESSAGES_TABLE,

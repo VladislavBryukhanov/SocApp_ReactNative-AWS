@@ -52,12 +52,24 @@ const ChatListScreen: React.FC<NavigationSwitchScreenProps> & { navigationOption
     }
   }, []);
 
-  return activeChats ? (
+  if (!activeChats) {
+    return <Preloader/>;
+  }
+
+  if (!activeChats.length) {
+    return (
+      <View style={styles.notFoundView}>
+        <Text style={styles.notFoundText}>You have not any chats</Text>
+      </View>
+    );
+  }
+
+  return (
     <FlatList
       data={activeChats}
       renderItem={chatRoomTemplate}
     />
-  ) : <Preloader/>
+  );
 }
 
 ChatListScreen.navigationOptions = () => ({

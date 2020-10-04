@@ -14,6 +14,7 @@ import {
 import { CreateChatRoom } from '@models/chat-room';
 import { Message } from '@models/message';
 import { joinAvatar } from '@helpers/join-avatar';
+import { AppState } from '../index';
 
 export const fetchActiveChats = (): any => (
   async (dispatch: Dispatch) => {
@@ -34,14 +35,21 @@ export const fetchActiveChats = (): any => (
 );
 
 export const createChat = (chatPayload: CreateChatRoom): any => 
-  async (dispatch: Dispatch) => {
+  async (dispatch: Dispatch, getState: () => AppState) => {
     try {
       dispatch({ type: CHAT_CREATING });
 
-      const chat = await ChatRoomsRepository.create(chatPayload);
+      const newChat = await ChatRoomsRepository.create(chatPayload);
 
-      dispatch({ type: CHAT_CREATED });
-      dispatch(getChatDetails(chat.id));
+      await dispatch(getChatDetails(newChat.id));
+
+      const detailedChat = getState().chatRoomsModule.openedChatDetails!;
+      const resultChat = await joinAvatar(detailedChat);
+
+      dispatch({ 
+        type: CHAT_CREATED,
+        payload: { chat: resultChat }
+      });
     } catch (err) {
       errorHandler(err, 'createChat');
     }

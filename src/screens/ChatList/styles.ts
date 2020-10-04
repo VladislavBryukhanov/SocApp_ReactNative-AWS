@@ -42,5 +42,15 @@ export default StyleSheet.create({
   textData: {
     flex: 1,
     paddingVertical: 2
+  },
+  notFoundView: {
+    flex: 1,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+  notFoundText: {
+    color: customColors.primary,
+    fontSize: 20,
+    fontWeight: 'bold',
   }
 });
