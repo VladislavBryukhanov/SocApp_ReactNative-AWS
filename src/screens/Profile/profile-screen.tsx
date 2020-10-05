@@ -54,7 +54,7 @@ class ProfileScreen extends React.Component<ProfileScreeProps, ProfieScreenState
     return (
       <ScrollView contentContainerStyle={styles.profileView}>
         <CachedImageLoaded
-          imageUrl={avatar}
+          s3Key={avatar}
           style={styles.avatar}
           defaultImage={defaultAvatar}
         />

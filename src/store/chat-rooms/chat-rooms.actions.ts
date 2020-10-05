@@ -13,20 +13,15 @@ import {
 } from '@store/action-types';
 import { CreateChatRoom } from '@models/chat-room';
 import { Message } from '@models/message';
-import { joinAvatar } from '@helpers/join-avatar';
 import { AppState } from '../index';
 
 export const fetchActiveChats = (): any => (
   async (dispatch: Dispatch) => {
     try {
       const chatList = await ChatRoomsRepository.list();
-      const chatRooms = await Promise.all(
-        chatList.map(joinAvatar)
-      );
-
       dispatch({
         type: FETCH_ACTIVE_CHATS,
-        payload: { chatList: chatRooms }
+        payload: { chatList: chatList }
       });
     } catch (err) {
       errorHandler(err, 'fetchActiveChats');
@@ -44,11 +39,10 @@ export const createChat = (chatPayload: CreateChatRoom): any =>
       await dispatch(getChatDetails(newChat.id));
 
       const detailedChat = getState().chatRoomsModule.openedChatDetails!;
-      const resultChat = await joinAvatar(detailedChat);
 
       dispatch({ 
         type: CHAT_CREATED,
-        payload: { chat: resultChat }
+        payload: { chat: detailedChat }
       });
     } catch (err) {
       errorHandler(err, 'createChat');

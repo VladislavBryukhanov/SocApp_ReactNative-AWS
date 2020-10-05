@@ -12,22 +12,17 @@ import {
 } from "@store/action-types";
 import errorHandler from "@store/errorHandler";
 import { User } from '@models/user';
-import { joinAvatar } from '@helpers/join-avatar';
 
 export const fetchUsers = (): any => (
   async (dispatch: Dispatch, getState: () => AppState) => {
     try {
       const userList = await UsersRepository.list();
       const me = getState().usersModule.profile!;
-    
-      const users = await Promise.all(
-        userList.filter(({ id }) => id !== me.id).map(joinAvatar)
-      );
 
       dispatch({
         type: FETCH_USERS,
         payload: { 
-          fetchedUsers: users
+          fetchedUsers: userList.filter(({ id }) => id !== me.id)
         }
       });
     } catch (err) {
@@ -39,9 +34,7 @@ export const fetchUsers = (): any => (
 export const fetchProfile = (): any => (
   async (dispatch: Dispatch) => {
     try {
-      const profile = await UsersRepository
-        .fetchProfile()
-        .then(joinAvatar);
+      const profile = await UsersRepository.fetchProfile();
       
       dispatch({
         type: FETCH_PROFILE,

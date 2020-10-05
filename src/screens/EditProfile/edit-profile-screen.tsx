@@ -104,7 +104,7 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
             <View style={styles.avatarWrapper}>
               <CachedImageLoaded
                 style={styles.avatar}
-                imageUrl={avatar}
+                s3Key={avatar}
                 defaultImage={defaultAvatar}
               />
             </View>

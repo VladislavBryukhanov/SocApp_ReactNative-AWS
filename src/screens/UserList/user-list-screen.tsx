@@ -39,7 +39,7 @@ class UserListScreen extends React.Component<UserListProps> {
     >
       <View style={styles.userContainer}>
         <CachedImageLoaded
-          imageUrl={item.avatar}
+          s3Key={item.avatar}
           style={styles.avatar}
           defaultImage={defaultAvatar}
         />

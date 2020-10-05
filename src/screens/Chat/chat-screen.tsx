@@ -107,7 +107,7 @@ class ChatScreen extends React.Component<ChatScreenProps, ChatScreenState> {
       <View style={[styles.messageView, sentByMe && styles.reversed]}>
         <View style={styles.sender}>
           <CachedImageLoaded
-            imageUrl={sender.avatar}
+            s3Key={sender.avatar}
             style={styles.avatar}
             defaultImage={defaultAvatar}
           />

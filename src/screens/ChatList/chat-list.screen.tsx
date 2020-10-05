@@ -28,7 +28,7 @@ const ChatListScreen: React.FC<NavigationSwitchScreenProps> & { navigationOption
       <View style={styles.roomContainer}>
         <CachedImageLoaded
           style={styles.avatar}
-          imageUrl={item.avatar}
+          s3Key={item.avatar}
           defaultImage={defaultChatAvatar}
         />
         <View style={styles.textData}>
