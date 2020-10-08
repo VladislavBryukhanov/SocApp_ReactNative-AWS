@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { View, ImageStyle, StyleProp } from 'react-native';
 import FastImage, { FastImageSource } from 'react-native-fast-image';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -12,14 +12,10 @@ interface CachedImageLoadedProps {
   style: StyleProp<ImageStyle>;
 }
 
-export const CachedImageLoaded: React.FC<CachedImageLoadedProps> = (props: CachedImageLoadedProps) => {
+const CachedImageLoaded: React.FC<CachedImageLoadedProps> = (props: CachedImageLoadedProps) => {
   const { imageUrl, style, defaultImage, s3Key } = props;
   const [ loadingStatus, setLoadingStatus ] = useState(!!s3Key || !!imageUrl);
-  const [ source, setSource ] = useState(
-    imageUrl 
-      ? { uri: imageUrl } 
-      : defaultImage
-  );
+  const [ source, setSource ] = useState(imageUrl && { uri: imageUrl });
 
   const getTargetUrl = useCallback(async () => {
     if (!s3Key) return;
@@ -27,18 +23,18 @@ export const CachedImageLoaded: React.FC<CachedImageLoadedProps> = (props: Cache
     const cachedUrl = await AsyncStorage.getItem(s3Key);
     
     if (cachedUrl) {
-      return setSource({ uri: cachedUrl });
+      setSource({ uri: cachedUrl });
     }
 
     const image = await s3.read(s3Key);
-    // TODO catch errors
+    // TODO implement redux error handling or handle error locally
     AsyncStorage.setItem(s3Key, image);
     setSource({ uri: image });
   }, [s3Key]);
 
   useEffect(() => {
     getTargetUrl();
-  }, [getTargetUrl])
+  }, [getTargetUrl]);
 
   return (
     <View>
@@ -48,11 +44,18 @@ export const CachedImageLoaded: React.FC<CachedImageLoadedProps> = (props: Cache
           style={[ style, { position: 'absolute' } ]}
         />
       )}
-      <FastImage 
-        source={source}
-        style={style}
-        onLoadEnd={() => setLoadingStatus(false)}
-      />
+      { source ? (
+          <FastImage 
+            source={source}
+            style={style}
+            onLoadEnd={() => setLoadingStatus(false)}
+          />
+        ) : (
+          <FastImage source={defaultImage} style={style} />
+        )
+      }
     </View>
   );
 }
+
+export default memo(CachedImageLoaded);

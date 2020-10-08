@@ -7,7 +7,7 @@ import { AppState } from '@store/index';
 import { Preloader } from '@components/atoms/Prloader/preloader.component';
 import { TouchableNativeFeedback, View, Text } from 'react-native';
 import AppMenu from '@components/Menu/menu.component';
-import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 import defaultChatAvatar from '@assets/icons/chat.png';
 import styles from './styles';
 import moment from 'moment-mini';
@@ -15,6 +15,16 @@ import moment from 'moment-mini';
 const ChatListScreen: React.FC<NavigationSwitchScreenProps> & { navigationOptions: any } = (props) => {
   const activeChats: ChatRoom[] | undefined = useSelector((store: AppState) => store.chatRoomsModule.activeChats);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!activeChats) {
+      dispatch(fetchActiveChats())
+    }
+  }, []);
+
+  if (!activeChats) {
+    return <Preloader/>;
+  }
 
   const onOpenChat = (room: ChatRoom) => {
     props.navigation.navigate('Chat', { chatId: room.id });
@@ -34,27 +44,22 @@ const ChatListScreen: React.FC<NavigationSwitchScreenProps> & { navigationOption
         <View style={styles.textData}>
           <View style={styles.headLine}>
             <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.createDate}>
-              {moment(item.lastMessage.createdAt).format('DD MMM HH:mm:ss')}
-            </Text>
-          </View>
 
-          <Text style={styles.lastMsgContent}>{item.lastMessage.content}</Text> 
+            { item.lastMessage && (
+              <Text style={styles.createDate}>
+                {moment(item.lastMessage.createdAt).format('DD MMM HH:mm:ss')}
+              </Text>
+            )}
+          </View>
+          
+          { item.lastMessage
+              ? <Text style={styles.lastMsgContent}>{item.lastMessage.content}</Text> 
+              : <Text style={styles.lastMsgEmpty}>No messages found</Text> 
+          }
         </View>
-     
       </View>
     </TouchableNativeFeedback>
   );
-
-  useEffect(() => {
-    if (!activeChats) {
-      dispatch(fetchActiveChats())
-    }
-  }, []);
-
-  if (!activeChats) {
-    return <Preloader/>;
-  }
 
   if (!activeChats.length) {
     return (

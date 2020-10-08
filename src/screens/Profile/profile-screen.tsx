@@ -4,7 +4,7 @@ import { NavigationScreenProp, NavigationSwitchScreenProps, withNavigation } fro
 import defaultAvatar from '@assets/icons/user.png';
 import { startCase } from 'lodash';
 import styles from './styles';
-import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 import { FAB } from 'react-native-paper';
 import { AppState } from '@store/index';
 import { Dispatch, compose } from 'redux';

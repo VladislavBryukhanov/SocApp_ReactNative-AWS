@@ -115,9 +115,10 @@ exports.getActiveChats = async (req, res) => {
       },
     })
     .promise()
-    .then(({ Items: [user] }) => user)
+    .then(({ Items: [message] }) => message)
   );
-  const queryMessagesPromise = Promise.all(messsagesQueries);
+  const queryMessagesPromise = Promise.all(messsagesQueries)
+    .then(messages => messages.filter(msg => !!msg));
 
   // Find chats without name and set name and avatar of single interlocutor, as such chats are directs
   const chatsWithoutName = chatList.filter(({ name }) => !name);

@@ -28,6 +28,11 @@ export default StyleSheet.create({
     fontSize: 15,
     color: customColors.primary,
   },
+  lastMsgEmpty: {
+    fontStyle: 'italic',
+    fontSize: 15,
+    color: Colors.light,
+  },
   createDate: {
     fontSize: 13,
     color: Colors.dark,

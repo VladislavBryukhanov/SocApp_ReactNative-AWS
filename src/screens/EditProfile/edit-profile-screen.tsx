@@ -14,7 +14,7 @@ import { User } from '@models/user';
 import defaultAvatar from '@assets/icons/user.png';
 import { editProfile, fetchProfile, updateProfileAvatar } from '@store/users/users.actions';
 import { FileBase64 } from '@models/file-base64';
-import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 
 interface EditProfileProps {
   profile: User;
