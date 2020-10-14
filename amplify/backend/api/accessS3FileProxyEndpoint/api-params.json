@@ -1,0 +1,37 @@
+{
+    "paths": [
+        {
+            "name": "/{s3Key}",
+            "lambdaFunction": "accessS3FileProxy",
+            "privacy": {
+                "private": true,
+                "auth": [
+                    "/GET"
+                ]
+            }
+        }
+    ],
+    "resourceName": "accessS3FileProxyEndpoint",
+    "apiName": "accessS3FileProxyEndpoint",
+    "functionArns": [
+        {
+            "lambdaFunction": "accessS3FileProxy"
+        }
+    ],
+    "privacy": {
+        "auth": 1,
+        "unauth": 0,
+        "authRoleName": "amplify-soc-app-dev-110127-authRole",
+        "unAuthRoleName": "amplify-soc-app-dev-110127-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "accessS3FileProxy",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

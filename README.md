@@ -85,8 +85,17 @@ _____________________
 2) **editProfile** lambda
 3) **uploadAvatar** lambda
 4) **deviceTokenUpdater** lambda
+_____________________
 
-these lambdas require auth and should be wrapped by API gateway
+*cognito-auth* required for these lambdas:
+
+1) **fetchProfile**
+2) **editProfile**
+3) **uploadAvatar**
+4) **deviceTokenUpdater**
+5) **accessS3FileProxy**
+
+so they should be wrapped in API gateway and use this auth
 _____________________
 
 environment variables **SNS_APPLICATION_ARN** and **SNS_MSG_TOPIC_ARN**
