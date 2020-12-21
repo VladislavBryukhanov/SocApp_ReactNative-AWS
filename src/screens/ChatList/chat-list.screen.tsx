@@ -7,7 +7,7 @@ import { AppState } from '@store/index';
 import { Preloader } from '@components/atoms/Prloader/preloader.component';
 import { TouchableNativeFeedback, View, Text } from 'react-native';
 import AppMenu from '@components/Menu/menu.component';
-import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 import defaultChatAvatar from '@assets/icons/chat.png';
 import styles from './styles';
 import moment from 'moment-mini';

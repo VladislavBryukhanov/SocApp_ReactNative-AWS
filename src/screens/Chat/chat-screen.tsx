@@ -13,7 +13,7 @@ import { User } from '@models/user';
 import { AppState } from '@store/index';
 import onCreateMessageSubscription from '../../api/graphql/subscriptions/onCreateMessage.graphql';
 import listMessagesQuery from '../../api/graphql/queries/listMessages.graphql';
-import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 import { Preloader } from '@components/atoms/Prloader/preloader.component';
 import ChatInput from '@components/ChatInput/chat-input.component';
 import defaultAvatar from '@assets/icons/user.png';

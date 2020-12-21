@@ -15,7 +15,7 @@ export const displayDataNotification = async ({sender, message, tag}: {[key: str
 
     if (avatar) {
         try {
-            notification.largeIconUrl = await s3.read(avatar);
+            notification.largeIconUrl = await s3.getSignedUrl(avatar);
         } catch (err) {
             errorHandler(err, "displayDataNotification");
         }

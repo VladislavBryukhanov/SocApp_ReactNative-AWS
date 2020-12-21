@@ -14,7 +14,8 @@ import { User } from '@models/user';
 import defaultAvatar from '@assets/icons/user.png';
 import { editProfile, fetchProfile, updateProfileAvatar } from '@store/users/users.actions';
 import { FileBase64 } from '@models/file-base64';
-import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import FastImage from 'react-native-fast-image';
 
 interface EditProfileProps {
   profile: User;
@@ -24,6 +25,7 @@ interface EditProfileProps {
 }
 
 interface EditProfileState {
+  avatarPreview?: string;
   avatar?: string;
   username: string;
   bio?: string;
@@ -56,7 +58,7 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
     
     if (this.newAvatar) {
       const promise = this.props.updateAvatar(this.newAvatar)
-        .then(url => this.setState({ avatar: url }));
+        .then(s3Key => this.setState({ avatar: s3Key }));
 
       promises.push(promise)
     }
@@ -67,7 +69,10 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
 
     await Promise.all(promises);
     
-    this.setState({ loading: false });
+    this.setState({
+      avatarPreview: undefined,
+      loading: false,
+    });
   }
 
   onChangeAvatar = () => {
@@ -84,12 +89,12 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
       const extension = fileName!.split('.')[1];
       this.newAvatar = { data, type: type!, extension };
 
-      this.setState({ avatar: uri });
+      this.setState({ avatarPreview: uri });
     });
   }
 
   render() {
-    const { username, avatar , nickname, bio, loading } = this.state;
+    const { username, avatar, nickname, bio, loading, avatarPreview } = this.state;
 
     return (
       <ScrollView 
@@ -102,11 +107,19 @@ class EditProfileScreen extends React.Component<EditProfileProps, EditProfileSta
             background={TouchableNativeFeedback.Ripple(Colors.light, true)}
           >
             <View style={styles.avatarWrapper}>
-              <CachedImageLoaded
-                style={styles.avatar}
-                s3Key={avatar}
-                defaultImage={defaultAvatar}
-              />
+              { avatarPreview ? (
+                  <FastImage
+                    style={styles.avatar}
+                    source={{uri: avatarPreview}}
+                  />
+                ) : (
+                  <CachedImageLoaded
+                    style={styles.avatar}
+                    s3Key={avatar}
+                    defaultImage={defaultAvatar}
+                  />
+                )
+              }
             </View>
           </TouchableNativeFeedback>
 

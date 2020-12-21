@@ -89,9 +89,9 @@ export const updateProfileAvatar = (avatar: FileBase64): any => (
     try {
       const { data, type, extension } = avatar;
 
-      const avatarUrl = await UsersRepository.uploadProfileAvatar(
+      const { s3Key: avatarUrl } = await UsersRepository.uploadProfileAvatar(
         data, type, extension
-      ).then(({ s3Key }) => s3.read(s3Key))
+      );
 
       dispatch({
         type: UPDATE_AVATAR,

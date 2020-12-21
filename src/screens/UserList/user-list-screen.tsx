@@ -9,7 +9,7 @@ import { fetchUsers } from '@store/users/users.actions';
 import defaultAvatar from '@assets/icons/user.png';
 import AppMenu from '@components/Menu/menu.component';
 import { Preloader } from '@components/atoms/Prloader/preloader.component';
-import CachedImageLoaded from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
+import { CachedImageLoaded } from '@components/atoms/CachedImageLoaded/cached-image-loaded.component';
 import styles from './styles';
 
 interface UserListProps extends NavigationSwitchScreenProps {

@@ -19,15 +19,15 @@ class s3 {
     return this._storage;
   }
 
-  read(resourceKey: string) {
+  getSignedUrl(resourceKey: string) {
     return this.s3Instance.getSignedUrlPromise('getObject', {
       Expires: 10 * 60 * 1000,
       Key: resourceKey
-    })
+    });
   }
 
   upload(data: any, fileType: string, extension: string) {
-    const buff = new Buffer(data, 'base64');
+    const buff = Buffer.from(data, 'base64');
     const objectKey = uuidv4();
 
     const options = {
